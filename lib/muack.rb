@@ -50,6 +50,7 @@ module Muack
     attr_reader :__mock_object
     def initialize object
       @__mock_object = object
+      @end = false
       ::Muack.session.mocks << self
     end
 
@@ -99,8 +100,8 @@ module Muack
   end
 end
 
-s = Muack.mock.foo(2){ |s| s.bar }.bar{ 2 }
-s.end
+m = Muack.mock.foo(2){ |s| s.bar }.bar{ 2 }
+m.end
 
-puts s.foo(2)
+puts m.foo(2)
 p Muack.verify
