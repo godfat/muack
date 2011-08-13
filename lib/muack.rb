@@ -57,12 +57,12 @@ module Muack
     end
 
     def method_missing msg, *args, &block
-      if end?
+      if __mock_end?
         # TODO: what to with block?
-        if defi = lookup(msg, args)
-          dispatch(defi, msg, args, block)
+        if defi = __mock_lookup(msg, args)
+          __mock_dispatch(defi, msg, args, block)
         else
-          delegate(msg, args, block)
+          __mock_delegate(msg, args, block)
         end
       else
         __mock_methods << Definition.new(msg, args, block)
@@ -71,15 +71,15 @@ module Muack
       end
     end
 
-    def delegate msg, args, block
+    def __mock_delegate msg, args, block
       __mock_object.public_send(msg, *args, &block)
     end
 
-    def lookup msg, args
+    def __mock_lookup msg, args
       __mock_methods.find{ |defi| defi.message == msg }
     end
 
-    def dispatch defi, msg, args, block
+    def __mock_dispatch defi, msg, args, block
       if defi.args == args
         ::Muack.session.dispatches << defi
         defi.block.call(self)
@@ -93,7 +93,7 @@ module Muack
       self
     end
 
-    def end?
+    def __mock_end?
       !!@end
     end
   end
