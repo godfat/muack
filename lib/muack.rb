@@ -72,6 +72,7 @@ module Muack
       else
         __mock_methods << Definition.new(msg, args, block)
         ::Muack.session.definitions << __mock_methods.last if @verify
+        @end = true
         self
       end
     end
@@ -99,28 +100,28 @@ module Muack
       end
     end
 
-    def end
-      @end = true
+    def mock
+      @end = false
       self
     end
 
     def __mock_end?
-      !!@end
+      @end
     end
   end
 end
 
-m = Muack.mock.foo(2){ |s| s.bar }.bar{ 2 }.end
+m = Muack.mock.foo(2){ |s| s.bar }.mock.bar{ 2 }
 
 puts m.foo(2)
 p Muack.verify
 
-m = Muack.mock("Hello World!").sleep{ |s| s.sub('o', '') }.end
+m = Muack.mock("Hello World!").sleep{ |s| s.sub('o', '') }
 
 p m.sleep
 p Muack.verify
 
-q = Muack.stub.quack{}.end
+q = Muack.stub.quack{}
 q.quack
 q.quack
 p Muack.verify
