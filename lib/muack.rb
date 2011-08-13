@@ -42,6 +42,9 @@ module Muack
   end
 
   class IsA < Struct.new(:klass)
+    def to_s
+      "Muack.is_a(#{klass})"
+    end
   end
 
   class Unexpected < RuntimeError
@@ -109,7 +112,7 @@ module Muack
     def __check_args target, source
       if target.none?{ |arg| arg.kind_of?(IsA) }
         target == source
-      elsif target.size == args.size
+      elsif target.size == source.size
         target.zip(source).all?{ |(t, s)|
           if t.kind_of?(IsA)
             s.kind_of?(t.klass)
@@ -146,4 +149,8 @@ p Muack.verify
 q = Muack.stub.quack{}
 q.quack
 q.quack
+p Muack.verify
+
+r = Muack.mock.say(Muack.is_a(String))
+r.say("XD")
 p Muack.verify
