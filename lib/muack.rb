@@ -9,6 +9,10 @@ module Muack
     Mock.new(object, false)
   end
 
+  def is_a klass
+    IsA.new(klass)
+  end
+
   def verify
     session.verify
   ensure
@@ -35,6 +39,9 @@ module Muack
   end
 
   class Definition < Struct.new(:message, :args, :block, :caller)
+  end
+
+  class IsA < Struct.new(:klass)
   end
 
   class Unexpected < RuntimeError
@@ -86,17 +93,32 @@ module Muack
     end
 
     def __mock_dispatch defi, msg, args, block
-      if defi.args == args
+      if __check_args(defi.args, args)
         ::Muack.session.dispatches << defi if @verify
-        if defi.block
-          if defi.block.arity.abs == 1
-            defi.block.call(self)
-          else
-            defi.block.call
-          end
+        return unless defi.block
+        if defi.block.arity.abs == 1
+          defi.block.call(self)
+        else
+          defi.block.call
         end
       else
         ::Muack.send(:raise, Unexpected.new(defi, args))
+      end
+    end
+
+    def __check_args target, source
+      if target.none?{ |arg| arg.kind_of?(IsA) }
+        target == source
+      elsif target.size == args.size
+        target.zip(source).all?{ |(t, s)|
+          if t.kind_of?(IsA)
+            s.kind_of?(t.klass)
+          else
+            t == s
+          end
+        }
+      else
+        false
       end
     end
 
