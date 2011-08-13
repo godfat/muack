@@ -105,3 +105,8 @@ m = Muack.mock.foo(2){ |s| s.bar }.bar{ 2 }.end
 
 puts m.foo(2)
 p Muack.verify
+
+m = Muack.mock("Hello World!").sleep{ |s| s.sub('o', '') }.end
+
+p m.sleep
+p Muack.verify
