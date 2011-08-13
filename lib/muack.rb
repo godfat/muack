@@ -1,6 +1,4 @@
 
-require 'singleton'
-
 module Muack
   module_function
   def mock object=Object.new
