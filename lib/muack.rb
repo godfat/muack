@@ -2,62 +2,64 @@
 module Muack
   module_function
   def mock object=Object.new
-    Mock.new(object)
+    Muack::Mock.new(object)
   end
 
   def stub object=Object.new
-    Mock.new(object, false)
+    Muack::Mock.new(object, false)
   end
 
   def is_a klass
-    IsA.new(klass)
+    Muack::IsA.new(klass)
   end
 
-  def verify
+  def self.verify
     session.verify
   ensure
     reset
   end
 
-  def session
-    @session ||= Session.new
+  def self.session
+    @session ||= Muack::Session.new
   end
 
-  def reset
+  def self.reset
     @session = nil
   end
 
-  class Session
-    attr_reader :mocks, :definitions, :dispatches
-    def initialize
-      @mocks, @definitions, @dispatches = [], [], []
+  module Muack
+    class Session
+      attr_reader :mocks, :definitions, :dispatches
+      def initialize
+        @mocks, @definitions, @dispatches = [], [], []
+      end
+
+      def verify
+        definitions == dispatches
+      end
     end
 
-    def verify
-      definitions == dispatches
+    class Definition < Struct.new(:message, :args, :block, :caller)
     end
-  end
 
-  class Definition < Struct.new(:message, :args, :block, :caller)
-  end
-
-  class IsA < Struct.new(:klass)
-    def to_s
-      "Muack.is_a(#{klass})"
+    class IsA < Struct.new(:klass)
+      def to_s
+        "Muack.is_a(#{klass})"
+      end
     end
-  end
 
-  class Unexpected < RuntimeError
-    def initialize obj, defi, args
-      super(
-        "\nExpected: #{obj.inspect}.#{defi.message}(#{defi.args.map(&:inspect).join(', ')})\n" \
-          " but was: #{obj.inspect}.#{defi.message}(#{args.map(&:inspect).join(', ')})"
-      )
+    class Unexpected < RuntimeError
+      def initialize obj, defi, args
+        super(
+          "\nExpected: #{obj.inspect}.#{defi.message}(#{defi.args.map(&:inspect).join(', ')})\n" \
+            " but was: #{obj.inspect}.#{defi.message}(#{args.map(&:inspect).join(', ')})"
+        )
+      end
     end
   end
 end
 
-module Muack
+module Muack::Muack
   class Mock < BasicObject
     attr_reader :__mock_object
     def initialize object, verfiy=true
