@@ -48,10 +48,10 @@ module Muack
   end
 
   class Unexpected < RuntimeError
-    def initialize defi, args
+    def initialize obj, defi, args
       super(
-        "\nExpected: #{defi.message}(#{defi.args.join(', ')})\n" \
-          " but was: #{defi.message}(#{args.join(', ')})"
+        "\nExpected: #{obj.inspect}.#{defi.message}(#{defi.args.map(&:inspect).join(', ')})\n" \
+          " but was: #{obj.inspect}.#{defi.message}(#{args.map(&:inspect).join(', ')})"
       )
     end
   end
@@ -105,7 +105,7 @@ module Muack
           defi.block.call
         end
       else
-        ::Muack.send(:raise, Unexpected.new(defi, args))
+        ::Muack.send(:raise, Unexpected.new(__mock_object, defi, args))
       end
     end
 
@@ -151,6 +151,6 @@ q.quack
 q.quack
 p Muack.verify
 
-r = Muack.mock.say(Muack.is_a(String))
+r = Muack.mock("mock").say(Muack.is_a(String))
 r.say("XD")
 p Muack.verify
