@@ -5,6 +5,10 @@ module Muack
     Mock.new(object)
   end
 
+  def stub object=Object.new
+    Mock.new(object, false)
+  end
+
   def verify
     session.verify
   ensure
@@ -46,8 +50,9 @@ end
 module Muack
   class Mock < BasicObject
     attr_reader :__mock_object
-    def initialize object
+    def initialize object, verfiy=true
       @__mock_object = object
+      @verify = verfiy
       @end = false
       ::Muack.session.mocks << self
     end
@@ -66,7 +71,7 @@ module Muack
         end
       else
         __mock_methods << Definition.new(msg, args, block)
-        ::Muack.session.definitions << __mock_methods.last
+        ::Muack.session.definitions << __mock_methods.last if @verify
         self
       end
     end
@@ -81,8 +86,14 @@ module Muack
 
     def __mock_dispatch defi, msg, args, block
       if defi.args == args
-        ::Muack.session.dispatches << defi
-        defi.block.call(self)
+        ::Muack.session.dispatches << defi if @verify
+        if defi.block
+          if defi.block.arity.abs == 1
+            defi.block.call(self)
+          else
+            defi.block.call
+          end
+        end
       else
         ::Muack.send(:raise, Unexpected.new(defi, args))
       end
@@ -107,4 +118,9 @@ p Muack.verify
 m = Muack.mock("Hello World!").sleep{ |s| s.sub('o', '') }.end
 
 p m.sleep
+p Muack.verify
+
+q = Muack.stub.quack{}.end
+q.quack
+q.quack
 p Muack.verify
