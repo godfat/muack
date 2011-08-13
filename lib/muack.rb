@@ -92,6 +92,7 @@ module Muack
 
     def end
       @end = true
+      self
     end
 
     def end?
@@ -100,8 +101,7 @@ module Muack
   end
 end
 
-m = Muack.mock.foo(2){ |s| s.bar }.bar{ 2 }
-m.end
+m = Muack.mock.foo(2){ |s| s.bar }.bar{ 2 }.end
 
 puts m.foo(2)
 p Muack.verify
