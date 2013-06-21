@@ -140,22 +140,3 @@ module Muack::Muack
     end
   end
 end
-
-m = Muack.mock.foo(2){ |s| s.bar }.mock.bar{ 2 }
-
-puts m.foo(2)
-p Muack.verify
-
-m = Muack.mock("Hello World!").sleep{ |s| s.sub('o', '') }
-
-p m.sleep
-p Muack.verify
-
-q = Muack.stub.quack{}
-q.quack
-q.quack
-p Muack.verify
-
-r = Muack.mock("mock").say(Muack.is_a(String))
-r.say("XD")
-p Muack.verify
