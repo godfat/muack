@@ -48,12 +48,14 @@ module Muack
       end
     end
 
-    class Unexpected < RuntimeError
+    class Unexpected < Exception
+      attr_reader :expected, :was
       def initialize obj, defi, args
-        super(
-          "\nExpected: #{obj.inspect}.#{defi.message}(#{defi.args.map(&:inspect).join(', ')})\n" \
-            " but was: #{obj.inspect}.#{defi.message}(#{args.map(&:inspect).join(', ')})"
-        )
+        @expected = "#{obj.inspect}.#{defi.message}(" \
+                    "#{defi.args.map(&:inspect).join(', ')})"
+        @was      = "#{obj.inspect}.#{defi.message}(" \
+                    "#{args.map(&:inspect).join(', ')})"
+        super("\nExpected: #{expected}\n but was: #{was})")
       end
     end
   end
