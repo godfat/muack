@@ -103,10 +103,11 @@ module Muack::Muack
       if __check_args(defi.args, args)
         ::Muack.session.dispatches << defi if @verify
         return unless defi.block
-        if defi.block.arity.abs == 1
-          defi.block.call(self)
+        arity = defi.block.arity
+        if arity < 0
+          defi.block.call(*args)
         else
-          defi.block.call
+          defi.block.call(*args.first(arity))
         end
       else
         ::Muack.__send__(:raise, Unexpected.new(__mock_object, defi, args))
