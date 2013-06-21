@@ -109,7 +109,7 @@ module Muack::Muack
           defi.block.call
         end
       else
-        ::Muack.send(:raise, Unexpected.new(__mock_object, defi, args))
+        ::Muack.__send__(:raise, Unexpected.new(__mock_object, defi, args))
       end
     end
 
