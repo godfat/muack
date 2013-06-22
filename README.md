@@ -12,6 +12,8 @@ by Lin Jen-Shin ([godfat](http://godfat.org))
 
 Muack -- Yet Another Mocking Library
 
+Basically it's an RR clone.
+
 ## REQUIREMENTS:
 
 * Tested with MRI (official CRuby) 1.9.3, 2.0.0, Rubinius and JRuby.
