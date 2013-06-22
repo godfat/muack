@@ -1,7 +1,7 @@
 
 require 'muack/test'
 
-describe Muack do
+describe Muack::Mock do
   before do
     Muack.reset
   end
