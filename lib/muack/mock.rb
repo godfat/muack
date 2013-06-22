@@ -1,16 +1,17 @@
 
 module Muack
   class Mock < BasicObject
-    Definition = ::Class.new(::Struct.new(:message, :args, :block,
-                                          :original_method))
+    Definition  = ::Class.new(::Struct.new(:message, :args, :block,
+                                           :original_method))
+    WithAnyArgs = ::Object.new
 
-    attr_reader :__mock_object
+    attr_reader :object
     def initialize object
-      @__mock_object = object
+      @object = object
     end
 
     # Public API: Define mocked method
-    def method_missing msg, *args, &block
+    def with msg, *args, &block
       definition = Definition.new(msg, args, block)
       __mock_definitions(definition)
       __mock_inject_method(definition)
@@ -18,12 +19,19 @@ module Muack
     end
 
     # Public API
-    def times number
+    def with_any_args
+      __mock_definitions.last.args = WithAnyArgs
+      self
     end
 
     # Public API
-    def with_any_args
+    def times number
+      __mock_definitions.concat([__mock_definitions.last] * number)
+      self
     end
+
+    # Public API: Define mocked method, the convenient way
+    alias_method :method_missing, :with
 
     # used for mocked object to dispatch mocked method
     def __mock_dispatch defi, actual_args, actual_block
@@ -39,26 +47,28 @@ module Muack
         end
       else
         Mock.__send__(:raise, # basic object doesn't respond to raise
-          Unexpected.new(__mock_object, defi, actual_args))
+          Unexpected.new(object, defi, actual_args))
       end
     end
 
     # used for Muack::Session#verify
     def __mock_verify
-      __mock_definitions == __mock_dispatches || begin
+      __mock_definitions.sort_by(&:object_id) == __mock_dispatches.sort_by(&:object_id) || begin
         # TODO: this would be tricky to show the desired error message :(
         #       do we care about orders? shall we inject methods one by one?
         defi = (__mock_definitions - __mock_dispatches).first
         Mock.__send__(:raise,
-          Expected.new(__mock_object, defi, __mock_definitions.size,
+          Expected.new(object, defi, __mock_definitions.size,
                                             __mock_dispatches.size))
       end
     end
 
     # used for Muack::Session#reset
     def __mock_reset
+      obj = object
       __mock_definitions.each do |defi|
-        __mock_object.singleton_class.module_eval do
+        object.singleton_class.module_eval do
+          next unless obj.respond_to?(defi.message)
           remove_method(defi.message) # removed mocked method
           if defi.original_method     # restore original method
             alias_method defi.message, defi.original_method
@@ -70,7 +80,7 @@ module Muack
 
     private
     def __mock_inject_method defi
-      mock, obj = self, __mock_object # remember the context
+      mock, obj = self, object # remember the context
 
       obj.singleton_class.module_eval do
         if obj.respond_to?(defi.message) # store original method
@@ -99,7 +109,9 @@ module Muack
     end
 
     def __mock_check_args expected_args, actual_args
-      if expected_args.none?{ |arg| arg.kind_of?(Satisfy) }
+      if expected_args == WithAnyArgs
+        true
+      elsif expected_args.none?{ |arg| arg.kind_of?(Satisfy) }
         expected_args == actual_args
 
       elsif expected_args.size == actual_args.size
