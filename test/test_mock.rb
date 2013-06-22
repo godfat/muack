@@ -18,6 +18,11 @@ describe Muack::Mock do
       3.times{ Obj.say.should.eq 'goo' }
     end
 
+    should 'mock existing method' do
+      mock(Obj).to_s{ 'zoo' }
+      Obj.to_s.should.eq 'zoo'
+    end
+
     should 'mock twice' do
       mock(Obj).say(true){ Obj.saya }
       mock(Obj).saya{ 'coo' }
