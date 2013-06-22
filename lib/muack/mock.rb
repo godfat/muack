@@ -53,11 +53,11 @@ module Muack
 
     private
     def __mock_inject_method defi
-      mock = self # remember the context
+      mock, obj = self, __mock_object # remember the context
 
-      __mock_object.singleton_class.module_eval do
-        if method_defined?(defi.message) # store original method
-          original_method = Mock.find_alias_name(defi.message)
+      obj.singleton_class.module_eval do
+        if obj.respond_to?(defi.message) # store original method
+          original_method = Mock.find_new_name(obj, defi.message)
           alias_method original_method, defi.message
           defi.original_method = original_method
         end
@@ -69,13 +69,13 @@ module Muack
       end
     end
 
-    def self.find_alias_name message, level=0
+    def self.find_new_name object, message, level=0
       raise "Cannot find a suitable method name, tried #{level+1} times." if
-        level >= 10
+        level >= 9
 
       new_name = "__muack_mock_#{level}_#{message}"
-      if method_defined?(new_name)
-        __mock_find_alias_name(message, level+1)
+      if object.respond_to?(message)
+        find_new_name(object, message, level+1)
       else
         new_name
       end
