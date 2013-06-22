@@ -32,11 +32,15 @@ module Muack
     end
 
     def is_a klass
-      match(:kind_of?, klass)
+      Muack::IsA.new(klass)
     end
 
-    def match message, *args
-      Muack::Matcher.new(message, args)
+    def within range_or_array_or_hash
+      Muack::Within.new(range_or_array_or_hash)
+    end
+
+    def matcher &block
+      Muack::Matcher.new(block)
     end
   end
 end
