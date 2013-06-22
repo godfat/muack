@@ -7,31 +7,34 @@ describe Muack::Mock do
       Muack.verify.should.eq true
     end
 
+    obj = Object.new
+    moo = 'Moo'
+    def obj.inspect
+      'obj'
+    end
+
     should 'mock with regular method' do
-      moo = mock.moo(true){ 'boo' }
-      moo.moo(true).should.eq 'boo'
+      mock(obj).moo(true){ 'boo' }
+      obj.moo(true).should.eq 'boo'
     end
 
     should 'mock with is_a matcher' do
-      moo = mock('Moo').say(is_a(String)){ |arg| arg.reverse }
+      mock(moo).say(is_a(String)){ |arg| arg.reverse }
       moo.say('Foo').should.eq 'ooF'
     end
 
     should 'stub with regular method' do
-      moo = stub.foo{ 'goo' }
-      3.times{ moo.foo.should.eq 'goo' }
-      Muack.verify.should.eq true
+      stub(obj).foo{ 'goo' }
+      3.times{ obj.foo.should.eq 'goo' }
     end
 
     should 'mock chain' do
-      moo = mock
-      moo.moo(true){ moo.boo }.mock.boo{ 'coo' }
-      moo.moo(true).should.eq 'coo'
+      mock(obj).moo(true){ obj.boo }.mock.boo{ 'coo' }
+      obj.moo(true).should.eq 'coo'
     end
 
     should 'mock external object' do
-      moo = mock('Moo')
-      moo.sleep{ moo.sub('M', 'H') }
+      mock(moo).sleep{ moo.sub('M', 'H') }
       moo.sleep.should.eq 'Hoo'
     end
   end
@@ -42,17 +45,13 @@ describe Muack::Mock do
     end
 
     should 'raise Muack::Unexpected error if passing unexpected argument' do
-      moo = mock.moo(true){ 'boo' }
-      obj = moo.__mock_object
-      def obj.inspect
-        'moo'
-      end
+      mock(obj).moo(true){ 'boo' }
       begin
-        moo.moo(false).should.eq 'boo'
+        obj.moo(false)
         'never'.should.eq 'reach'
       rescue Muack::Unexpected => e
-        e.expected.should.eq 'moo.moo(true)'
-        e.was     .should.eq 'moo.moo(false)'
+        e.expected.should.eq 'obj.moo(true)'
+        e.was     .should.eq 'obj.moo(false)'
       end
     end
   end
