@@ -13,11 +13,6 @@ describe Muack::Mock do
       Obj.say(true).should.eq 'boo'
     end
 
-    should 'mock with is_a matcher' do
-      mock(Str).say(is_a(String)){ |arg| arg.reverse }
-      Str.say('Foo').should.eq 'ooF'
-    end
-
     should 'stub with regular method' do
       stub(Obj).say{ 'goo' }
       3.times{ Obj.say.should.eq 'goo' }

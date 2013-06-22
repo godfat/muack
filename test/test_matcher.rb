@@ -9,6 +9,14 @@ describe Muack::Matcher do
       matcher.to_s   .should.eq expected
       matcher.inspect.should.eq expected
     end
+
+    should 'match' do
+      mock(Str).say(is_a(String)){ |arg| arg.reverse }
+      Str.say('Foo').should.eq 'ooF'
+
+      Muack.verify.should.eq true
+      Muack::EnsureReset.call
+    end
   end
 
   describe Muack::Within do
