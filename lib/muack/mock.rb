@@ -65,10 +65,8 @@ module Muack
 
     # used for Muack::Session#reset
     def __mock_reset
-      obj = object
       __mock_definitions.each do |defi|
         object.singleton_class.module_eval do
-          next unless obj.respond_to?(defi.message)
           remove_method(defi.message) # removed mocked method
           if defi.original_method     # restore original method
             alias_method defi.message, defi.original_method
@@ -80,11 +78,12 @@ module Muack
 
     private
     def __mock_inject_method defi
-      mock, obj = self, object # remember the context
+      mock = self # remember the context
 
-      obj.singleton_class.module_eval do
-        if obj.respond_to?(defi.message) # store original method
-          original_method = Mock.find_new_name(obj, defi.message)
+      object.singleton_class.module_eval do
+        if instance_methods(false).include?(defi.message)
+          # store original method
+          original_method = Mock.find_new_name(self, defi.message)
           alias_method original_method, defi.message
           defi.original_method = original_method
         end
@@ -96,12 +95,12 @@ module Muack
       end
     end
 
-    def self.find_new_name object, message, level=0
+    def self.find_new_name klass, message, level=0
       raise "Cannot find a suitable method name, tried #{level+1} times." if
         level >= 9
 
       new_name = "__muack_mock_#{level}_#{message}"
-      if object.respond_to?(new_name)
+      if klass.instance_methods(false).include?(new_name)
         find_new_name(object, message, level+1)
       else
         new_name
