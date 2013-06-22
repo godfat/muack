@@ -23,14 +23,14 @@ module Muack
   class IsA < Matcher
     def initialize klass
       @api_args = [klass]
-      super lambda{|actual_arg| actual_arg.kind_of?(klass)}
+      super lambda{ |actual_arg| actual_arg.kind_of?(klass) }
     end
   end
 
   class Within < Matcher
-    def initialize range_or_array_or_hash
-      @api_args = [range_or_array_or_hash]
-      super lambda{|actual_arg| range_or_array_or_hash.include?(actual_arg)}
+    def initialize range_or_array
+      @api_args = [range_or_array]
+      super lambda{ |actual_arg| range_or_array.include?(actual_arg) }
     end
   end
 end

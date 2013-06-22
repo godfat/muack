@@ -35,8 +35,8 @@ module Muack
       Muack::IsA.new(klass)
     end
 
-    def within range_or_array_or_hash
-      Muack::Within.new(range_or_array_or_hash)
+    def within range_or_array
+      Muack::Within.new(range_or_array)
     end
 
     def matcher &block
