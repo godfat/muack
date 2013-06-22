@@ -31,9 +31,11 @@ module Muack
       Muack.session[object.object_id] ||= Muack::Stub.new(object)
     end
 
+    # TODO: test
     def proxy object=Object.new
     end
 
+    # TODO: test
     def any_instance_of
     end
 
@@ -45,17 +47,21 @@ module Muack
       Muack::Within.new(range_or_array)
     end
 
+    # TODO: test
     def anything
       Muack::Anything.new
     end
 
+    # TODO: test
     def match regexp
       Muack::Match.new(regexp)
     end
 
+    # TODO: test
     def hash_including hash
     end
 
+    # TODO: test
     def satisfy &block
       Muack::Satisfy.new(block)
     end
