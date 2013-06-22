@@ -67,8 +67,11 @@ module Muack
     def __mock_reset
       __mock_definitions.each do |defi|
         object.singleton_class.module_eval do
-          remove_method(defi.message) # removed mocked method
-          if defi.original_method     # restore original method
+          methods = instance_methods(false)
+          if methods.include?(defi.message)         # removed mocked method
+            remove_method(defi.message) # could be removed by other defi
+          end
+          if methods.include?(defi.original_method) # restore original method
             alias_method defi.message, defi.original_method
             remove_method defi.original_method
           end
