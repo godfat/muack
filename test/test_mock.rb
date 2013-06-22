@@ -8,13 +8,17 @@ describe Muack::Mock do
     'obj'
   end
 
+  ensure_reset = lambda{
+    [obj, moo].each do |o|
+      o.methods.select{ |m| m.to_s.start_with?('__muack_mock') }.
+        should.empty
+    end
+  }
+
   describe 'Muack.verify==true' do
     after do
       Muack.verify.should.eq true
-      [obj, moo].each do |o|
-        o.methods.select{ |m| m.to_s.start_with?('__muack_mock') }.
-          should.empty
-      end
+      ensure_reset.call
     end
 
     should 'mock with regular method' do
@@ -47,6 +51,7 @@ describe Muack::Mock do
   describe 'Muack.verify==false' do
     after do
       Muack.verify.should.eq false
+      ensure_reset.call
     end
 
     should 'raise Muack::Unexpected error if passing unexpected argument' do
