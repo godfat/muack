@@ -22,7 +22,29 @@ Muack -- Yet Another Mocking Library
 
 ## SYNOPSIS:
 
-Basically it's an [RR](https://github.com/rr/rr) clone.
+Basically it's an [RR](https://github.com/rr/rr) clone. Let's see a
+[bacon](https://github.com/chneukirchen/bacon) example.
+
+``` ruby
+require 'bacon'
+require 'muack'
+
+include Muack::API
+
+describe 'Hello' do
+  after do
+    Muack.verify
+  end
+
+  should 'say world!' do
+    str = 'Hello'
+    mock(str).say('!'){ |arg| "World#{arg}" }
+    str.say('!').should.equal 'World!'
+  end
+end
+```
+
+More recipes to come.
 
 ## CONTRIBUTORS:
 
