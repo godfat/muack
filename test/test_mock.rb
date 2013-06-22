@@ -11,6 +11,10 @@ describe Muack::Mock do
   describe 'Muack.verify==true' do
     after do
       Muack.verify.should.eq true
+      [obj, moo].each do |o|
+        o.methods.select{ |m| m.to_s.start_with?('__muack_mock') }.
+          should.empty
+      end
     end
 
     should 'mock with regular method' do

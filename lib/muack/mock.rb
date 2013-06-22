@@ -37,12 +37,12 @@ module Muack
 
     # used for Muack::Session#verify
     def __mock_verify
-      @__mock_definitions == @__mock_dispatches
+      __mock_definitions == __mock_dispatches
     end
 
     # used for Muack::Session#reset
     def __mock_reset
-      __mock_methods.each do |defi|
+      __mock_definitions.each do |defi|
         __mock_object.singleton_class.module_eval do
           remove_method(defi.message) # removed mocked method
           alias_method defi.message, defi.original_method if
@@ -94,7 +94,14 @@ module Muack
       end
     end
 
-    def __mock_definitions defi; (@__mock_definitions ||= []) << defi; end
-    def __mock_dispatches  defi; (@__mock_dispatches  ||= []) << defi; end
+    def __mock_definitions defi=nil
+      @__mock_definitions ||= []
+      if defi then @__mock_definitions << defi else @__mock_definitions end
+    end
+
+    def __mock_dispatches defi=nil
+      @__mock_dispatches ||= []
+      if defi then @__mock_dispatches  << defi else @__mock_dispatches  end
+    end
   end
 end
