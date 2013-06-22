@@ -31,6 +31,9 @@ module Muack
       Muack.session[object.object_id] ||= Muack::Stub.new(object)
     end
 
+    def proxy object=Object.new
+    end
+
     def any_instance_of
     end
 
