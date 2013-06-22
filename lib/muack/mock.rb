@@ -89,7 +89,7 @@ module Muack
         level >= 9
 
       new_name = "__muack_mock_#{level}_#{message}"
-      if object.respond_to?(message)
+      if object.respond_to?(new_name)
         find_new_name(object, message, level+1)
       else
         new_name
