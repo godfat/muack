@@ -27,7 +27,7 @@ describe Muack::Matcher do
         e.was     .should.eq 'obj.say(false)'
         e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
       ensure
-        Muack.verify.should.eq false
+        Muack.reset
         Muack::EnsureReset.call
       end
     end
@@ -48,8 +48,8 @@ describe Muack::Matcher do
 
       mock(Str).say(within(%[a b])){ |arg| arg.upcase }
       Str.say('b').should.eq 'B'
-      Muack.verify.should.eq true
 
+      Muack.verify.should.eq true
       Muack::EnsureReset.call
     end
 
@@ -63,7 +63,7 @@ describe Muack::Matcher do
         e.was     .should.eq 'obj.say(6)'
         e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
       ensure
-        Muack.verify.should.eq false
+        Muack.reset
         Muack::EnsureReset.call
       end
     end

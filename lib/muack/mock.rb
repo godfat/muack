@@ -37,7 +37,12 @@ module Muack
 
     # used for Muack::Session#verify
     def __mock_verify
-      __mock_definitions == __mock_dispatches
+      __mock_definitions == __mock_dispatches || begin
+        defi = (__mock_definitions - __mock_dispatches).first
+        Mock.__send__(:raise,
+          Expected.new(__mock_object, defi, __mock_definitions.size,
+                                            __mock_dispatches.size))
+      end
     end
 
     # used for Muack::Session#reset

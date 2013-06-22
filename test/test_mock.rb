@@ -32,7 +32,7 @@ describe Muack::Mock do
 
   describe 'Muack.verify==false' do
     after do
-      Muack.verify.should.eq false
+      Muack.reset
       Muack::EnsureReset.call
     end
 
@@ -45,6 +45,19 @@ describe Muack::Mock do
         e.expected.should.eq 'obj.say(true)'
         e.was     .should.eq 'obj.say(false)'
         e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      end
+    end
+
+    should 'raise Muack::Expected error if mock methods were not called' do
+      mock(Obj).say(true){ 'boo' }
+      begin
+        Muack.verify
+      rescue Muack::Expected => e
+        e.expected      .should.eq 'obj.say(true)'
+        e.expected_times.should.eq 1
+        e.actual_times  .should.eq 0
+        e.message       .should.eq "\nExpected: obj.say(true)\n  " \
+                                   "called 1 times\n but was 0 times."
       end
     end
   end
