@@ -2,15 +2,15 @@
 require 'muack/test'
 
 describe Muack::Mock do
-  describe 'Muack.verify == true' do
+  obj = Object.new
+  moo = 'Moo'
+  def obj.inspect
+    'obj'
+  end
+
+  describe 'Muack.verify==true' do
     after do
       Muack.verify.should.eq true
-    end
-
-    obj = Object.new
-    moo = 'Moo'
-    def obj.inspect
-      'obj'
     end
 
     should 'mock with regular method' do
@@ -28,8 +28,9 @@ describe Muack::Mock do
       3.times{ obj.foo.should.eq 'goo' }
     end
 
-    should 'mock chain' do
-      mock(obj).moo(true){ obj.boo }.mock.boo{ 'coo' }
+    should 'mock twice' do
+      mock(obj).moo(true){ obj.boo }
+      mock(obj).boo{ 'coo' }
       obj.moo(true).should.eq 'coo'
     end
 
@@ -39,7 +40,7 @@ describe Muack::Mock do
     end
   end
 
-  describe 'Muack.verify == false' do
+  describe 'Muack.verify==false' do
     after do
       Muack.verify.should.eq false
     end

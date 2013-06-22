@@ -1,13 +1,12 @@
 
 module Muack
-  class Session
-    attr_reader :mocks, :definitions, :dispatches
-    def initialize
-      @mocks, @definitions, @dispatches = [], [], []
+  class Session < Hash
+    def verify
+      each_value.all?(&:__mock_verify)
     end
 
-    def verify
-      definitions == dispatches
+    def reset
+      each_value(&:__mock_reset)
     end
   end
 end

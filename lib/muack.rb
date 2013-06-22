@@ -1,5 +1,6 @@
 
 require 'muack/mock'
+require 'muack/stub'
 require 'muack/matcher'
 require 'muack/session'
 require 'muack/failure'
@@ -16,17 +17,18 @@ module Muack
   end
 
   def self.reset
+    @session && @session.reset
     @session = nil
   end
 
   module API
     module_function
     def mock object=Object.new
-      Muack::Mock.new(object)
+      Muack.session[object.object_id] ||= Muack::Mock.new(object)
     end
 
     def stub object=Object.new
-      Muack::Mock.new(object, false)
+      Muack.session[object.object_id] ||= Muack::Stub.new(object)
     end
 
     def is_a klass
