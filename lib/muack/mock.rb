@@ -17,6 +17,14 @@ module Muack
       self
     end
 
+    # Public API
+    def times number
+    end
+
+    # Public API
+    def with_any_args
+    end
+
     # used for mocked object to dispatch mocked method
     def __mock_dispatch defi, actual_args, actual_block
       if __mock_check_args(defi.args, actual_args)
@@ -89,12 +97,12 @@ module Muack
     end
 
     def __mock_check_args expected_args, actual_args
-      if expected_args.none?{ |arg| arg.kind_of?(Matcher) }
+      if expected_args.none?{ |arg| arg.kind_of?(Satisfy) }
         expected_args == actual_args
 
       elsif expected_args.size == actual_args.size
         expected_args.zip(actual_args).all?{ |(e, a)|
-          if e.kind_of?(Matcher) then e.match(a) else e == a end
+          if e.kind_of?(Satisfy) then e.match(a) else e == a end
         }
       else
         false

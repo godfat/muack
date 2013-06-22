@@ -1,7 +1,7 @@
 
 require 'muack/mock'
 require 'muack/stub'
-require 'muack/matcher'
+require 'muack/satisfy'
 require 'muack/session'
 require 'muack/failure'
 
@@ -31,6 +31,9 @@ module Muack
       Muack.session[object.object_id] ||= Muack::Stub.new(object)
     end
 
+    def any_instance_of
+    end
+
     def is_a klass
       Muack::IsA.new(klass)
     end
@@ -39,8 +42,19 @@ module Muack
       Muack::Within.new(range_or_array)
     end
 
-    def matcher &block
-      Muack::Matcher.new(block)
+    def anything
+      Muack::Anything.new
+    end
+
+    def match regexp
+      Muack::Match.new(regexp)
+    end
+
+    def hash_including hash
+    end
+
+    def satisfy &block
+      Muack::Satisfy.new(block)
     end
   end
 end

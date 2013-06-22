@@ -1,7 +1,7 @@
 
 require 'muack/test'
 
-describe Muack::Matcher do
+describe Muack::Satisfy do
   describe Muack::IsA do
     should 'have human readable to_s and inspect' do
       matcher = is_a(String)
