@@ -16,6 +16,21 @@ describe Muack::Matcher do
       Muack.verify.should.eq true
       Muack::EnsureReset.call
     end
+
+    should 'raise Muack::Unexpected error if passing unexpected argument' do
+      mock(Obj).say(is_a(Array)){ 'boo' }
+      begin
+        Obj.say(false)
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq 'obj.say(Muack::API.is_a(Array))'
+        e.was     .should.eq 'obj.say(false)'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      ensure
+        Muack.verify.should.eq false
+        Muack::EnsureReset.call
+      end
+    end
   end
 
   describe Muack::Within do
@@ -36,6 +51,21 @@ describe Muack::Matcher do
       Muack.verify.should.eq true
 
       Muack::EnsureReset.call
+    end
+
+    should 'raise Muack::Unexpected error if passing unexpected argument' do
+      mock(Obj).say(within(0..5)){ 'boo' }
+      begin
+        Obj.say(6)
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq 'obj.say(Muack::API.within(0..5))'
+        e.was     .should.eq 'obj.say(6)'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      ensure
+        Muack.verify.should.eq false
+        Muack::EnsureReset.call
+      end
     end
   end
 end
