@@ -38,6 +38,8 @@ module Muack
     # used for Muack::Session#verify
     def __mock_verify
       __mock_definitions == __mock_dispatches || begin
+        # TODO: this would be tricky to show the desired error message :(
+        #       do we care about orders? shall we inject methods one by one?
         defi = (__mock_definitions - __mock_dispatches).first
         Mock.__send__(:raise,
           Expected.new(__mock_object, defi, __mock_definitions.size,
@@ -51,7 +53,7 @@ module Muack
         __mock_object.singleton_class.module_eval do
           remove_method(defi.message) # removed mocked method
           alias_method defi.message, defi.original_method if
-            defi.original_method   # restore original method
+            defi.original_method      # restore original method
         end
       end
     end
