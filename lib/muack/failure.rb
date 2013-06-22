@@ -7,7 +7,7 @@ module Muack
                   "#{defi.args.map(&:inspect).join(', ')})"
       @was      = "#{obj.inspect}.#{defi.message}(" \
                   "#{args.map(&:inspect).join(', ')})"
-      super("\nExpected: #{expected}\n but was: #{was})")
+      super("\nExpected: #{expected}\n but was: #{was}")
     end
   end
 end

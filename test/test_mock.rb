@@ -44,6 +44,7 @@ describe Muack::Mock do
       rescue Muack::Unexpected => e
         e.expected.should.eq 'obj.say(true)'
         e.was     .should.eq 'obj.say(false)'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
       end
     end
   end
