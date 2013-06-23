@@ -31,14 +31,7 @@ module Muack
       if defi
         __mock_disp_push(defi)
         if __mock_check_args(defi.args, actual_args)
-          if defi.block
-            arity = defi.block.arity
-            if arity < 0
-              defi.block.call(*actual_args)
-            else
-              defi.block.call(*actual_args.first(arity))
-            end
-          end
+          __mock_block_call(defi.block, actual_args)
         else
           Mock.__send__(:raise, # basic object doesn't respond to raise
             Unexpected.new(object, defi, actual_args))
@@ -107,6 +100,17 @@ module Muack
         find_new_name(object, message, level+1)
       else
         new_name
+      end
+    end
+
+    def __mock_block_call block, actual_args
+      if block
+        arity = block.arity
+        if arity < 0
+          block.call(*actual_args)
+        else
+          block.call(*actual_args.first(arity))
+        end
       end
     end
 
