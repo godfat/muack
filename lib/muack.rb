@@ -27,15 +27,15 @@ module Muack
   module API
     module_function
     def mock object=Object.new
-      Muack.session["mock #{object.object_id}"] ||= Muack::Mock.new(object)
+      Muack.session["mock #{object.__id__}"] ||= Muack::Mock.new(object)
     end
 
     def stub object=Object.new
-      Muack.session["stub #{object.object_id}"] ||= Muack::Stub.new(object)
+      Muack.session["stub #{object.__id__}"] ||= Muack::Stub.new(object)
     end
 
     def proxy object=Object.new
-      Muack.session["proxy #{object.object_id}"] ||= Muack::Proxy.new(object)
+      Muack.session["proxy #{object.__id__}"] ||= Muack::Proxy.new(object)
     end
 
     def any_instance_of klass
