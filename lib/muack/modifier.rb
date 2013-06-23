@@ -10,7 +10,10 @@ module Muack
     end
 
     # Public API
-    # TODO: test
+    def any_times
+    end
+
+    # Public API
     def times number
       (number - 1).times{ mock.__mock_defi_push(defi) }
       self
