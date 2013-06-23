@@ -8,7 +8,7 @@ describe Muack::Proxy do
       Muack::EnsureReset.call
     end
 
-    should 'stub with regular method' do
+    should 'proxy with regular method' do
       proxy(Str).reverse
       Str.reverse.should.eq 'ooM'
     end
