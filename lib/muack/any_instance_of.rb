@@ -1,8 +1,4 @@
 
 module Muack
-  class AnyInstanceOf < Struct.new(:klass)
-    def singleton_class
-      klass
-    end
-  end
+  AnyInstanceOf = Class.new(Struct.new(:singleton_class))
 end
