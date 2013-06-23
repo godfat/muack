@@ -59,7 +59,6 @@ module Muack
       Muack::Within.new(range_or_array)
     end
 
-    # TODO: test
     def satisfy &block
       Muack::Satisfy.new(block)
     end

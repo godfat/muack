@@ -166,4 +166,35 @@ describe Muack::Satisfy do
       end
     end
   end
+
+  describe Muack::Satisfy do
+    should 'have human readable to_s and inspect' do
+      matcher = satisfy{ |arg| arg % 2 == 0 }
+      expected = 'Muack::API.satisfy(#<Proc:'
+      matcher.to_s   .should.start_with expected
+      matcher.inspect.should.start_with expected
+    end
+
+    should 'satisfy' do
+      mock(Str).say(satisfy{ |arg| arg % 2 == 0 }){ |arg| arg + 1 }
+      Str.say(14).should.eq 15
+      Muack.verify.should.eq true
+      Muack::EnsureReset.call
+    end
+
+    should 'raise Muack::Unexpected error if passing unexpected argument' do
+      mock(Obj).say(satisfy{ |arg| arg % 2 == 0 }){ 'boo' }
+      begin
+        Obj.say(1)
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.start_with 'obj.say(Muack::API.satisfy(#<Proc:'
+        e.was     .should.eq         'obj.say(1)'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      ensure
+        Muack.reset
+        Muack::EnsureReset.call
+      end
+    end
+  end
 end
