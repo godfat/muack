@@ -42,6 +42,12 @@ describe Muack::Mock do
       mock(Obj).say{ 0 }.times(3)
       3.times{ |i| Obj.say.should.eq 0 }
     end
+
+    should 'mock any_instance_of' do
+      klass = Class.new
+      any_instance_of(klass){ |instance| mock(instance).say{ true } }
+      klass.new.say.should.eq true
+    end
   end
 
   describe 'Muack.verify==false' do

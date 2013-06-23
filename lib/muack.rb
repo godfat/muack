@@ -5,6 +5,8 @@ require 'muack/stub'
 require 'muack/satisfy'
 require 'muack/session'
 
+require 'muack/any_instance_of'
+
 module Muack
   def self.verify
     session.verify
@@ -36,7 +38,8 @@ module Muack
     end
 
     # TODO: test
-    def any_instance_of
+    def any_instance_of klass
+      yield Muack::AnyInstanceOf.new(klass)
     end
 
     def is_a klass
