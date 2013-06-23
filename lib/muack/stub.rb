@@ -12,7 +12,7 @@ module Muack
         __mock_check_args(d.args, actual_args)
       }
       if defi
-        __mock_block_call(defi.block, actual_args)
+        __mock_block_call(defi, actual_args)
       else
         Mock.__send__(:raise, # basic object doesn't respond to raise
           Unexpected.new(object, __mock_defis[msg], msg, actual_args))

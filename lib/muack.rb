@@ -33,11 +33,10 @@ module Muack
       Muack.session[object.object_id] ||= Muack::Stub.new(object)
     end
 
-    # TODO: test
     def proxy object=Object.new
+      Muack.session[object.object_id] ||= Muack::Proxy.new(object)
     end
 
-    # TODO: test
     def any_instance_of klass
       yield Muack::AnyInstanceOf.new(klass)
     end
