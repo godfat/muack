@@ -5,9 +5,8 @@ require 'muack'
 include Muack::API
 
 describe 'Hello' do
-  after do
-    Muack.verify
-  end
+  before{ Muack.reset  }
+  after { Muack.verify }
 
   should 'say world!' do
     str = 'Hello'
