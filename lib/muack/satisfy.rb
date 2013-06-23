@@ -6,7 +6,7 @@ module Muack
     end
 
     def to_s
-      "Muack::API.#{api_name}(#{api_args.join(', ')})"
+      "Muack::API.#{api_name}(#{api_args.map(&:inspect).join(', ')})"
     end
     alias_method :inspect, :to_s
 

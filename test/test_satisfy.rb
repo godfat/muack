@@ -69,6 +69,37 @@ describe Muack::Satisfy do
     end
   end
 
+  describe Muack::Match do
+    should 'have human readable to_s and inspect' do
+      matcher = match(/\w/)
+      expected = 'Muack::API.match(/\w/)'
+      matcher.to_s   .should.eq expected
+      matcher.inspect.should.eq expected
+    end
+
+    should 'satisfy' do
+      mock(Str).say(match(/\w/)){ |arg| arg }
+      Str.say('aa').should.eq 'aa'
+      Muack.verify.should.eq true
+      Muack::EnsureReset.call
+    end
+
+    should 'raise Muack::Unexpected error if passing unexpected argument' do
+      mock(Obj).say(match(/\w/)){ 'boo' }
+      begin
+        Obj.say('!')
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq 'obj.say(Muack::API.match(/\w/))'
+        e.was     .should.eq 'obj.say("!")'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      ensure
+        Muack.reset
+        Muack::EnsureReset.call
+      end
+    end
+  end
+
   describe Muack::Within do
     should 'have human readable to_s and inspect' do
       matcher = within(0..9)
