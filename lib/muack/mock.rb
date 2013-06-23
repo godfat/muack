@@ -97,7 +97,7 @@ module Muack
 
       new_name = "__muack_mock_#{level}_#{message}".to_sym
       if klass.instance_methods(false).include?(new_name)
-        find_new_name(object, message, level+1)
+        find_new_name(klass, message, level+1)
       else
         new_name
       end
