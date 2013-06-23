@@ -43,22 +43,20 @@ module Muack
       Muack::IsA.new(klass)
     end
 
-    def within range_or_array
-      Muack::Within.new(range_or_array)
-    end
-
-    # TODO: test
     def anything
       Muack::Anything.new
     end
 
-    # TODO: test
     def match regexp
       Muack::Match.new(regexp)
     end
 
     # TODO: test
     def hash_including hash
+    end
+
+    def within range_or_array
+      Muack::Within.new(range_or_array)
     end
 
     # TODO: test

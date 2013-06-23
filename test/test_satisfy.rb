@@ -10,7 +10,7 @@ describe Muack::Satisfy do
       matcher.inspect.should.eq expected
     end
 
-    should 'match' do
+    should 'satisfy' do
       mock(Str).say(is_a(String)){ |arg| arg.reverse }
       Str.say('Foo').should.eq 'ooF'
       Muack.verify.should.eq true
@@ -33,6 +33,42 @@ describe Muack::Satisfy do
     end
   end
 
+  describe Muack::Anything do
+    should 'have human readable to_s and inspect' do
+      matcher = anything
+      expected = 'Muack::API.anything()'
+      matcher.to_s   .should.eq expected
+      matcher.inspect.should.eq expected
+    end
+
+    should 'satisfy' do
+      mock(Str).say(anything){ |arg| arg*2 }
+      Str.say(5).should.eq 10
+      Muack.verify.should.eq true
+
+      mock(Str).say(anything){ |arg| arg.upcase }
+      Str.say('b').should.eq 'B'
+
+      Muack.verify.should.eq true
+      Muack::EnsureReset.call
+    end
+
+    should 'raise Muack::Unexpected error if passing unexpected argument' do
+      mock(Obj).say(anything){ 'boo' }
+      begin
+        Obj.say(6, 7)
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq 'obj.say(Muack::API.anything())'
+        e.was     .should.eq 'obj.say(6, 7)'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      ensure
+        Muack.reset
+        Muack::EnsureReset.call
+      end
+    end
+  end
+
   describe Muack::Within do
     should 'have human readable to_s and inspect' do
       matcher = within(0..9)
@@ -41,7 +77,7 @@ describe Muack::Satisfy do
       matcher.inspect.should.eq expected
     end
 
-    should 'match' do
+    should 'satisfy' do
       mock(Str).say(within(0..9)){ |arg| arg*2 }
       Str.say(5).should.eq 10
       Muack.verify.should.eq true
