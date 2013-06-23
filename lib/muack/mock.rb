@@ -79,7 +79,7 @@ module Muack
       object.singleton_class.module_eval do
         if instance_methods(false).include?(defi.msg)
           # store original method
-          original_method = Mock.find_new_name(self, defi.msg)
+          original_method = Mock.find_new_name(self, defi.msg).to_sym
           alias_method original_method, defi.msg
           defi.original_method = original_method
         end
