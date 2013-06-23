@@ -25,6 +25,16 @@ module Muack
       (__mock_defis[defi.msg] ||= []) << defi
     end
 
+    # used for Muack::Modifier#times
+    def __mock_defi_pop defi
+      (__mock_defis[defi.msg] ||= []).pop
+    end
+
+    # used for Muack::Modifier#times
+    def __mock_disp_push defi
+      (__mock_disps[defi.msg] ||= []) << defi
+    end
+
     # used for mocked object to dispatch mocked method
     def __mock_dispatch msg, actual_args, actual_block
       if defi = __mock_defis[msg].shift
@@ -126,10 +136,6 @@ module Muack
       else
         false
       end
-    end
-
-    def __mock_disp_push defi
-      (__mock_disps[defi.msg] ||= []) << defi
     end
 
     def __mock_defis

@@ -43,6 +43,10 @@ describe Muack::Mock do
       3.times{ |i| Obj.say.should.eq 0 }
     end
 
+    should 'mock 0 times with times(0) modifier' do
+      mock(Obj).say{ 0 }.times(0).should.kind_of Muack::Modifier
+    end
+
     should 'mix mock and stub' do
       mock(Obj).say { 0 }
       stub(Obj).saya{ 1 }
