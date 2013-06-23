@@ -5,7 +5,7 @@ module Muack
   class Proxy < Mock
     # used for mocked object to dispatch mocked method
     def __mock_block_call defi, actual_args
-      if defi.original_method
+      if defi.original_method && !object.kind_of?(AnyInstanceOf)
         object.__send__(defi.original_method, *actual_args)
       end
     end
@@ -25,7 +25,11 @@ module Muack
         define_method defi.msg do |*actual_args, &actual_block|
           r = mock.__mock_dispatch(defi.msg, actual_args, actual_block)
           if defi.original_method
-            r
+            if mock.object.kind_of?(AnyInstanceOf)
+              __send__(defi.original_method, *actual_args, &actual_block)
+            else
+              r
+            end
           else
             super(*actual_args, &actual_block)
           end
