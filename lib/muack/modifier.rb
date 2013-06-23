@@ -2,7 +2,7 @@
 require 'muack/definition'
 
 module Muack
-  class Modifier < Struct.new(:defi)
+  class Modifier < Struct.new(:mock, :defi)
     # Public API
     def with_any_args
       defi.args = [WithAnyArgs]
@@ -12,7 +12,7 @@ module Muack
     # Public API
     # TODO: test
     def times number
-      __mock_definitions.concat([__mock_definitions.last] * number)
+      (number - 1).times{ mock.__mock_with(defi) }
       self
     end
   end

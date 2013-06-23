@@ -50,6 +50,11 @@ describe Muack::Mock do
       3.times{ |i| mock(Obj).say(i){ i } }
       3.times{ |i| Obj.say(i).should.eq i }
     end
+
+    should 'mock multiple times with times(n) modifier' do
+      mock(Obj).say{ 0 }.times(3)
+      3.times{ |i| Obj.say.should.eq 0 }
+    end
   end
 
   describe 'Muack.verify==false' do

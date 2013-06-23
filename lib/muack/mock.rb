@@ -13,12 +13,17 @@ module Muack
     # Public API: Define mocked method
     def with msg, *args, &block
       defi = Definition.new(msg, args, block)
-      __mock_inject_method(defi) if __mock_definitions(defi).size == 1
-      Modifier.new(defi)
+      __mock_with(defi)
+      Modifier.new(self, defi)
     end
 
     # Public API: Define mocked method, the convenient way
     alias_method :method_missing, :with
+
+    # used for Muack::Modifier#times
+    def __mock_with defi
+      __mock_inject_method(defi) if __mock_definitions(defi).size == 1
+    end
 
     # used for mocked object to dispatch mocked method
     def __mock_dispatch msg, actual_args, actual_block
@@ -51,9 +56,9 @@ module Muack
         # TODO: this would be tricky to show the desired error message :(
         #       do we care about orders? shall we inject methods one by one?
         msg, defis = __mock_definitions.find{ |k, v| v.size > 0 }
+        disps      = (__mock_dispatches[msg] || []).size
         Mock.__send__(:raise,
-          Expected.new(object, defis.first, defis.size,
-                                            (__mock_dispatches[msg]||[]).size))
+          Expected.new(object, defis.first, defis.size + disps, disps))
       end
     end
 
