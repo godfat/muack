@@ -29,9 +29,21 @@ describe Muack::Mock do
       Obj.say(true).should.eq 'coo'
     end
 
-    should 'mock external object' do
-      mock(Str).say{ Str.sub('M', 'H') }
-      Str.say.should.eq 'Hoo'
+    should 'stub with any arguments' do
+      stub(Str).say{ Str.sub('M', 'H') }.with_any_args
+      Str.say      .should.eq 'Hoo'
+      Str.say(0)   .should.eq 'Hoo'
+      Str.say(0, 1).should.eq 'Hoo'
+      Str.say('  ').should.eq 'Hoo'
+    end
+
+    should 'also mock with with' do
+      mock(Str).with(:say, 0){ 0 }
+      Str.say(0).should.eq 0
+      Muack.verify.should.eq true
+      mock(Str).with(:say, 1){ 1 }
+      lambda{ Str.say(2) }.should.raise(Muack::Unexpected)
+      Muack.reset
     end
   end
 

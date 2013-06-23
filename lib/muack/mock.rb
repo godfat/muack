@@ -11,7 +11,6 @@ module Muack
     end
 
     # Public API: Define mocked method
-    # TODO: test
     def with msg, *args, &block
       definition = Definition.new(msg, args, block)
       __mock_definitions(definition)
@@ -20,7 +19,6 @@ module Muack
     end
 
     # Public API
-    # TODO: test
     def with_any_args
       __mock_definitions.last.args = WithAnyArgs
       self
