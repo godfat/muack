@@ -8,8 +8,8 @@ module Muack
 
     # used for mocked object to dispatch mocked method
     def __mock_dispatch msg, actual_args, actual_block
-      defi = __mock_defis[msg].find{ |defi|
-        __mock_check_args(defi.args, actual_args)
+      defi = __mock_defis[msg].find{ |d|
+        __mock_check_args(d.args, actual_args)
       }
       if defi
         __mock_block_call(defi.block, actual_args)
