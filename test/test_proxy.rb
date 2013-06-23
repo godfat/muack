@@ -17,6 +17,11 @@ describe Muack::Proxy do
       2.times{ proxy(Str).reverse }
       2.times{ Str.reverse.should.eq 'ooM' }
     end
+
+    should 'proxy multiple times with super method' do
+      2.times{ proxy(Str).class }
+      2.times{ Str.class.should.eq String }
+    end
   end
 
   describe 'Muack.verify==false' do
