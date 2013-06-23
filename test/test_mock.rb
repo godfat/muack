@@ -13,11 +13,6 @@ describe Muack::Mock do
       Obj.say(true).should.eq 'boo'
     end
 
-    should 'stub with regular method' do
-      stub(Obj).say{ 'goo' }
-      3.times{ Obj.say.should.eq 'goo' }
-    end
-
     should 'mock existing method' do
       mock(Obj).to_s{ 'zoo' }
       Obj.to_s.should.eq 'zoo'
@@ -27,14 +22,6 @@ describe Muack::Mock do
       mock(Obj).say(true){ Obj.saya }
       mock(Obj).saya{ 'coo' }
       Obj.say(true).should.eq 'coo'
-    end
-
-    should 'stub with any arguments' do
-      stub(Str).say{ Str.sub('M', 'H') }.with_any_args
-      Str.say      .should.eq 'Hoo'
-      Str.say(0)   .should.eq 'Hoo'
-      Str.say(0, 1).should.eq 'Hoo'
-      Str.say('  ').should.eq 'Hoo'
     end
 
     should 'also mock with with' do

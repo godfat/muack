@@ -13,7 +13,7 @@ module Muack
     # Public API: Define mocked method
     def with msg, *args, &block
       defi = Definition.new(msg, args, block)
-      __mock_with(defi)
+      __mock_inject_method(defi) if __mock_defi_push(defi).size == 1
       Modifier.new(self, defi)
     end
 
@@ -21,15 +21,15 @@ module Muack
     alias_method :method_missing, :with
 
     # used for Muack::Modifier#times
-    def __mock_with defi
-      __mock_inject_method(defi) if __mock_definitions(defi).size == 1
+    def __mock_defi_push defi
+      (__mock_defis[defi.msg] ||= []) << defi
     end
 
     # used for mocked object to dispatch mocked method
     def __mock_dispatch msg, actual_args, actual_block
-      defi = __mock_definitions[msg].shift
+      defi = __mock_defis[msg].shift
       if defi
-        __mock_dispatches(defi)
+        __mock_disp_push(defi)
         if __mock_check_args(defi.args, actual_args)
           if defi.block
             arity = defi.block.arity
@@ -44,7 +44,7 @@ module Muack
             Unexpected.new(object, defi, actual_args))
         end
       else
-        defis = __mock_dispatches[msg]
+        defis = __mock_disps[msg]
         Mock.__send__(:raise,
           Expected.new(object, defis.first, defis.size, defis.size+1))
       end
@@ -52,11 +52,11 @@ module Muack
 
     # used for Muack::Session#verify
     def __mock_verify
-      __mock_definitions.values.all?(&:empty?) || begin
+      __mock_defis.values.all?(&:empty?) || begin
         # TODO: this would be tricky to show the desired error message :(
         #       do we care about orders? shall we inject methods one by one?
-        msg, defis = __mock_definitions.find{ |k, v| v.size > 0 }
-        disps      = (__mock_dispatches[msg] || []).size
+        msg, defis = __mock_defis.find{ |k, v| v.size > 0 }
+        disps      = (__mock_disps[msg] || []).size
         Mock.__send__(:raise,
           Expected.new(object, defis.first, defis.size + disps, disps))
       end
@@ -64,7 +64,7 @@ module Muack
 
     # used for Muack::Session#reset
     def __mock_reset
-      [__mock_definitions, __mock_dispatches].
+      [__mock_defis, __mock_disps].
       flat_map{ |h| h.values.flatten }.compact.each do |defi|
         object.singleton_class.module_eval do
           methods = instance_methods(false)
@@ -125,22 +125,16 @@ module Muack
       end
     end
 
-    def __mock_definitions defi=nil
-      @__mock_definitions ||= {}
-      if defi
-        (@__mock_definitions[defi.msg] ||= []) << defi
-      else
-        @__mock_definitions
-      end
+    def __mock_disp_push defi
+      (__mock_disps[defi.msg] ||= []) << defi
     end
 
-    def __mock_dispatches defi=nil
-      @__mock_dispatches ||= {}
-      if defi
-        (@__mock_dispatches[defi.msg] ||= []) << defi
-      else
-        @__mock_dispatches
-      end
+    def __mock_defis
+      @__mock_defis ||= {}
+    end
+
+    def __mock_disps
+      @__mock_disps ||= {}
     end
   end
 end
