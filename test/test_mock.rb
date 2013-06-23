@@ -69,6 +69,20 @@ describe Muack::Mock do
       end
     end
 
+    should 'have correct message for multiple mocks with the same name' do
+      2.times{ mock(Obj).say }
+      begin
+        3.times{ Obj.say }
+        'never'.should.eq 'reach'
+      rescue Muack::Expected => e
+        e.expected.should.eq 'obj.say()'
+        e.expected_times.should.eq 2
+        e.actual_times  .should.eq 3
+        e.message       .should.eq "\nExpected: obj.say()\n  " \
+                                   "called 2 times\n but was 3 times."
+      end
+    end
+
     should 'raise Muack::Expected error if mock methods were not called' do
       mock(Obj).say(true){ 'boo' }
       begin
