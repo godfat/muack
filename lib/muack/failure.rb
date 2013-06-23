@@ -5,9 +5,9 @@ module Muack
   class Unexpected < Failure
     attr_reader :expected, :was
     def initialize obj, defi, args
-      @expected = "#{obj.inspect}.#{defi.message}(" \
+      @expected = "#{obj.inspect}.#{defi.msg}(" \
                   "#{defi.args.map(&:inspect).join(', ')})"
-      @was      = "#{obj.inspect}.#{defi.message}(" \
+      @was      = "#{obj.inspect}.#{defi.msg}(" \
                   "#{args.map(&:inspect).join(', ')})"
       super("\nExpected: #{expected}\n but was: #{was}")
     end
@@ -16,7 +16,7 @@ module Muack
   class Expected < Failure
     attr_reader :expected, :expected_times, :actual_times
     def initialize obj, defi, expected_times, actual_times
-      @expected = "#{obj.inspect}.#{defi.message}(" \
+      @expected = "#{obj.inspect}.#{defi.msg}(" \
                   "#{defi.args.map(&:inspect).join(', ')})"
       @expected_times = expected_times
       @actual_times   = actual_times

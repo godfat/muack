@@ -1,7 +1,7 @@
 
 module Muack
   class Mock < BasicObject
-    Definition  = ::Class.new(::Struct.new(:message, :args, :block,
+    Definition  = ::Class.new(::Struct.new(:msg, :args, :block,
                                            :original_method))
     WithAnyArgs = ::Object.new
 
@@ -69,11 +69,11 @@ module Muack
       __mock_definitions.each do |defi|
         object.singleton_class.module_eval do
           methods = instance_methods(false)
-          if methods.include?(defi.message)         # removed mocked method
-            remove_method(defi.message) # could be removed by other defi
+          if methods.include?(defi.msg) # removed mocked method
+            remove_method(defi.msg)     # could be removed by other defi
           end
           if methods.include?(defi.original_method) # restore original method
-            alias_method defi.message, defi.original_method
+            alias_method defi.msg, defi.original_method
             remove_method defi.original_method
           end
         end
@@ -85,15 +85,15 @@ module Muack
       mock = self # remember the context
 
       object.singleton_class.module_eval do
-        if instance_methods(false).include?(defi.message)
+        if instance_methods(false).include?(defi.msg)
           # store original method
-          original_method = Mock.find_new_name(self, defi.message)
-          alias_method original_method, defi.message
+          original_method = Mock.find_new_name(self, defi.msg)
+          alias_method original_method, defi.msg
           defi.original_method = original_method
         end
 
         # define mocked method
-        define_method defi.message do |*actual_args, &actual_block|
+        define_method defi.msg do |*actual_args, &actual_block|
           mock.__mock_dispatch(defi, actual_args, actual_block)
         end
       end
