@@ -61,6 +61,13 @@ describe Muack::Mock do
     should 'inspect' do
       mock(Obj).inspect.should.eq "#<Muack::Mock object=obj>"
     end
+
+    should 'mock and call, mock and call' do
+      mock(Obj).say{0}
+      Obj.say.should.eq 0
+      mock(Obj).say{1}
+      Obj.say.should.eq 1
+    end
   end
 
   describe 'Muack.verify==false' do

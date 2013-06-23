@@ -18,7 +18,8 @@ module Muack
     # Public API: Define mocked method
     def with msg, *args, &block
       defi = Definition.new(msg, args, block)
-      __mock_inject_method(defi) if __mock_defi_push(defi).size == 1
+      __mock_inject_method(defi) if __mock_pure?(defi)
+      __mock_defi_push(defi)
       Modifier.new(self, defi)
     end
 
@@ -87,6 +88,11 @@ module Muack
     end
 
     private
+    def __mock_pure? defi
+      (__mock_defis[defi.msg] ||= []).empty? &&
+      (__mock_disps[defi.msg] ||= []).empty?
+    end
+
     def __mock_inject_method defi
       mock = self # remember the context
 

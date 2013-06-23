@@ -22,6 +22,13 @@ describe Muack::Proxy do
       2.times{ proxy(Str).class }
       2.times{ Str.class.should.eq String }
     end
+
+    should 'proxy and call, proxy and call' do
+      proxy(Obj).inspect
+      Obj.inspect.should.eq 'obj'
+      proxy(Obj).inspect
+      Obj.inspect.should.eq 'obj'
+    end
   end
 
   describe 'Muack.verify==false' do
