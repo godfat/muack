@@ -1,23 +1,30 @@
 
 module Muack
-  Failure = Class.new(Exception)
+  class Failure < Exception
+    attr_reader :expected
+    def build_expected obj, defis
+      @expected = defis.map{ |defi|
+                    "#{obj.inspect}.#{defi.msg}(" \
+                    "#{defi.args.map(&:inspect).join(', ')})"
+                  }.join("\n      or: ")
+    end
+  end
 
   class Unexpected < Failure
-    attr_reader :expected, :was
-    def initialize obj, defi, args
-      @expected = "#{obj.inspect}.#{defi.msg}(" \
-                  "#{defi.args.map(&:inspect).join(', ')})"
-      @was      = "#{obj.inspect}.#{defi.msg}(" \
+    attr_reader :was
+    def initialize obj, expected_defis, msg, args
+      build_expected(obj, expected_defis)
+      @was      = "#{obj.inspect}.#{msg}(" \
                   "#{args.map(&:inspect).join(', ')})"
+
       super("\nExpected: #{expected}\n but was: #{was}")
     end
   end
 
   class Expected < Failure
-    attr_reader :expected, :expected_times, :actual_times
-    def initialize obj, defi, expected_times, actual_times
-      @expected = "#{obj.inspect}.#{defi.msg}(" \
-                  "#{defi.args.map(&:inspect).join(', ')})"
+    attr_reader :expected_times, :actual_times
+    def initialize obj, expected_defis, expected_times, actual_times
+      build_expected(obj, expected_defis)
       @expected_times = expected_times
       @actual_times   = actual_times
 

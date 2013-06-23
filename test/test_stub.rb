@@ -39,5 +39,18 @@ describe Muack::Stub do
         e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
       end
     end
+
+    should 'give all alternatives' do
+      stub(Obj).say(0){ 'boo' }
+      stub(Obj).say(1){ 'moo' }
+      begin
+        Obj.say(false)
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq "obj.say(0)\n      or: obj.say(1)"
+        e.was     .should.eq 'obj.say(false)'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      end
+    end
   end
 end

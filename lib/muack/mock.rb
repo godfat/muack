@@ -34,12 +34,12 @@ module Muack
           __mock_block_call(defi.block, actual_args)
         else
           Mock.__send__(:raise, # basic object doesn't respond to raise
-            Unexpected.new(object, defi, actual_args))
+            Unexpected.new(object, [defi], msg, actual_args))
         end
       else
         defis = __mock_disps[msg]
         Mock.__send__(:raise,
-          Expected.new(object, defis.first, defis.size, defis.size+1))
+          Expected.new(object, defis, defis.size, defis.size+1))
       end
     end
 
@@ -51,7 +51,7 @@ module Muack
         msg, defis = __mock_defis.find{ |k, v| v.size > 0 }
         disps      = (__mock_disps[msg] || []).size
         Mock.__send__(:raise,
-          Expected.new(object, defis.first, defis.size + disps, disps))
+          Expected.new(object, defis, defis.size + disps, disps))
       end
     end
 
