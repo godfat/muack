@@ -42,6 +42,13 @@ describe Muack::Mock do
       mock(Obj).say{ 0 }.times(3)
       3.times{ |i| Obj.say.should.eq 0 }
     end
+
+    should 'mix mock and stub' do
+      mock(Obj).say { 0 }
+      stub(Obj).saya{ 1 }
+      3.times{ Obj.saya.should.eq 1 }
+               Obj.say .should.eq 0
+    end
   end
 
   describe 'Muack.verify==false' do
