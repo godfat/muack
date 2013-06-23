@@ -79,7 +79,7 @@ module Muack
       object.singleton_class.module_eval do
         if instance_methods(false).include?(defi.msg)
           # store original method
-          original_method = Mock.find_new_name(self, defi.msg).to_sym
+          original_method = Mock.find_new_name(self, defi.msg)
           alias_method original_method, defi.msg
           defi.original_method = original_method
         end
@@ -95,7 +95,7 @@ module Muack
       raise "Cannot find a suitable method name, tried #{level+1} times." if
         level >= 9
 
-      new_name = "__muack_mock_#{level}_#{message}"
+      new_name = "__muack_mock_#{level}_#{message}".to_sym
       if klass.instance_methods(false).include?(new_name)
         find_new_name(object, message, level+1)
       else
