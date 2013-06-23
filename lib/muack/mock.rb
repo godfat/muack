@@ -12,7 +12,7 @@ module Muack
 
     # Public API: Bacon needs this, or we often ended up with stack overflow
     def inspect
-      "#<Muack::Mock object=#{object.inspect}>"
+      "#<#{class << self; self; end.superclass} object=#{object.inspect}>"
     end
 
     # Public API: Define mocked method
