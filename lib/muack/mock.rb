@@ -10,6 +10,11 @@ module Muack
       @object = object
     end
 
+    # Public API: Bacon needs this, or we often ended up with stack overflow
+    def inspect
+      "#<Muack::Mock object=#{object.inspect}>"
+    end
+
     # Public API: Define mocked method
     def with msg, *args, &block
       defi = Definition.new(msg, args, block)
