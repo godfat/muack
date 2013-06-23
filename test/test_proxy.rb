@@ -12,6 +12,11 @@ describe Muack::Proxy do
       proxy(Str).reverse
       Str.reverse.should.eq 'ooM'
     end
+
+    should 'proxy multiple times' do
+      2.times{ proxy(Str).reverse }
+      2.times{ Str.reverse.should.eq 'ooM' }
+    end
   end
 
   describe 'Muack.verify==false' do
