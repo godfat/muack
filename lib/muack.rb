@@ -51,8 +51,8 @@ module Muack
       Muack::Match.new(regexp)
     end
 
-    # TODO: test
     def hash_including hash
+      Muack::HashIncluding.new(hash)
     end
 
     def within range_or_array
