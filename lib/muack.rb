@@ -1,9 +1,9 @@
 
 require 'muack/mock'
 require 'muack/stub'
+
 require 'muack/satisfy'
 require 'muack/session'
-require 'muack/failure'
 
 module Muack
   def self.verify

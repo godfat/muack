@@ -1,10 +1,10 @@
 
+require 'muack/definition'
+require 'muack/modifier'
+require 'muack/failure'
+
 module Muack
   class Mock < BasicObject
-    Definition  = ::Class.new(::Struct.new(:msg, :args, :block,
-                                           :original_method))
-    WithAnyArgs = ::Object.new
-
     attr_reader :object
     def initialize object
       @object = object
@@ -12,61 +12,55 @@ module Muack
 
     # Public API: Define mocked method
     def with msg, *args, &block
-      definition = Definition.new(msg, args, block)
-      __mock_definitions(definition)
-      __mock_inject_method(definition)
-      self
-    end
-
-    # Public API
-    def with_any_args
-      __mock_definitions.last.args = WithAnyArgs
-      self
-    end
-
-    # Public API
-    # TODO: test
-    def times number
-      __mock_definitions.concat([__mock_definitions.last] * number)
-      self
+      defi = Definition.new(msg, args, block)
+      __mock_inject_method(defi) if __mock_definitions(defi).size == 1
+      Modifier.new(defi)
     end
 
     # Public API: Define mocked method, the convenient way
     alias_method :method_missing, :with
 
     # used for mocked object to dispatch mocked method
-    def __mock_dispatch defi, actual_args, actual_block
-      if __mock_check_args(defi.args, actual_args)
+    def __mock_dispatch msg, actual_args, actual_block
+      defi = __mock_definitions[msg].shift
+      if defi
         __mock_dispatches(defi)
-        if defi.block
-          arity = defi.block.arity
-          if arity < 0
-            defi.block.call(*actual_args)
-          else
-            defi.block.call(*actual_args.first(arity))
+        if __mock_check_args(defi.args, actual_args)
+          if defi.block
+            arity = defi.block.arity
+            if arity < 0
+              defi.block.call(*actual_args)
+            else
+              defi.block.call(*actual_args.first(arity))
+            end
           end
+        else
+          Mock.__send__(:raise, # basic object doesn't respond to raise
+            Unexpected.new(object, defi, actual_args))
         end
       else
-        Mock.__send__(:raise, # basic object doesn't respond to raise
-          Unexpected.new(object, defi, actual_args))
+        defis = __mock_dispatches[msg]
+        Mock.__send__(:raise,
+          Expected.new(object, defis.first, defis.size, defis.size+1))
       end
     end
 
     # used for Muack::Session#verify
     def __mock_verify
-      __mock_definitions.sort_by(&:object_id) == __mock_dispatches.sort_by(&:object_id) || begin
+      __mock_definitions.values.all?(&:empty?) || begin
         # TODO: this would be tricky to show the desired error message :(
         #       do we care about orders? shall we inject methods one by one?
-        defi = (__mock_definitions - __mock_dispatches).first
+        msg, defis = __mock_definitions.find{ |k, v| v.size > 0 }
         Mock.__send__(:raise,
-          Expected.new(object, defi, __mock_definitions.size,
-                                            __mock_dispatches.size))
+          Expected.new(object, defis.first, defis.size,
+                                            (__mock_dispatches[msg]||[]).size))
       end
     end
 
     # used for Muack::Session#reset
     def __mock_reset
-      __mock_definitions.each do |defi|
+      [__mock_definitions, __mock_dispatches].
+      flat_map{ |h| h.values.flatten }.compact.each do |defi|
         object.singleton_class.module_eval do
           methods = instance_methods(false)
           if methods.include?(defi.msg) # removed mocked method
@@ -94,7 +88,7 @@ module Muack
 
         # define mocked method
         define_method defi.msg do |*actual_args, &actual_block|
-          mock.__mock_dispatch(defi, actual_args, actual_block)
+          mock.__mock_dispatch(defi.msg, actual_args, actual_block)
         end
       end
     end
@@ -112,7 +106,7 @@ module Muack
     end
 
     def __mock_check_args expected_args, actual_args
-      if expected_args == WithAnyArgs
+      if expected_args == [WithAnyArgs]
         true
       elsif expected_args.none?{ |arg| arg.kind_of?(Satisfy) }
         expected_args == actual_args
@@ -127,13 +121,21 @@ module Muack
     end
 
     def __mock_definitions defi=nil
-      @__mock_definitions ||= []
-      if defi then @__mock_definitions << defi else @__mock_definitions end
+      @__mock_definitions ||= {}
+      if defi
+        (@__mock_definitions[defi.msg] ||= []) << defi
+      else
+        @__mock_definitions
+      end
     end
 
     def __mock_dispatches defi=nil
-      @__mock_dispatches ||= []
-      if defi then @__mock_dispatches  << defi else @__mock_dispatches  end
+      @__mock_dispatches ||= {}
+      if defi
+        (@__mock_dispatches[defi.msg] ||= []) << defi
+      else
+        @__mock_dispatches
+      end
     end
   end
 end
