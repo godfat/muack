@@ -27,8 +27,7 @@ module Muack
 
     # used for mocked object to dispatch mocked method
     def __mock_dispatch msg, actual_args, actual_block
-      defi = __mock_defis[msg].shift
-      if defi
+      if defi = __mock_defis[msg].shift
         __mock_disp_push(defi)
         if __mock_check_args(defi.args, actual_args)
           __mock_block_call(defi, actual_args)
