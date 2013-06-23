@@ -14,5 +14,10 @@ module Muack
       (number - 1).times{ mock.__mock_defi_push(defi) }
       self
     end
+
+    # Public API
+    def object
+      mock.object
+    end
   end
 end

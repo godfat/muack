@@ -49,6 +49,10 @@ describe Muack::Mock do
       3.times{ Obj.saya.should.eq 1 }
                Obj.say .should.eq 0
     end
+
+    should 'unnamed mock' do
+      mock.say{1}.object.say.should.eq 1
+    end
   end
 
   describe 'Muack.verify==false' do
