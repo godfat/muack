@@ -1,0 +1,43 @@
+
+require 'muack/test'
+
+describe Muack::Stub do
+  describe 'Muack.verify==true' do
+    after do
+      Muack.verify.should.eq true
+      Muack::EnsureReset.call
+    end
+
+    should 'stub with regular method' do
+      stub(Obj).say{ 'goo' }
+      3.times{ Obj.say.should.eq 'goo' }
+    end
+
+    should 'stub with any arguments' do
+      stub(Str).say{ Str.sub('M', 'H') }.with_any_args
+      Str.say      .should.eq 'Hoo'
+      Str.say(0)   .should.eq 'Hoo'
+      Str.say(0, 1).should.eq 'Hoo'
+      Str.say('  ').should.eq 'Hoo'
+    end
+  end
+
+  describe 'Muack.verify==false' do
+    after do
+      Muack.reset
+      Muack::EnsureReset.call
+    end
+
+    should 'raise Muack::Unexpected error if passing unexpected argument' do
+      stub(Obj).say(true){ 'boo' }
+      begin
+        Obj.say(false)
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq 'obj.say(true)'
+        e.was     .should.eq 'obj.say(false)'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      end
+    end
+  end
+end
