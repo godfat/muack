@@ -45,6 +45,11 @@ describe Muack::Mock do
       lambda{ Str.say(2) }.should.raise(Muack::Unexpected)
       Muack.reset
     end
+
+    should 'mock multiple times' do
+      3.times{ |i| mock(Obj).say(i){ i } }
+      3.times{ |i| Obj.say(i).should.eq i }
+    end
   end
 
   describe 'Muack.verify==false' do
