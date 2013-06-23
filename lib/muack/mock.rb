@@ -42,12 +42,12 @@ module Muack
         if __mock_check_args(defi.args, actual_args)
           __mock_block_call(defi, actual_args)
         else
-          Mock.__send__(:raise, # basic object doesn't respond to raise
+          Mock.__send__(:raise, # Wrong argument
             Unexpected.new(object, [defi], msg, actual_args))
         end
       else
         defis = __mock_disps[msg]
-        Mock.__send__(:raise,
+        Mock.__send__(:raise,   # Too many times
           Expected.new(object, defis, defis.size, defis.size+1))
       end
     end
@@ -59,7 +59,7 @@ module Muack
         #       do we care about orders? shall we inject methods one by one?
         msg, defis = __mock_defis.find{ |k, v| v.size > 0 }
         disps      = (__mock_disps[msg] || []).size
-        Mock.__send__(:raise,
+        Mock.__send__(:raise,   # Too little times
           Expected.new(object, defis, defis.size + disps, disps))
       end
     end
