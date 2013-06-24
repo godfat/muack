@@ -33,11 +33,23 @@ describe Muack::Proxy do
       Str.class.should.eq 'gnirtS'
     end
 
-    should 'proxy and call, proxy and call' do
+    should 'mock_proxy and call, mock_proxy and call' do
       mock_proxy(Obj).class{ |k| k.name.reverse }
       Obj.class.should.eq 'tcejbO'
       mock_proxy(Obj).class{ |k| k.name.upcase }
       Obj.class.should.eq 'OBJECT'
+    end
+
+    should 'stub_proxy and call, stub_proxy and call' do
+      stub_proxy(Obj).kind_of?(Object){ |b| !b }
+      Obj.kind_of?(Object).should.eq false
+      stub_proxy(Obj).kind_of?(String){ |b| b.to_s }
+      Obj.kind_of?(String).should.eq 'false'
+    end
+
+    should 'stub_proxy with any times' do
+      stub_proxy(Obj).class{ |k| k.name.downcase }
+      3.times{ Obj.class.should.eq 'object' }
     end
   end
 
