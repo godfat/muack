@@ -20,6 +20,12 @@ describe Muack::Stub do
       Str.say(0, 1).should.eq 'Hoo'
       Str.say('  ').should.eq 'Hoo'
     end
+
+    should 'accept block API' do
+      stub(Obj){ |o| o.say{0}; o.saya{1} }
+      Obj.saya.should.eq 1
+      Obj.say .should.eq 0
+    end
   end
 
   describe 'Muack.verify==false' do

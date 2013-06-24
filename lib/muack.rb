@@ -27,19 +27,23 @@ module Muack
   module API
     module_function
     def mock obj=Object.new
-      Muack.session["mock #{obj.__id__}"] ||= Muack::Mock.new(obj)
+      ret = Muack.session["mk #{obj.__id__}"] ||= Muack::Mock.new(obj)
+      if block_given? then yield(ret) else ret end
     end
 
     def stub obj=Object.new
-      Muack.session["stub #{obj.__id__}"] ||= Muack::Stub.new(obj)
+      ret = Muack.session["sb #{obj.__id__}"] ||= Muack::Stub.new(obj)
+      if block_given? then yield(ret) else ret end
     end
 
     def mock_proxy obj=Object.new
-      Muack.session["mock_proxy #{obj.__id__}"] ||= Muack::MockProxy.new(obj)
+      ret = Muack.session["mp #{obj.__id__}"] ||= Muack::MockProxy.new(obj)
+      if block_given? then yield(ret) else ret end
     end
 
     def stub_proxy obj=Object.new
-      Muack.session["stub_proxy #{obj.__id__}"] ||= Muack::StubProxy.new(obj)
+      ret = Muack.session["sp #{obj.__id__}"] ||= Muack::StubProxy.new(obj)
+      if block_given? then yield(ret) else ret end
     end
 
     def any_instance_of klass
