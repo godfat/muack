@@ -34,10 +34,10 @@ describe Muack::Proxy do
     end
 
     should 'proxy and call, proxy and call' do
-      mock_proxy(Obj).inspect
-      Obj.inspect.should.eq 'obj'
-      mock_proxy(Obj).inspect
-      Obj.inspect.should.eq 'obj'
+      mock_proxy(Obj).class{ 'obj' }
+      Obj.class.should.eq 'obj'
+      mock_proxy(Obj).class{ 'obj' }
+      Obj.class.should.eq 'obj'
     end
   end
 
