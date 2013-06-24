@@ -6,7 +6,12 @@ module Muack
     # used for mocked object to dispatch mocked method
     def __mock_block_call defi, actual_args
       if defi.original_method && !object.kind_of?(AnyInstanceOf)
-        object.__send__(defi.original_method, *actual_args)
+        result = object.__send__(defi.original_method, *actual_args)
+        if defi.block
+          defi.block.call(result)
+        else
+          result
+        end
       end
     end
 
@@ -26,12 +31,22 @@ module Muack
           r = mock.__mock_dispatch(defi.msg, actual_args, actual_block)
           if defi.original_method
             if mock.object.kind_of?(AnyInstanceOf)
-              __send__(defi.original_method, *actual_args, &actual_block)
+              result = __send__(defi.original_method, *actual_args, &actual_block)
+              if defi.block
+                defi.block.call(result)
+              else
+                result
+              end
             else
               r
             end
           else
-            super(*actual_args, &actual_block)
+            result = super(*actual_args, &actual_block)
+            if defi.block
+              defi.block.call(result)
+            else
+              result
+            end
           end
         end
       end

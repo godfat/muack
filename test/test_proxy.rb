@@ -23,6 +23,16 @@ describe Muack::Proxy do
       2.times{ Str.class.should.eq String }
     end
 
+    should 'proxy and call the block' do
+      proxy(Obj).with(:inspect){ |str| str.reverse }
+      Obj.inspect.should.eq 'jbo'
+    end
+
+    should 'proxy and call the block with super' do
+      proxy(Str).class{ |klass| klass.name.reverse  }
+      Str.class.should.eq 'gnirtS'
+    end
+
     should 'proxy and call, proxy and call' do
       proxy(Obj).inspect
       Obj.inspect.should.eq 'obj'
