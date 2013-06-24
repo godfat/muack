@@ -50,7 +50,7 @@ module Muack
       if defi = __mock_defis[msg].shift
         __mock_disps_push(defi)
         if __mock_check_args(defi.args, actual_args)
-          __mock_block_call(defi, actual_args)
+          __mock_block_call(defi, actual_args, actual_block)
         else
           Mock.__send__(:raise, # Wrong argument
             Unexpected.new(object, [defi], msg, actual_args))
@@ -136,13 +136,13 @@ module Muack
       }
     end
 
-    def __mock_block_call defi, actual_args
+    def __mock_block_call defi, actual_args, actual_block
       if block = defi.block
         arity = block.arity
         if arity < 0
-          block.call(*actual_args)
+          block.call(*actual_args             , &actual_block)
         else
-          block.call(*actual_args.first(arity))
+          block.call(*actual_args.first(arity), &actual_block)
         end
       end
     end
