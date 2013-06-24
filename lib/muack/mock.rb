@@ -104,22 +104,17 @@ module Muack
     end
 
     def __mock_inject_method defi
-      mock = self # remember the context
-
       target = object.singleton_class
-      if target.instance_methods(false).include?(defi.msg)
-        # store original method
-        original_method = Mock.find_new_name(target, defi.msg)
-        target.alias_method(original_method, defi.msg)
-        defi.original_method = original_method
-      end
+      Mock.store_original_method(target, defi)
+       __mock_inject_mock_method(target, defi.msg)
+    end
 
-      target.module_eval do
-        # define mocked method
-        define_method defi.msg do |*actual_args, &actual_block|
-          mock.__mock_dispatch(defi.msg, actual_args, actual_block)
-        end
-      end
+    def self.store_original_method klass, defi
+      return unless klass.instance_methods(false).include?(defi.msg)
+      # store original method
+      original_method = find_new_name(klass, defi.msg)
+      klass.alias_method(original_method, defi.msg)
+      defi.original_method = original_method
     end
 
     def self.find_new_name klass, message, level=0
@@ -131,6 +126,13 @@ module Muack
         find_new_name(klass, message, level+1)
       else
         new_name
+      end
+    end
+
+    def __mock_inject_mock_method target, msg
+      mock = self # remember the context
+      target.__send__(:define_method, msg) do |*actual_args, &actual_block|
+        mock.__mock_dispatch(msg, actual_args, actual_block)
       end
     end
 
