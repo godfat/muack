@@ -29,15 +29,15 @@ describe Muack::Proxy do
     end
 
     should 'proxy and call the block with super' do
-      mock_proxy(Str).class{ |klass| klass.name.reverse  }
+      mock_proxy(Str).class{ |k| k.name.reverse  }
       Str.class.should.eq 'gnirtS'
     end
 
     should 'proxy and call, proxy and call' do
-      mock_proxy(Obj).class{ 'obj' }
-      Obj.class.should.eq 'obj'
-      mock_proxy(Obj).class{ 'obj' }
-      Obj.class.should.eq 'obj'
+      mock_proxy(Obj).class{ |k| k.name.reverse }
+      Obj.class.should.eq 'tcejbO'
+      mock_proxy(Obj).class{ |k| k.name.reverse }
+      Obj.class.should.eq 'tcejbO'
     end
   end
 
