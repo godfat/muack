@@ -59,7 +59,7 @@ were extracted from
 
 #### [mock](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#mock)
 
-Valid for both RR and Muack
+`mock` is the same as RR.
 
 ``` ruby
 view = controller.template
@@ -80,7 +80,7 @@ end
 
 #### [stub](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#stub)
 
-Valid for both RR and Muack
+`stub` is the same as RR.
 
 ``` ruby
 jane = User.new
@@ -92,18 +92,18 @@ stub(User).find do |id|
 end
 ```
 
-#### [dont_allow](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#dont_allow-aliased-to-do_not_allow-dont_call-and-do_not_call)
+#### [times(0)](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#dont_allow-aliased-to-do_not_allow-dont_call-and-do_not_call)
 
-There's no `dont_allow` method in Muack, use `times(0)` instead.
+There's no dont_allow method in Muack, use `times(0)` instead.
 
 ``` ruby
 User.find('42').times(0)
 User.find('42') # raises a Muack::Unexpected
 ```
 
-#### [mock.proxy](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#mockproxy)
+#### [mock_proxy](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#mockproxy)
 
-Since I don't see how we gain from calling it `mock.proxy`, in Muack we
+Since I don't see how we gain from calling it mock.proxy, in Muack we
 just call it `mock_proxy`.
 
 ``` ruby
@@ -115,7 +115,7 @@ mock_proxy(view).render(:partial => "user_info") do |html|
 end
 ```
 
-#### [stub.proxy](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#stubproxy)
+#### [stub_proxy](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#stubproxy)
 
 The same goes to `stub_proxy`.
 
@@ -156,7 +156,7 @@ mock(script) do |expect|
 end
 ```
 
-#### [Double graphs](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#double-graphs)
+#### [Nested mocks](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#double-graphs)
 
 The shortest API (which might be a bit tricky) is not supported,
 but we do support:
@@ -183,9 +183,9 @@ stub(object).foo { bar }
 object.foo.bar  #=> :baz
 ```
 
-#### [Modifying doubles](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#modifying-doubles)
+#### [Modifier](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#modifying-doubles)
 
-Instead of DoubleDefinition from RR, you get `Muack::Modifier`
+After defining a mock method, you get a `Muack::Modifier` back.
 
 ``` ruby
 stub(object).foo     #=> Muack::Modifier
@@ -373,14 +373,14 @@ object.foo
 
 #### [Argument wildcard matchers](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#argument-wildcard-matchers)
 
-The same as RR `anything`.
+`anything` is the same as RR.
 
 ``` ruby
 mock(object).foobar(1, anything)
 object.foobar(1, :my_symbol)
 ```
 
-The same as RR `is_a`.
+`is_a` is the same as RR.
 
 ``` ruby
 mock(object).foobar(is_a(Time))
@@ -428,14 +428,14 @@ mock(object).foobar(match(/on/))
 object.foobar("ruby on rails")
 ```
 
-The same as RR `hash_including`.
+`hash_including` is the same as RR.
 
 ``` ruby
 mock(object).foobar(hash_including(:red => "#FF0000", :blue => "#0000FF"))
 object.foobar({:red => "#FF0000", :blue => "#0000FF", :green => "#00FF00"})
 ```
 
-The same as RR `satisfy`.
+`satisfy` is the same as RR.
 
 ``` ruby
 mock(object).foobar(satisfy {|arg| arg.length == 2 })
