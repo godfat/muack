@@ -1,5 +1,6 @@
 
 require 'muack/mock'
+require 'muack/stub'
 
 module Muack
   module Proxy
