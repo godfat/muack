@@ -20,15 +20,12 @@ module Muack
     end
 
     # Public API: Define mocked method
-    def with msg, *args, &block
+    def method_missing msg, *args, &block
       defi = Definition.new(msg, args, block)
       __mock_inject_method(defi) if __mock_pure?(defi)
       __mock_defis_push(defi)
       Modifier.new(self, defi)
     end
-
-    # Public API: Define mocked method, the convenient way
-    alias_method :method_missing, :with
 
     # used for Muack::Modifier#times
     def __mock_defis_push defi

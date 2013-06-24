@@ -24,7 +24,7 @@ describe Muack::Proxy do
     end
 
     should 'proxy and call the block' do
-      mock_proxy(Obj).with(:inspect){ |str| str.reverse }
+      mock_proxy(Obj).method_missing(:inspect){ |str| str.reverse }
       Obj.inspect.should.eq 'jbo'
     end
 

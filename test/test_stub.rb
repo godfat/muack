@@ -21,7 +21,7 @@ describe Muack::Stub do
       Str.say('  ').should.eq 'Hoo'
     end
 
-    should 'accept block API' do
+    should 'accept block form' do
       stub(Obj){ |o| o.say{0}; o.saya{1} }
       Obj.saya.should.eq 1
       Obj.say .should.eq 0

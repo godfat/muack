@@ -25,10 +25,10 @@ describe Muack::Mock do
     end
 
     should 'also mock with with' do
-      mock(Str).with(:say, 0){ 0 }
+      mock(Str).method_missing(:say, 0){ 0 }
       Str.say(0).should.eq 0
       Muack.verify.should.eq true
-      mock(Str).with(:say, 1){ 1 }
+      mock(Str).method_missing(:say, 1){ 1 }
       lambda{ Str.say(2) }.should.raise(Muack::Unexpected)
       Muack.reset
     end
