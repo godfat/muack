@@ -116,17 +116,17 @@ describe Muack::Mock do
     #   end
     # end
 
-    # should 'raise if a mock with times(0) gets called with diff sig' do
-    #   mock(Obj).say.times(0)
-    #   begin
-    #     Obj.say(true)
-    #     'never'.should.eq 'reach'
-    #   rescue Muack::Unexpected => e
-    #     e.expected.should.eq 'obj.say()'
-    #     e.was     .should.eq 'obj.say(true)'
-    #     e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
-    #   end
-    # end
+    should 'raise if a mock with times(0) gets called with diff sig' do
+      mock(Obj).say.times(0)
+      begin
+        Obj.say(true)
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq nil
+        e.was     .should.eq 'obj.say(true)'
+        e.message .should.start_with "\nExpected: #{e.was}\n"
+      end
+    end
 
     should 'raise Muack::Unexpected when calling with diff sig' do
       mock(Obj).say(true){1}
