@@ -19,4 +19,12 @@ describe Muack::AnyInstanceOf do
     obj.f.should.eq true
     Muack.verify.should.eq true
   end
+
+  should 'proxy any_instance_of with a block' do
+    klass = Class.new{ def f; 0; end }
+    any_instance_of(klass){ |instance| proxy(instance).f{ |i| i+1 } }
+    obj = klass.new
+    obj.f.should.eq 1
+    Muack.verify.should.eq true
+  end
 end
