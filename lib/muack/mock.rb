@@ -8,6 +8,10 @@ module Muack
     attr_reader :object
     def initialize object
       @object = object
+      @__mock_ignore = []
+      [:__mock_defis=, :__mock_disps=].each do |m|
+        __send__(m, ::Hash.new{ |h, k| h[k] = [] })
+      end
     end
 
     # Public API: Bacon needs this, or we often ended up with stack overflow
@@ -19,7 +23,7 @@ module Muack
     def with msg, *args, &block
       defi = Definition.new(msg, args, block)
       __mock_inject_method(defi) if __mock_pure?(defi)
-      __mock_defi_push(defi)
+      __mock_defis_push(defi)
       Modifier.new(self, defi)
     end
 
@@ -27,24 +31,24 @@ module Muack
     alias_method :method_missing, :with
 
     # used for Muack::Modifier#times
-    def __mock_defi_push defi
-      (__mock_defis[defi.msg] ||= []) << defi
+    def __mock_defis_push defi
+      __mock_defis[defi.msg] << defi
     end
 
     # used for Muack::Modifier#times
-    def __mock_defi_pop defi
-      (__mock_defis[defi.msg] ||= []).pop
+    def __mock_defis_pop defi
+      __mock_defis[defi.msg].pop
     end
 
     # used for Muack::Modifier#times
-    def __mock_disp_push defi
-      (__mock_disps[defi.msg] ||= []) << defi
+    def __mock_ignore defi
+      @__mock_ignore << defi
     end
 
     # used for mocked object to dispatch mocked method
     def __mock_dispatch msg, actual_args, actual_block
       if defi = __mock_defis[msg].shift
-        __mock_disp_push(defi)
+        __mock_disps_push(defi)
         if __mock_check_args(defi.args, actual_args)
           __mock_block_call(defi, actual_args)
         else
@@ -64,7 +68,7 @@ module Muack
         # TODO: this would be tricky to show the desired error message :(
         #       do we care about orders? shall we inject methods one by one?
         msg, defis = __mock_defis.find{ |k, v| v.size > 0 }
-        disps      = (__mock_disps[msg] || []).size
+        disps      = __mock_disps[msg].size
         Mock.__send__(:raise,   # Too little times
           Expected.new(object, defis, defis.size + disps, disps))
       end
@@ -72,8 +76,8 @@ module Muack
 
     # used for Muack::Session#reset
     def __mock_reset
-      [__mock_defis, __mock_disps].
-      flat_map{ |h| h.values.flatten }.compact.each do |defi|
+      [__mock_defis.values, __mock_disps.values, @__mock_ignore].
+      flatten.compact.each do |defi|
         object.singleton_class.module_eval do
           methods = instance_methods(false)
           if methods.include?(defi.msg) # removed mocked method
@@ -87,10 +91,12 @@ module Muack
       end
     end
 
+    protected # get warnings for private attributes
+    attr_accessor :__mock_defis, :__mock_disps
+
     private
     def __mock_pure? defi
-      (__mock_defis[defi.msg] ||= []).empty? &&
-      (__mock_disps[defi.msg] ||= []).empty?
+      __mock_defis[defi.msg].empty? && __mock_disps[defi.msg].empty?
     end
 
     def __mock_inject_method defi
@@ -149,12 +155,9 @@ module Muack
       end
     end
 
-    def __mock_defis
-      @__mock_defis ||= {}
-    end
-
-    def __mock_disps
-      @__mock_disps ||= {}
+    # used for Muack::Mock#__mock_dispatch
+    def __mock_disps_push defi
+      __mock_disps[defi.msg] << defi
     end
   end
 end
