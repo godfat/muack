@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.files = [
   ".gitmodules",
   ".travis.yml",
+  "CHANGES.md",
   "Gemfile",
   "LICENSE",
   "README.md",
