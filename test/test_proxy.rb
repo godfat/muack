@@ -36,8 +36,8 @@ describe Muack::Proxy do
     should 'proxy and call, proxy and call' do
       mock_proxy(Obj).class{ |k| k.name.reverse }
       Obj.class.should.eq 'tcejbO'
-      mock_proxy(Obj).class{ |k| k.name.reverse }
-      Obj.class.should.eq 'tcejbO'
+      mock_proxy(Obj).class{ |k| k.name.upcase }
+      Obj.class.should.eq 'OBJECT'
     end
   end
 
