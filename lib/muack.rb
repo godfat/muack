@@ -26,16 +26,20 @@ module Muack
 
   module API
     module_function
-    def mock object=Object.new
-      Muack.session["mock #{object.__id__}"] ||= Muack::Mock.new(object)
+    def mock obj=Object.new
+      Muack.session["mock #{obj.__id__}"] ||= Muack::Mock.new(obj)
     end
 
-    def stub object=Object.new
-      Muack.session["stub #{object.__id__}"] ||= Muack::Stub.new(object)
+    def stub obj=Object.new
+      Muack.session["stub #{obj.__id__}"] ||= Muack::Stub.new(obj)
     end
 
-    def proxy object=Object.new
-      Muack.session["proxy #{object.__id__}"] ||= Muack::Proxy.new(object)
+    def mock_proxy obj=Object.new
+      Muack.session["mock_proxy #{obj.__id__}"] ||= Muack::MockProxy.new(obj)
+    end
+
+    def stub_proxy obj=Object.new
+      Muack.session["stub_proxy #{obj.__id__}"] ||= Muack::StubProxy.new(obj)
     end
 
     def any_instance_of klass

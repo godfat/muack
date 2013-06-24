@@ -2,7 +2,7 @@
 require 'muack/mock'
 
 module Muack
-  class Proxy < Mock
+  module Proxy
     def __mock_block_call defi, actual_args, actual_block
       # handle block call in injected method, since we need to call origin
     end
@@ -25,5 +25,13 @@ module Muack
         end
       }
     end
+  end
+
+  class MockProxy < Mock
+    include Proxy
+  end
+
+  class StubProxy < Stub
+    include Proxy
   end
 end

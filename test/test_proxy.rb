@@ -9,34 +9,34 @@ describe Muack::Proxy do
     end
 
     should 'proxy with regular method' do
-      proxy(Str).reverse
+      mock_proxy(Str).reverse
       Str.reverse.should.eq 'ooM'
     end
 
     should 'proxy multiple times' do
-      2.times{ proxy(Str).reverse }
+      2.times{ mock_proxy(Str).reverse }
       2.times{ Str.reverse.should.eq 'ooM' }
     end
 
     should 'proxy multiple times with super method' do
-      2.times{ proxy(Str).class }
+      2.times{ mock_proxy(Str).class }
       2.times{ Str.class.should.eq String }
     end
 
     should 'proxy and call the block' do
-      proxy(Obj).with(:inspect){ |str| str.reverse }
+      mock_proxy(Obj).with(:inspect){ |str| str.reverse }
       Obj.inspect.should.eq 'jbo'
     end
 
     should 'proxy and call the block with super' do
-      proxy(Str).class{ |klass| klass.name.reverse  }
+      mock_proxy(Str).class{ |klass| klass.name.reverse  }
       Str.class.should.eq 'gnirtS'
     end
 
     should 'proxy and call, proxy and call' do
-      proxy(Obj).inspect
+      mock_proxy(Obj).inspect
       Obj.inspect.should.eq 'obj'
-      proxy(Obj).inspect
+      mock_proxy(Obj).inspect
       Obj.inspect.should.eq 'obj'
     end
   end
@@ -48,7 +48,7 @@ describe Muack::Proxy do
     end
 
     should 'raise Muack::Expected error if passing unexpected argument' do
-      proxy(Str).reverse
+      mock_proxy(Str).reverse
       Str.reverse.should.eq 'ooM'
       begin
         Str.reverse
