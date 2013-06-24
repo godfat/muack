@@ -57,20 +57,24 @@ module Muack
         end
       else
         defis = __mock_disps[msg]
-        Mock.__send__(:raise,   # Too many times
-          Expected.new(object, defis, defis.size, defis.size+1))
+        if expected_defi = defis.find{ |d| d.args == actual_args }
+          Mock.__send__(:raise, # Too many times
+            Expected.new(object, expected_defi, defis.size, defis.size+1))
+        else
+          Mock.__send__(:raise, # Wrong argument
+            Unexpected.new(object, defis, msg, actual_args))
+        end
       end
     end
 
     # used for Muack::Session#verify
     def __mock_verify
       __mock_defis.values.all?(&:empty?) || begin
-        # TODO: this would be tricky to show the desired error message :(
-        #       do we care about orders? shall we inject methods one by one?
-        msg, defis = __mock_defis.find{ |k, v| v.size > 0 }
-        disps      = __mock_disps[msg].size
+        msg, defis_with_same_msg = __mock_defis.find{ |_, v| v.size > 0 }
+        args, defis = defis_with_same_msg.group_by(&:args).first
+        dsize = __mock_disps[msg].select{ |d| d.args == args }.size
         Mock.__send__(:raise,   # Too little times
-          Expected.new(object, defis, defis.size + disps, disps))
+          Expected.new(object, defis.first, defis.size + dsize, dsize))
       end
     end
 

@@ -102,7 +102,46 @@ describe Muack::Mock do
       end
     end
 
-    should 'raise Muack::Expected error if mock methods were not called' do
+    # should 'raise if a mock with times(0) gets called' do
+    #   mock(Obj).say.times(0)
+    #   begin
+    #     Obj.say
+    #     'never'.should.eq 'reach'
+    #   rescue Muack::Expected => e
+    #     e.expected      .should.eq 'obj.say()'
+    #     e.expected_times.should.eq 0
+    #     e.actual_times  .should.eq 1
+    #     e.message       .should.eq "\nExpected: obj.say()\n  " \
+    #                                "called 0 times\n but was 1 times."
+    #   end
+    # end
+
+    # should 'raise if a mock with times(0) gets called with diff sig' do
+    #   mock(Obj).say.times(0)
+    #   begin
+    #     Obj.say(true)
+    #     'never'.should.eq 'reach'
+    #   rescue Muack::Unexpected => e
+    #     e.expected.should.eq 'obj.say()'
+    #     e.was     .should.eq 'obj.say(true)'
+    #     e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+    #   end
+    # end
+
+    should 'raise Muack::Unexpected when calling with diff sig' do
+      mock(Obj).say(true){1}
+      Obj.say(true).should.eq 1
+      begin
+        Obj.say
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq 'obj.say(true)'
+        e.was     .should.eq 'obj.say()'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      end
+    end
+
+    should 'raise Muack::Expected error if mock methods not called' do
       mock(Obj).say(true){ 'boo' }
       begin
         Muack.verify
@@ -112,6 +151,21 @@ describe Muack::Mock do
         e.actual_times  .should.eq 0
         e.message       .should.eq "\nExpected: obj.say(true)\n  " \
                                    "called 1 times\n but was 0 times."
+      end
+    end
+
+    should 'show first not enough calls' do
+      mock(Obj).say{ 'boo' }.times(2)
+      mock(Obj).saya        .times(2)
+      begin
+        Obj.say
+        Muack.verify
+      rescue Muack::Expected => e
+        e.expected      .should.eq 'obj.say()'
+        e.expected_times.should.eq 2
+        e.actual_times  .should.eq 1
+        e.message       .should.eq "\nExpected: obj.say()\n  " \
+                                   "called 2 times\n but was 1 times."
       end
     end
   end

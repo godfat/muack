@@ -23,8 +23,8 @@ module Muack
 
   class Expected < Failure
     attr_reader :expected_times, :actual_times
-    def initialize obj, expected_defis, expected_times, actual_times
-      build_expected(obj, expected_defis)
+    def initialize obj, defi, expected_times, actual_times
+      build_expected(obj, [defi])
       @expected_times = expected_times
       @actual_times   = actual_times
 
