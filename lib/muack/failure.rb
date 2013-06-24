@@ -2,8 +2,8 @@
 module Muack
   class Failure < Exception
     attr_reader :expected
-    def build_expected obj, defis
-      @expected = defis.uniq{ |defi| [defi.msg, defi.args] }.map{ |defi|
+    def build_expected obj, expected_defis
+      @expected = expected_defis.uniq{ |d| [d.msg, d.args] }.map{ |defi|
                     "#{obj.inspect}.#{defi.msg}(" \
                     "#{defi.args.map(&:inspect).join(', ')})"
                   }.join("\n      or: ")
