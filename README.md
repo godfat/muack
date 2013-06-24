@@ -10,9 +10,13 @@ by Lin Jen-Shin ([godfat](http://godfat.org))
 
 ## DESCRIPTION:
 
-Muack -- Yet Another Mocking Library
+Muack -- Yet another mocking library.
 
-Basically it's an RR clone.
+Basically it's an [RR][] clone, but much faster under heavy use.
+It's 32x times faster for running [Rib][] tests.
+
+[RR]: https://github.com/rr/rr
+[Rib]: https://github.com/godfat/rib
 
 ## REQUIREMENTS:
 
@@ -24,7 +28,7 @@ Basically it's an RR clone.
 
 ## SYNOPSIS:
 
-Basically it's an [RR](https://github.com/rr/rr) clone. Let's see a
+Basically it's an [RR][] clone. Let's see a
 [bacon](https://github.com/chneukirchen/bacon) example.
 
 ``` ruby
