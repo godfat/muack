@@ -78,13 +78,11 @@ module Muack
     # used for Muack::Session#reset
     def __mock_reset
       [__mock_defis.values, __mock_disps.values, @__mock_ignore].
-      flatten.compact.each do |defi|
+      flatten.compact.group_by(&:msg).each_value do |(defi, *)|
         object.singleton_class.module_eval do
-          methods = instance_methods(false)
-          if methods.include?(defi.msg) # removed mocked method
-            remove_method(defi.msg)     # could be removed by other defi
-          end
-          if methods.include?(defi.original_method) # restore original method
+          remove_method(defi.msg)
+          # restore original method
+          if instance_methods(false).include?(defi.original_method)
             alias_method defi.msg, defi.original_method
             remove_method defi.original_method
           end

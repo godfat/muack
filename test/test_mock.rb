@@ -68,6 +68,14 @@ describe Muack::Mock do
       mock(Obj).say{1}
       Obj.say.should.eq 1
     end
+
+    should 'not remove original singleton method' do
+      obj = Class.new{ def self.f; 0; end }
+      2.times{ mock(obj).f{ 1 }  }
+      2.times{ obj.f.should.eq 1 }
+      Muack.verify.should.eq true
+      obj.f       .should.eq 0
+    end
   end
 
   describe 'Muack.verify==false' do
