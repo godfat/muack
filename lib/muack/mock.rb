@@ -22,7 +22,11 @@ module Muack
     # Public API: Define mocked method
     def method_missing msg, *args, &block
       defi = Definition.new(msg, args, block)
-      __mock_inject_method(defi) unless __mock_injected[defi.msg]
+      if injected = __mock_injected[defi.msg]
+        defi.original_method = injected.original_method
+      else
+        __mock_inject_method(defi)
+      end
       __mock_defis_push(defi)
       Modifier.new(self, defi)
     end

@@ -29,4 +29,15 @@ describe Muack::AnyInstanceOf do
     Muack.verify.should.eq true
     obj.f       .should.eq 0
   end
+
+  should 'work with multiple any_instance_of call' do
+    klass = Class.new{ def f; 0; end }
+    any_instance_of(klass){ |instance| mock_proxy(instance).f{ |i| i+1 } }
+    any_instance_of(klass){ |instance| mock_proxy(instance).f{ |i| i+2 } }
+    obj = klass.new
+    obj.f.should.eq 1
+    obj.f.should.eq 2
+    Muack.verify.should.eq true
+    obj.f.should.eq 0
+  end
 end
