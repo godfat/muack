@@ -7,6 +7,7 @@ module Muack
 
     def reset
       each_value(&:__mock_reset)
+      clear
     end
   end
 end
