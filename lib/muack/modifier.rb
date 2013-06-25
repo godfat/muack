@@ -14,7 +14,7 @@ module Muack
       if number >= 1
         (number - 1).times{ mock.__mock_defis_push(defi) }
       elsif number == 0
-        mock.__mock_ignore(mock.__mock_defis_pop(defi))
+        mock.__mock_defis_pop(defi)
       else
         raise "What would you expect from calling a method #{number} times?"
       end

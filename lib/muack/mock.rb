@@ -8,8 +8,7 @@ module Muack
     attr_reader :object
     def initialize object
       @object = object
-      @__mock_ignore = []
-      [:__mock_defis=, :__mock_disps=].each do |m|
+      [:__mock_defis=, :__mock_disps=, :__mock_injected=].each do |m|
         __send__(m, ::Hash.new{ |h, k| h[k] = [] })
       end
     end
@@ -22,7 +21,7 @@ module Muack
     # Public API: Define mocked method
     def method_missing msg, *args, &block
       defi = Definition.new(msg, args, block)
-      __mock_inject_method(defi) if __mock_pure?(defi)
+      __mock_inject_method(defi) if __mock_injected[defi.msg].empty?
       __mock_defis_push(defi)
       Modifier.new(self, defi)
     end
@@ -35,11 +34,6 @@ module Muack
     # used for Muack::Modifier#times
     def __mock_defis_pop defi
       __mock_defis[defi.msg].pop
-    end
-
-    # used for Muack::Modifier#times
-    def __mock_ignore defi
-      @__mock_ignore << defi
     end
 
     # used for mocked object to dispatch mocked method
@@ -77,8 +71,7 @@ module Muack
 
     # used for Muack::Session#reset
     def __mock_reset
-      [__mock_defis.values, __mock_disps.values, @__mock_ignore].
-      flatten.compact.group_by(&:msg).each_value do |(defi, *)|
+      __mock_injected.each_value do |(defi, *)|
         object.singleton_class.module_eval do
           remove_method(defi.msg)
           # restore original method
@@ -91,14 +84,11 @@ module Muack
     end
 
     protected # get warnings for private attributes
-    attr_accessor :__mock_defis, :__mock_disps
+    attr_accessor :__mock_defis, :__mock_disps, :__mock_injected
 
     private
-    def __mock_pure? defi
-      __mock_defis[defi.msg].empty? && __mock_disps[defi.msg].empty?
-    end
-
     def __mock_inject_method defi
+      __mock_injected[defi.msg] << defi
       target = object.singleton_class
       Mock.store_original_method(target, defi)
        __mock_inject_mock_method(target, defi)
