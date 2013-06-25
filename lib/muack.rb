@@ -1,12 +1,6 @@
 
-require 'muack/mock'
-require 'muack/stub'
-require 'muack/proxy'
-
-require 'muack/satisfy'
 require 'muack/session'
-
-require 'muack/any_instance_of'
+require 'muack/satisfy'
 
 module Muack
   def self.verify
@@ -27,27 +21,28 @@ module Muack
   module API
     module_function
     def mock obj=Object.new
-      ret = Muack.session["mk #{obj.__id__}"] ||= Muack::Mock.new(obj)
+      ret = Muack.session.mock(obj)
       if block_given? then yield(ret) else ret end
     end
 
     def stub obj=Object.new
-      ret = Muack.session["sb #{obj.__id__}"] ||= Muack::Stub.new(obj)
+      ret = Muack.session.stub(obj)
       if block_given? then yield(ret) else ret end
     end
 
     def mock_proxy obj=Object.new
-      ret = Muack.session["mp #{obj.__id__}"] ||= Muack::MockProxy.new(obj)
+      ret = Muack.session.mock_proxy(obj)
       if block_given? then yield(ret) else ret end
     end
 
     def stub_proxy obj=Object.new
-      ret = Muack.session["sp #{obj.__id__}"] ||= Muack::StubProxy.new(obj)
+      ret = Muack.session.stub_proxy(obj)
       if block_given? then yield(ret) else ret end
     end
 
     def any_instance_of klass
-      yield Muack::AnyInstanceOf.new(klass)
+      ret = Muack.session.any_instance_of(klass)
+      if block_given? then yield(ret) else ret end
     end
 
     def is_a klass
