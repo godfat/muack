@@ -2,6 +2,10 @@
 require 'muack/test'
 
 describe Muack::Stub do
+  should 'raise StubHasNoTimes with stub(obj).f.times(0)' do
+    lambda{ stub(Obj).f.times(0) }.should.raise(Muack::StubHasNoTimes)
+  end
+
   describe 'Muack.verify==true' do
     after do
       Muack.verify.should.eq true

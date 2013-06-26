@@ -17,7 +17,7 @@ module Muack
 
     # Public API: Bacon needs this, or we often ended up with stack overflow
     def inspect
-      "#<#{class << self; self; end.superclass} object=#{object.inspect}>"
+      "#<#{__mock_class} object=#{object.inspect}>"
     end
 
     # Public API: Define mocked method
@@ -40,6 +40,11 @@ module Muack
     # used for Muack::Modifier#times
     def __mock_defis_pop defi
       __mock_defis[defi.msg].pop
+    end
+
+    # used for Muack::Modifier#times to determine if it's a mock or not
+    def __mock_class
+      (class << self; self; end).superclass
     end
 
     # used for mocked object to dispatch mocked method

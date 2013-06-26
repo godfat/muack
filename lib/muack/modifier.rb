@@ -1,5 +1,5 @@
 
-require 'muack/definition'
+require 'muack/error'
 
 module Muack
   class Modifier < Struct.new(:mock, :defi)
@@ -21,6 +21,10 @@ module Muack
 
     # Public API
     def times number
+      if mock.__mock_class == Stub
+        raise StubHasNoTimes.new(object, defi, number)
+      end
+
       if number >= 1
         (number - 1).times{ mock.__mock_defis_push(defi) }
       elsif number == 0

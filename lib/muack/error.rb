@@ -7,4 +7,12 @@ module Muack
             "\nSet ENV['MUACK_RECURSION_LEVEL'] to raise this limit."
     end
   end
+
+  class StubHasNoTimes < Error
+    def initialize obj, defi, times
+      super "\nUse mocks if you want to specify times.\ne.g. "          \
+            "mock(#{obj.inspect}).#{defi.msg}(#{defi.args.join(', ')})" \
+            ".times(#{times})"
+    end
+  end
 end
