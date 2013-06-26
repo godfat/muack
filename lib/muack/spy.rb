@@ -14,11 +14,10 @@ module Muack
       super # simulate dispatching before passing to mock to verify
     end
 
-    # used for Muack::Session#reset, no need to do anything
-    def __mock_reset
-    end
+    # used for Muack::Session#reset, but spies never leave any track
+    def __mock_reset; end
 
     private
-    def __mock_inject_method defi; end # no point to inject anything
+    def __mock_inject_method defi; end # spies don't leave any track
   end
 end
