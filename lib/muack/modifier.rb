@@ -10,6 +10,11 @@ module Muack
     end
 
     # Public API
+    def returns val=nil, &block
+      defi.block = block || lambda{ val }
+    end
+
+    # Public API
     def times number
       if number >= 1
         (number - 1).times{ mock.__mock_defis_push(defi) }

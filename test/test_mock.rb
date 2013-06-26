@@ -76,6 +76,16 @@ describe Muack::Mock do
       Muack.verify.should.eq true
       obj.f       .should.eq 0
     end
+
+    should 'return values with returns with a value' do
+      mock(Obj).say.returns(0)
+      Obj.say.should.eq 0
+    end
+
+    should 'return values with returns with a block' do
+      mock(Obj).say.returns{0}
+      Obj.say.should.eq 0
+    end
   end
 
   describe 'Muack.verify==false' do

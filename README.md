@@ -209,10 +209,37 @@ mock(object).method_missing(:inspect){ 'bar' }.times(2)
 
 #### [Stubbing method implementation / return value](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#stubbing-method-implementation--return-value)
 
-Again, there's only one true API form you can use. On the other hand,
-since Muack is more strict than RR. Passing no arguments means you
-really don't want any argument. Here we need to specify the argument
-for Muack. The example should be changed to:
+Again, we embrace one true API to avoid confusion, unless the alternative
+API really has a great advantage. So we encourage people to use the block to
+return values. However, sometimes you cannot easily do that for certain
+methods due to Ruby's syntax. For example, you can't pass a block to
+a subscript operator `[]`. As a workaround, you can do it with
+`method_missing`, though it's not very obvious if you don't know
+what is `method_missing`.
+
+``` ruby
+stub(object).method_missing(:[], is_a(Fixnum)){ |a| a+1 }
+object[1]  #=> 2
+```
+
+Instead you can do this with `returns`:
+
+``` ruby
+stub(object)[is_a(Fixnum)].returns{ |a| a + 1 }
+object[1]  #=> 2
+```
+
+You can also pass a value directly to `returns` if you only want to return
+a simple value.
+
+``` ruby
+stub(object)[is_a(Fixnum)].returns(2)
+object[1]  #=> 2
+```
+
+On the other hand, since Muack is more strict than RR. Passing no arguments
+means you really don't want any argument. Here we need to specify the
+argument for Muack. The example in RR should be changed to this in Muack:
 
 ``` ruby
 stub(object).foo(is_a(Fixnum), anything){ |age, count, &block|
