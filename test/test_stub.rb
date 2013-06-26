@@ -117,5 +117,37 @@ describe Muack::Stub do
         e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
       end
     end
+
+    should 'show correct times for under satisfaction' do
+      stub(Obj).say
+      2.times{ Obj.say }
+      spy( Obj).say.times(3)
+      begin
+        Muack.verify
+        'never'.should.eq 'reach'
+      rescue Muack::Expected => e
+        e.expected      .should.eq 'obj.say()'
+        e.expected_times.should.eq 3
+        e.actual_times  .should.eq 2
+        e.message       .should.eq "\nExpected: obj.say()\n  " \
+                                   "called 3 times\n but was 2 times."
+      end
+    end
+
+    should 'show correct times for over satisfaction' do
+      stub(Obj).say
+      2.times{ Obj.say }
+      spy( Obj).say
+      begin
+        Muack.verify
+        'never'.should.eq 'reach'
+      rescue Muack::Expected => e
+        e.expected      .should.eq 'obj.say()'
+        e.expected_times.should.eq 1
+        e.actual_times  .should.eq 2
+        e.message       .should.eq "\nExpected: obj.say()\n  " \
+                                   "called 1 times\n but was 2 times."
+      end
+    end
   end
 end

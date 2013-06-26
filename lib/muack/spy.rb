@@ -5,14 +5,13 @@ module Muack
   class Spy < Mock
     def initialize stub
       super(stub.object)
-      self.__mock_disps = stub.__mock_disps.dup # steal disps
+      @secret = stub.__mock_disps.values.flatten # steal disps
     end
 
     # used for Muack::Session#verify
     def __mock_verify
-      __mock_disps.values.flatten.each{ |defi|
-        __mock_dispatch(defi.msg, defi.args) } # simulate dispatching
-      super
+      @secret.each{ |defi| __mock_dispatch(defi.msg, defi.args) }
+      super # simulate dispatching before passing to mock to verify
     end
 
     # used for Muack::Session#reset, no need to do anything
@@ -21,6 +20,5 @@ module Muack
 
     private
     def __mock_inject_method defi; end # no point to inject anything
-    def __mock_disps_push    defi; end # freeze __mock_disps
   end
 end

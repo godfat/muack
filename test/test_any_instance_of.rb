@@ -58,4 +58,36 @@ describe Muack::AnyInstanceOf do
     Muack.verify.should.eq true
     obj.f.should.eq 0
   end
+
+  should 'stub with any_instance_of and spy under satisfied' do
+    any_instance_of(klass){ |inst| stub(inst).f{ 5 } }
+    obj = klass.new
+    obj.f.should.eq 5
+    spy(any_instance_of(klass)).f.times(2)
+    begin
+      Muack.verify
+    rescue Muack::Expected => e
+      expected = /Muack::API\.any_instance_of\(.+?\)\.f\(\)/
+      e.expected      .should =~ expected
+      e.expected_times.should.eq 2
+      e.actual_times  .should.eq 1
+    end
+    obj.f.should.eq 0
+  end
+
+  should 'stub with any_instance_of and spy over satisfied' do
+    any_instance_of(klass){ |inst| stub(inst).f{ 2 } }
+    obj = klass.new
+    2.times{ obj.f.should.eq 2 }
+    spy(any_instance_of(klass)).f
+    begin
+      Muack.verify
+    rescue Muack::Expected => e
+      expected = /Muack::API\.any_instance_of\(.+?\)\.f\(\)/
+      e.expected      .should =~ expected
+      e.expected_times.should.eq 1
+      e.actual_times  .should.eq 2
+    end
+    obj.f.should.eq 0
+  end
 end
