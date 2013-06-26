@@ -12,6 +12,14 @@ describe Muack::Stub do
       Muack::EnsureReset.call
     end
 
+    should 'inspect' do
+      stub(Obj).inspect.should.eq "Muack::API.stub(obj)"
+    end
+
+    should 'inspect' do
+      spy( Obj).inspect.should.eq "Muack::API.spy(obj)"
+    end
+
     should 'stub with regular method' do
       stub(Obj).say{ 'goo' }
       3.times{ Obj.say.should.eq 'goo' }

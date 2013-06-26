@@ -8,6 +8,10 @@ describe Muack::Mock do
       Muack::EnsureReset.call
     end
 
+    should 'inspect' do
+      mock(Obj).inspect.should.eq "Muack::API.mock(obj)"
+    end
+
     should 'mock with regular method' do
       mock(Obj).say(true){ 'boo' }
       Obj.say(true).should.eq 'boo'
@@ -56,10 +60,6 @@ describe Muack::Mock do
 
     should 'unnamed mock' do
       mock.say{1}.object.say.should.eq 1
-    end
-
-    should 'inspect' do
-      mock(Obj).inspect.should.eq "#<Muack::Mock object=obj>"
     end
 
     should 'mock and call, mock and call' do

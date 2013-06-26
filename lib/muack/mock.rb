@@ -17,7 +17,7 @@ module Muack
 
     # Public API: Bacon needs this, or we often ended up with stack overflow
     def inspect
-      "#<#{__mock_class} object=#{object.inspect}>"
+      "Muack::API.#{__mock_class.name[/\w+$/].downcase}(#{object.inspect})"
     end
 
     # Public API: Define mocked method
