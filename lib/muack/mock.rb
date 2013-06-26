@@ -42,7 +42,7 @@ module Muack
     end
 
     # used for mocked object to dispatch mocked method
-    def __mock_dispatch msg, actual_args, actual_block
+    def __mock_dispatch msg, actual_args
       if defi = __mock_defis[msg].shift
         __mock_disps_push(defi)
         if __mock_check_args(defi.args, actual_args)
@@ -59,6 +59,25 @@ module Muack
         else
           Mock.__send__(:raise, # Wrong argument
             Unexpected.new(object, defis, msg, actual_args))
+        end
+      end
+    end
+
+    # used for mocked object to dispatch mocked method
+    def __mock_dispatch_call disp, actual_args, actual_block
+      if disp.proxy
+        value = yield # need the original context for proxy or AnyInstanceOf
+        if disp.block
+          disp.block.call(value)
+        else
+          value
+        end
+      elsif block = disp.block
+        arity = block.arity
+        if arity < 0
+          block.call(*actual_args             , &actual_block)
+        else
+          block.call(*actual_args.first(arity), &actual_block)
         end
       end
     end
@@ -94,7 +113,7 @@ module Muack
     private
     def __mock_inject_method defi
       __mock_injected[defi.msg] = defi
-      target = object.singleton_class
+      target = object.singleton_class # would be the class in AnyInstanceOf
       Mock.store_original_method(target, defi)
        __mock_inject_mock_method(target, defi)
     end
@@ -122,27 +141,14 @@ module Muack
     def __mock_inject_mock_method target, defi
       mock = self # remember the context
       target.__send__(:define_method, defi.msg){|*actual_args, &actual_block|
-        disp = mock.__mock_dispatch(defi.msg, actual_args, actual_block)
-
-        if disp.proxy
-          ret = if disp.original_method
-                  __send__(disp.original_method, *actual_args, &actual_block)
-                else
-                  super(*actual_args, &actual_block)
-                end
-          if disp.block
-            disp.block.call(ret)
+        disp = mock.__mock_dispatch(defi.msg, actual_args)
+        mock.__mock_dispatch_call(disp, actual_args, actual_block){
+          if disp.original_method
+            __send__(disp.original_method, *actual_args, &actual_block)
           else
-            ret
+            super(*actual_args, &actual_block)
           end
-        elsif block = disp.block
-          arity = block.arity
-          if arity < 0
-            block.call(*actual_args             , &actual_block)
-          else
-            block.call(*actual_args.first(arity), &actual_block)
-          end
-        end
+        }
       }
     end
 

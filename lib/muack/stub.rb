@@ -7,7 +7,7 @@ module Muack
     def __mock_verify; true; end
 
     # used for mocked object to dispatch mocked method
-    def __mock_dispatch msg, actual_args, actual_block
+    def __mock_dispatch msg, actual_args
       __mock_defis[msg].find{ |d| __mock_check_args(d.args, actual_args) } ||
         Mock.__send__(:raise, # Wrong argument
           Unexpected.new(object, __mock_defis[msg], msg, actual_args))
