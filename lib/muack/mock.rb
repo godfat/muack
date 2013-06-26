@@ -127,8 +127,11 @@ module Muack
     end
 
     def self.find_new_name klass, message, level=0
-      raise "Cannot find a suitable method name, tried #{level+1} times." if
-        level >= 9
+      if level >= (::ENV['MUACK_RECURSION_LEVEL'] || 9).to_i
+        raise "Can't find a new method name for :#{message}, tried" \
+              " #{level+1} times. Set ENV['MUACK_RECURSION_LEVEL']" \
+              " to raise this limit."
+      end
 
       new_name = "__muack_mock_#{level}_#{message}".to_sym
       if klass.instance_methods(false).include?(new_name)
