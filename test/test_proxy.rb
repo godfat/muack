@@ -51,6 +51,12 @@ describe Muack::Mock do
       stub(Obj).class{ |k| k.name.downcase }.proxy
       3.times{ Obj.class.should.eq 'object' }
     end
+
+    should 'stub proxy and spy' do
+      stub(Obj).class{ |k| k.name.downcase }.proxy
+      Obj.class.should.eq 'object'
+      spy(Obj).class
+    end
   end
 
   describe 'Muack.verify==false' do

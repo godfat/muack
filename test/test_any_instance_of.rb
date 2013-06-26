@@ -48,4 +48,14 @@ describe Muack::AnyInstanceOf do
     Muack.verify.should.eq true
     obj.f.should.eq 0
   end
+
+  should 'stub proxy with any_instance_of and spy' do
+    any_instance_of(klass){ |inst| stub(inst).f{ |i| i+3 }.proxy }
+    obj = klass.new
+    obj.f.should.eq 3
+    obj.f.should.eq 3
+    spy(any_instance_of(klass)).f.times(2)
+    Muack.verify.should.eq true
+    obj.f.should.eq 0
+  end
 end
