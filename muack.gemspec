@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = "muack"
-  s.version = "0.5.2"
+  s.version = "0.7.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Lin Jen-Shin (godfat)"]
@@ -21,11 +21,13 @@ Gem::Specification.new do |s|
   "lib/muack.rb",
   "lib/muack/any_instance_of.rb",
   "lib/muack/definition.rb",
+  "lib/muack/error.rb",
   "lib/muack/failure.rb",
   "lib/muack/mock.rb",
   "lib/muack/modifier.rb",
   "lib/muack/satisfy.rb",
   "lib/muack/session.rb",
+  "lib/muack/spy.rb",
   "lib/muack/stub.rb",
   "lib/muack/test.rb",
   "lib/muack/version.rb",

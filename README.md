@@ -141,6 +141,27 @@ any_instance_of(User) do |u|
 end
 ```
 
+#### [Spies](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#spies)
+
+We don't try to provide different methods for different testing framework,
+so that we don't have to create so many testing framework adapters, and
+try to be smart to find the correct adapter. There are simply too many
+testing frameworks out there. Ruby's built-in test/unit and minitest have
+a lot of different versions, so does rspec.
+
+Here we just try to do it the Muack's way:
+
+
+``` ruby
+subject = Object.new
+stub(subject).foo(1)
+subject.foo(1)
+
+spy(subject).foo(1)
+spy(subject).bar # This doesn't verify immediately.
+Muack.verify     # This fails, saying `bar` was never called.
+```
+
 #### [Block form](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#block-syntax)
 
 Block form is also supported. However we don't support `instance_eval` form.
