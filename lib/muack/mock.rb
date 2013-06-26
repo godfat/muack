@@ -2,6 +2,7 @@
 require 'muack/definition'
 require 'muack/modifier'
 require 'muack/failure'
+require 'muack/error'
 
 module Muack
   class Mock < BasicObject
@@ -128,9 +129,7 @@ module Muack
 
     def self.find_new_name klass, message, level=0
       if level >= (::ENV['MUACK_RECURSION_LEVEL'] || 9).to_i
-        raise "Can't find a new method name for :#{message}, tried" \
-              " #{level+1} times. Set ENV['MUACK_RECURSION_LEVEL']" \
-              " to raise this limit."
+        raise CannotFindInjectionName.new(level+1, message)
       end
 
       new_name = "__muack_mock_#{level}_#{message}".to_sym
