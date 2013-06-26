@@ -10,12 +10,13 @@ module Muack
   end
 
   def self.session
-    @session ||= Muack::Session.new
+    Thread.current[:muack_session] ||= Muack::Session.new
   end
 
   def self.reset
-    @session && @session.reset
-    @session = nil
+    session = Thread.current[:muack_session]
+    session && session.reset
+    Thread.current[:muack_session] = nil
   end
 
   module API
