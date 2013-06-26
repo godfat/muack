@@ -17,6 +17,7 @@ module Muack
     end
 
     def reset
+      instance_variable_defined?(:@others) && @others.clear
       each_value(&:__mock_reset)
       clear
     end
