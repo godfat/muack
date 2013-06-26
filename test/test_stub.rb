@@ -34,7 +34,7 @@ describe Muack::Stub do
       Muack::EnsureReset.call
     end
 
-    should 'raise Muack::Unexpected error if passing unexpected argument' do
+    should 'raise Unexpected error if passing unexpected argument' do
       stub(Obj).say(true){ 'boo' }
       begin
         Obj.say(false)

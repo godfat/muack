@@ -59,7 +59,7 @@ describe Muack::Mock do
       Muack::EnsureReset.call
     end
 
-    should 'raise Muack::Expected error if passing unexpected argument' do
+    should 'raise Expected error if passing unexpected argument' do
       mock(Str).reverse.proxy
       Str.reverse.should.eq 'ooM'
       begin

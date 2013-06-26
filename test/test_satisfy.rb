@@ -17,7 +17,7 @@ describe Muack::Satisfy do
       Muack::EnsureReset.call
     end
 
-    should 'raise Muack::Unexpected error if passing unexpected argument' do
+    should 'raise Unexpected error if passing unexpected argument' do
       mock(Obj).say(is_a(Array)){ 'boo' }
       begin
         Obj.say(false)
@@ -53,7 +53,7 @@ describe Muack::Satisfy do
       Muack::EnsureReset.call
     end
 
-    should 'raise Muack::Unexpected error if passing unexpected argument' do
+    should 'raise Unexpected error if passing unexpected argument' do
       mock(Obj).say(anything){ 'boo' }
       begin
         Obj.say(6, 7)
@@ -84,7 +84,7 @@ describe Muack::Satisfy do
       Muack::EnsureReset.call
     end
 
-    should 'raise Muack::Unexpected error if passing unexpected argument' do
+    should 'raise Unexpected error if passing unexpected argument' do
       mock(Obj).say(match(/\w/)){ 'boo' }
       begin
         Obj.say('!')
@@ -115,7 +115,7 @@ describe Muack::Satisfy do
       Muack::EnsureReset.call
     end
 
-    should 'raise Muack::Unexpected error if passing unexpected argument' do
+    should 'raise Unexpected error if passing unexpected argument' do
       mock(Obj).say(hash_including(:b => 2)){ 'boo' }
       begin
         Obj.say(:a => 1)
@@ -151,7 +151,7 @@ describe Muack::Satisfy do
       Muack::EnsureReset.call
     end
 
-    should 'raise Muack::Unexpected error if passing unexpected argument' do
+    should 'raise Unexpected error if passing unexpected argument' do
       mock(Obj).say(within(0..5)){ 'boo' }
       begin
         Obj.say(6)
@@ -182,7 +182,7 @@ describe Muack::Satisfy do
       Muack::EnsureReset.call
     end
 
-    should 'raise Muack::Unexpected error if passing unexpected argument' do
+    should 'raise Unexpected error if passing unexpected argument' do
       mock(Obj).say(satisfy{ |arg| arg % 2 == 0 }){ 'boo' }
       begin
         Obj.say(1)

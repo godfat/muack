@@ -94,7 +94,7 @@ describe Muack::Mock do
       Muack::EnsureReset.call
     end
 
-    should 'raise Muack::Unexpected error if passing unexpected argument' do
+    should 'raise Unexpected error if passing unexpected argument' do
       mock(Obj).say(true){ 'boo' }
       begin
         Obj.say(false)
@@ -144,7 +144,7 @@ describe Muack::Mock do
       end
     end
 
-    should 'raise Muack::Unexpected when calling with diff sig' do
+    should 'raise Unexpected when calling with diff sig' do
       mock(Obj).say(true){1}
       Obj.say(true).should.eq 1
       begin
@@ -157,7 +157,7 @@ describe Muack::Mock do
       end
     end
 
-    should 'raise Muack::Expected error if mock methods not called' do
+    should 'raise Expected error if mock methods not called' do
       mock(Obj).say(true){ 'boo' }
       begin
         Muack.verify
