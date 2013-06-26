@@ -1,7 +1,7 @@
 
 require 'muack/test'
 
-describe Muack::Proxy do
+describe Muack::Mock do
   describe 'Muack.verify==true' do
     after do
       Muack.verify.should.eq true
@@ -9,46 +9,46 @@ describe Muack::Proxy do
     end
 
     should 'proxy with regular method' do
-      mock_proxy(Str).reverse
+      mock(Str).reverse.proxy
       Str.reverse.should.eq 'ooM'
     end
 
     should 'proxy multiple times' do
-      2.times{ mock_proxy(Str).reverse }
+      2.times{ mock(Str).reverse.proxy }
       2.times{ Str.reverse.should.eq 'ooM' }
     end
 
     should 'proxy multiple times with super method' do
-      2.times{ mock_proxy(Str).class }
+      2.times{ mock(Str).class.proxy }
       2.times{ Str.class.should.eq String }
     end
 
     should 'proxy and call the block' do
-      mock_proxy(Obj).method_missing(:inspect){ |str| str.reverse }
+      mock(Obj).method_missing(:inspect){ |str| str.reverse }.proxy
       Obj.inspect.should.eq 'jbo'
     end
 
     should 'proxy and call the block with super' do
-      mock_proxy(Str).class{ |k| k.name.reverse  }
+      mock(Str).class{ |k| k.name.reverse }.proxy
       Str.class.should.eq 'gnirtS'
     end
 
-    should 'mock_proxy and call, mock_proxy and call' do
-      mock_proxy(Obj).class{ |k| k.name.reverse }
+    should 'mock proxy and call, mock proxy and call' do
+      mock(Obj).class{ |k| k.name.reverse }.proxy
       Obj.class.should.eq 'tcejbO'
-      mock_proxy(Obj).class{ |k| k.name.upcase }
+      mock(Obj).class{ |k| k.name.upcase }.proxy
       Obj.class.should.eq 'OBJECT'
     end
 
-    should 'stub_proxy and call, stub_proxy and call' do
-      stub_proxy(Obj).kind_of?(Object){ |b| !b }
+    should 'stub proxy and call, stub proxy and call' do
+      stub(Obj).kind_of?(Object){ |b| !b }.proxy
       Obj.kind_of?(Object).should.eq false
-      stub_proxy(Obj).kind_of?(String){ |b| b.to_s }
+      stub(Obj).kind_of?(String){ |b| b.to_s }.proxy
       Obj.kind_of?(String).should.eq 'false'
     end
 
-    should 'stub_proxy with any times' do
-      stub_proxy(Obj).class{ |k| k.name.downcase }
+    should 'stub proxy with any times' do
+      stub(Obj).class{ |k| k.name.downcase }.proxy
       3.times{ Obj.class.should.eq 'object' }
     end
   end
@@ -60,7 +60,7 @@ describe Muack::Proxy do
     end
 
     should 'raise Muack::Expected error if passing unexpected argument' do
-      mock_proxy(Str).reverse
+      mock(Str).reverse.proxy
       Str.reverse.should.eq 'ooM'
       begin
         Str.reverse

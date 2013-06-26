@@ -15,6 +15,11 @@ module Muack
     end
 
     # Public API
+    def proxy
+      defi.proxy = true
+    end
+
+    # Public API
     def times number
       if number >= 1
         (number - 1).times{ mock.__mock_defis_push(defi) }
