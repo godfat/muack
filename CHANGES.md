@@ -1,5 +1,47 @@
 # CHANGES
 
+## Muack 0.7.0 -- 2013-06-27
+
+### Incompatible changes
+
+* Now instead of using mock_proxy, we use `proxy` as a modifier. That says
+  mock_proxy and stub_proxy no longer existed. like this:
+
+``` ruby
+mock(object).to_s.proxy
+stub(object).to_s.proxy
+```
+
+We change this due to the introduction of spies.
+
+### Enhancement
+
+* We have spies support now. Here's an example:
+
+``` ruby
+subject = Object.new
+stub(subject).foo(1)
+subject.foo(1)
+
+spy(subject).foo(1)
+spy(subject).bar # This doesn't verify immediately.
+Muack.verify     # This fails, saying `bar` was never called.
+```
+
+* It would now raise a `StubHasNoTimes` exception if you tried to set times
+  on stubs, which has no meanings in Muack. Use `mock` or `spy` instead if
+  you need to specify times.
+
+* Muack.reset and Muack.verify is now thread-safe.
+  You can run test cases concurrently now.
+
+* AnyInstanceOf now has a more readable inspect.
+* Improved various error messages. e.g. CannotFindInjectionName.
+* You can now set ENV['MUACK_RECURSION_LEVEL'] to raise the limit
+  to find a new method name when we're injecting a method. Normally
+  this should not happen, and it could be a bug in Muack. But instead of
+  putting a magic number 9 out there as before, this might be better.
+
 ## Muack 0.5.2 -- 2013-06-26
 
 * Add `returns` modifier which you can pass the return values if passing
