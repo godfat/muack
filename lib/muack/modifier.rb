@@ -12,11 +12,13 @@ module Muack
     # Public API
     def returns val=nil, &block
       defi.block = block || lambda{ val }
+      self
     end
 
     # Public API
     def proxy
       defi.proxy = true
+      self
     end
 
     # Public API
