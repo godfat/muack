@@ -101,27 +101,47 @@ User.find('42').times(0)
 User.find('42') # raises a Muack::Unexpected
 ```
 
-#### [mock_proxy](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#mockproxy)
+#### [proxy](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#mockproxy)
 
-Since I don't see how we gain from calling it mock.proxy, in Muack we
-just call it `mock_proxy`.
+Instead of calling `proxy` immediately after calling `mock`, we put
+`proxy` the last because it's a method from `Muack::Modifier`.
 
 ``` ruby
 view = controller.template
-mock_proxy(view).render(:partial => "right_navigation")
-mock_proxy(view).render(:partial => "user_info") do |html|
+mock(view).render(:partial => "right_navigation").proxy
+mock(view).render(:partial => "user_info") do |html|
+  html.should include("John Doe")
+  "Different html"
+end.proxy
+```
+
+If you feel it is weird to put proxy the last, you can also use
+`returns` modifier to put the block last as this:
+
+``` ruby
+view = controller.template
+mock(view).render(:partial => "right_navigation").proxy
+mock(view).render(:partial => "user_info").proxy.returns do |html|
   html.should include("John Doe")
   "Different html"
 end
 ```
 
-#### [stub_proxy](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#stubproxy)
-
-The same goes to `stub_proxy`.
+The same goes to `stub`.
 
 ``` ruby
 view = controller.template
-stub_proxy(view).render(:partial => "user_info") do |html|
+stub(view).render(:partial => "user_info") do |html|
+  html.should include("Joe Smith")
+  html
+end.proxy
+```
+
+Or use `returns`:
+
+``` ruby
+view = controller.template
+stub(view).render(:partial => "user_info").proxy.returns do |html|
   html.should include("Joe Smith")
   html
 end
