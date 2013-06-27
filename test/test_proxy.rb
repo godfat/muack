@@ -23,6 +23,12 @@ describe Muack::Mock do
       2.times{ Str.class.should.eq String }
     end
 
+    should 'return modifier itself for any modifier methods' do
+      mock(Str).to_s.proxy.returns{ |s| s.reverse }.times(2).
+        with_any_args.with_any_args
+      2.times{ Str.to_s.should.eq 'ooM' }
+    end
+
     should 'proxy and call the block' do
       mock(Obj).method_missing(:inspect){ |str| str.reverse }.proxy
       Obj.inspect.should.eq 'jbo'
