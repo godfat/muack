@@ -156,8 +156,8 @@ any of the above is supported as well, not only stub.
 any_instance_of(User) do |u|
   stub(u).valid? { false }
   mock(u).errors { []    }
-  mock_proxy.save
-  stub_proxy.reload
+  mock(u).save.proxy
+  stub(u).reload.proxy
 end
 ```
 
@@ -363,7 +363,7 @@ object.foo        # fails
 
 Multiple mock with different argument set is fine, too.
 
-```
+``` ruby
 mock(object).foo(1, 2).times(0)
 mock(object).foo(3, 4)
 object.foo(3, 4)  # ok
