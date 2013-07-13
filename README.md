@@ -469,15 +469,6 @@ mock(object).foobar(is_a(TrueClass) | is_a(FalseClass))
 object.foobar(false)
 ```
 
-Or simply pass a custom satisfy block for it.
-Though there's not much point here. Just want to demonstrate.
-
-``` ruby
-mock(object).foobar(
-  satisfy{ |a| a.kind_of?(TrueClass) || a.kind_of?(FalseClass) })
-object.foobar(false)
-```
-
 Since duck_type is a weird name to me. Here we use `respond_to(:walk, :talk)`.
 
 ``` ruby
