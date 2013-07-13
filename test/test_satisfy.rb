@@ -181,9 +181,14 @@ describe Muack::Satisfy do
     end
 
     should 'satisfy' do
-      mock(Str).say(respond_to(:verify)){ |arg| arg.name }
+      mock(Str).say(respond_to(:verify, :reset)){ |arg| arg.name }
       Str.say(Muack).should.eq 'Muack'
       Muack.verify.should.eq true
+
+      mock(Str).say(respond_to(:verify        )){ |arg| arg.name }
+      Str.say(Muack).should.eq 'Muack'
+      Muack.verify.should.eq true
+
       Muack::EnsureReset.call
     end
 
@@ -226,6 +231,72 @@ describe Muack::Satisfy do
       rescue Muack::Unexpected => e
         e.expected.should.start_with 'obj.say(Muack::API.satisfy(#<Proc:'
         e.was     .should.eq         'obj.say(1)'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      ensure
+        Muack.reset
+        Muack::EnsureReset.call
+      end
+    end
+  end
+
+  describe Muack::Satisfy::Union do
+    should 'have human readable to_s and inspect' do
+      matcher = is_a(TrueClass) | is_a(FalseClass)
+      expected = 'Muack::API.is_a(TrueClass) | Muack::API.is_a(FalseClass)'
+      matcher.to_s   .should.start_with expected
+      matcher.inspect.should.start_with expected
+    end
+
+    should 'satisfy' do
+      mock(Str).say(is_a(TrueClass) | is_a(FalseClass)){ |arg| !arg }
+      Str.say(false).should.eq true
+      Muack.verify  .should.eq true
+      Muack::EnsureReset.call
+    end
+
+    should 'raise Unexpected error if passing unexpected argument' do
+      mock(Obj).say(within('0'..'1') | match(/a/)){ 'boo' }
+      begin
+        Obj.say('2')
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq \
+          'obj.say(Muack::API.within("0".."1") | Muack::API.match(/a/))'
+        e.was     .should.eq \
+          'obj.say("2")'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      ensure
+        Muack.reset
+        Muack::EnsureReset.call
+      end
+    end
+  end
+
+  describe Muack::Satisfy::Inter do
+    should 'have human readable to_s and inspect' do
+      matcher = respond_to(:ancestors) & is_a(Class)
+      expected = 'Muack::API.respond_to(:ancestors) & Muack::API.is_a(Class)'
+      matcher.to_s   .should.eq expected
+      matcher.inspect.should.eq expected
+    end
+
+    should 'satisfy' do
+      mock(Str).say(respond_to(:ancestors) & is_a(Class)){ |arg| arg.new }
+      Str.say(String).should.eq ''
+      Muack.verify   .should.eq true
+      Muack::EnsureReset.call
+    end
+
+    should 'raise Unexpected error if passing unexpected argument' do
+      mock(Obj).say(anything & within(0..1)){ 'boo' }
+      begin
+        Obj.say(2)
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq \
+          'obj.say(Muack::API.anything() & Muack::API.within(0..1))'
+        e.was     .should.eq \
+          'obj.say(2)'
         e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
       ensure
         Muack.reset
