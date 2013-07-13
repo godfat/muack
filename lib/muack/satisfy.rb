@@ -51,4 +51,11 @@ module Muack
             [range_or_array]
     end
   end
+
+  class RespondTo < Satisfy
+    def initialize *messages
+      super lambda{ |actual_arg|
+        messages.all?{ |msg| actual_arg.respond_to?(msg) } }, messages
+    end
+  end
 end

@@ -61,6 +61,10 @@ module Muack
       Muack::Within.new(range_or_array)
     end
 
+    def respond_to *msg
+      Muack::RespondTo.new(*msg)
+    end
+
     def satisfy &block
       Muack::Satisfy.new(block)
     end

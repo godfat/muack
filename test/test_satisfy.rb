@@ -167,6 +167,42 @@ describe Muack::Satisfy do
     end
   end
 
+  describe Muack::RespondTo do
+    should 'have human readable to_s and inspect' do
+      matcher = respond_to(:id)
+      expected = 'Muack::API.respond_to(:id)'
+      matcher.to_s   .should.start_with expected
+      matcher.inspect.should.start_with expected
+
+      matcher = respond_to(:id, :reload)
+      expected = 'Muack::API.respond_to(:id, :reload)'
+      matcher.to_s   .should.start_with expected
+      matcher.inspect.should.start_with expected
+    end
+
+    should 'satisfy' do
+      mock(Str).say(respond_to(:verify)){ |arg| arg.name }
+      Str.say(Muack).should.eq 'Muack'
+      Muack.verify.should.eq true
+      Muack::EnsureReset.call
+    end
+
+    should 'raise Unexpected error if passing unexpected argument' do
+      mock(Obj).say(respond_to(:nothing)){ 'boo' }
+      begin
+        Obj.say(0)
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq 'obj.say(Muack::API.respond_to(:nothing))'
+        e.was     .should.eq 'obj.say(0)'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      ensure
+        Muack.reset
+        Muack::EnsureReset.call
+      end
+    end
+  end
+
   describe Muack::Satisfy do
     should 'have human readable to_s and inspect' do
       matcher = satisfy{ |arg| arg % 2 == 0 }
