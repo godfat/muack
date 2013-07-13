@@ -462,7 +462,15 @@ mock(object).foobar(is_a(Numeric))
 object.foobar(99)
 ```
 
-No boolean supports. Pass a custom satisfy block for it:
+No boolean supports, but you can use union (`|`).
+
+``` ruby
+mock(object).foobar(is_a(TrueClass) | is_a(FalseClass))
+object.foobar(false)
+```
+
+Or simply pass a custom satisfy block for it.
+Though there's not much point here. Just want to demonstrate.
 
 ``` ruby
 mock(object).foobar(
@@ -470,11 +478,21 @@ mock(object).foobar(
 object.foobar(false)
 ```
 
-No duck_type supports. Pass a custom satisfy block for it:
+Since duck_type is a weird name to me. Here we use `respond_to(:walk, :talk)`.
 
 ``` ruby
-mock(object).foobar(
-  satisfy{ |a| a.respond_to?(:walk) && a.respond_to?(:talk) })
+mock(object).foobar(respond_to(:walk, :talk))
+arg = Object.new
+def arg.walk; 'waddle'; end
+def arg.talk; 'quack'; end
+object.foobar(arg)
+```
+
+You can also use intersection (`&`) for multiple responses.
+Though there's not much point here. Just want to demonstrate.
+
+``` ruby
+mock(object).foobar(respond_to(:walk) & respond_to(:talk))
 arg = Object.new
 def arg.walk; 'waddle'; end
 def arg.talk; 'quack'; end
