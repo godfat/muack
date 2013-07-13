@@ -1,5 +1,10 @@
 # CHANGES
 
+## Muack 0.7.1 -- 2013-07-13
+
+* Added `respond_to` argument matcher corresponding to RR's duck_type.
+* Added `|` and `&` for argument matcher union and intersection. See README.md
+
 ## Muack 0.7.0 -- 2013-06-27
 
 ### Incompatible changes
