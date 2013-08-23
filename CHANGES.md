@@ -1,5 +1,11 @@
 # CHANGES
 
+## Muack 0.7.2 -- 2013-08-23
+
+* Show correct Expected error for special satisfiers. Previously, it would
+  incorrectly showing Unexpected error. However it's considered expected,
+  it's simply the number of times is wrong.
+
 ## Muack 0.7.1 -- 2013-07-13
 
 * Added `respond_to` argument matcher corresponding to RR's duck_type.
