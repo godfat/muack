@@ -1,7 +1,12 @@
 
-require "#{dir = File.dirname(__FILE__)}/task/gemgem"
-Gemgem.dir = dir
+begin
+  require "#{dir = File.dirname(__FILE__)}/task/gemgem"
+rescue LoadError
+  sh 'git submodule update --init'
+  exec Gem.ruby, '-S', 'rake', *ARGV
+end
 
+Gemgem.dir = dir
 ($LOAD_PATH << File.expand_path("#{Gemgem.dir}/lib")).uniq!
 
 desc 'Generate gemspec'
