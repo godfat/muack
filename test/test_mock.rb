@@ -120,6 +120,22 @@ describe Muack::Mock do
       end
     end
 
+    should 'have correct message for mocks with special satisfier' do
+      mock(Obj).say(anything)
+      begin
+        Obj.say(1)
+        Obj.say(2)
+        'never'.should.eq 'reach'
+      rescue Muack::Expected => e
+        expected = 'obj.say(Muack::API.anything())'
+        e.expected.should.eq expected
+        e.expected_times.should.eq 1
+        e.actual_times  .should.eq 2
+        e.message       .should.eq "\nExpected: #{expected}\n  " \
+                                   "called 1 times\n but was 2 times."
+      end
+    end
+
     should 'raise if a mock with times(0) gets called' do
       mock(Obj).say.times(0)
       begin

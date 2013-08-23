@@ -59,9 +59,9 @@ module Muack
         end
       else
         defis = __mock_disps[msg]
-        if expected_defi = defis.find{ |d| d.args == actual_args }
+        if expected = defis.find{ |d| __mock_check_args(d.args, actual_args) }
           Mock.__send__(:raise, # Too many times
-            Expected.new(object, expected_defi, defis.size, defis.size+1))
+            Expected.new(object, expected, defis.size, defis.size+1))
         else
           Mock.__send__(:raise, # Wrong argument
             Unexpected.new(object, defis, msg, actual_args))
