@@ -18,6 +18,11 @@ It's 32x times faster (750s vs 23s) for running [Rib][] tests.
 [RR]: https://github.com/rr/rr
 [Rib]: https://github.com/godfat/rib
 
+## WHY?
+
+Because RR has/had some bugs and it is too complex for me to fix it.
+Muack is much simpler and thus much faster and less likely to have bugs.
+
 ## REQUIREMENTS:
 
 * Tested with MRI (official CRuby) 1.9.3, 2.0.0, Rubinius and JRuby.
