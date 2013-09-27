@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+# stub: muack 0.7.2 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "muack"
@@ -6,7 +7,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Lin Jen-Shin (godfat)"]
-  s.date = "2013-08-23"
+  s.date = "2013-09-28"
   s.description = "Muack -- Yet another mocking library.\n\nBasically it's an [RR][] clone, but much faster under heavy use.\nIt's 32x times faster (750s vs 23s) for running [Rib][] tests.\n\n[RR]: https://github.com/rr/rr\n[Rib]: https://github.com/godfat/rib"
   s.email = ["godfat (XD) godfat.org"]
   s.files = [
@@ -43,7 +44,7 @@ Gem::Specification.new do |s|
   s.homepage = "https://github.com/godfat/muack"
   s.licenses = ["Apache License 2.0"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "2.0.6"
+  s.rubygems_version = "2.1.5"
   s.summary = "Muack -- Yet another mocking library."
   s.test_files = [
   "test/test_any_instance_of.rb",
