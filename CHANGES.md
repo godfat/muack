@@ -1,5 +1,10 @@
 # CHANGES
 
+## Muack 0.7.3 -- 2013-10-01
+
+* Added `Muack::API.including(element)` for detecting if the underlying
+  element is included in the passed argument.
+
 ## Muack 0.7.2 -- 2013-08-23
 
 * Show correct Expected error for special satisfiers. Previously, it would
