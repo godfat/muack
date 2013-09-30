@@ -131,6 +131,37 @@ describe Muack::Satisfy do
     end
   end
 
+  describe Muack::Including do
+    should 'have human readable to_s and inspect' do
+      matcher = including(2)
+      expected = 'Muack::API.including(2)'
+      matcher.to_s   .should.eq expected
+      matcher.inspect.should.eq expected
+    end
+
+    should 'satisfy' do
+      mock(Str).say(including(2)){ |arg| arg.first }
+      Str.say([1, 2]).should.eq 1
+      Muack.verify.should.eq true
+      Muack::EnsureReset.call
+    end
+
+    should 'raise Unexpected error if passing unexpected argument' do
+      mock(Obj).say(including(2)){ 'boo' }
+      begin
+        Obj.say([1])
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq 'obj.say(Muack::API.including(2))'
+        e.was     .should.eq 'obj.say([1])'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      ensure
+        Muack.reset
+        Muack::EnsureReset.call
+      end
+    end
+  end
+
   describe Muack::Within do
     should 'have human readable to_s and inspect' do
       matcher = within(0..9)

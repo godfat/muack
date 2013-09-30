@@ -57,6 +57,10 @@ module Muack
       Muack::HashIncluding.new(hash)
     end
 
+    def including element
+      Muack::Including.new(element)
+    end
+
     def within range_or_array
       Muack::Within.new(range_or_array)
     end

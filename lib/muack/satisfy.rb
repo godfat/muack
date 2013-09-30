@@ -70,6 +70,13 @@ module Muack
     end
   end
 
+  class Including < Satisfy
+    def initialize element
+      super lambda{ |actual_arg|
+        actual_arg.include?(element) }, [element]
+    end
+  end
+
   class Within < Satisfy
     def initialize range_or_array
       super lambda{ |actual_arg| range_or_array.include?(actual_arg) },
