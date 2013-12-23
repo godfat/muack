@@ -1,5 +1,36 @@
 # CHANGES
 
+## Muack 1.0.0 -- ?
+
+Incompatible changes:
+
+* Removed proxy method. From now on, if you do not pass a block to a
+  mock, then it would assume it's a proxy. You can think of instead of
+  make an empty block as a default, the original method is the default.
+  That means, previously, mock without a block would always return nil,
+  but now it instead means a proxy.
+
+* Introduced peek_args method. Sometimes I really need to peek the
+  arguments of a method, or trying to provide a different argument
+  based on the original argument. So peek_args is the way to do it.
+
+* Introduced peek_return method. By duality, we also introduce something
+  we can peek the return value. Using this along with a custom block
+  doesn't really make sense, but this is actually the previous proxy
+  block. Previously, if a mock is a proxy, then the block doesn't really
+  mean the implementation, but a modification to the original return.
+  That is, the current peek_return. Originally the block is quite
+  inconsistent as the semantics of the block would change depending on
+  it is a proxy or not.
+
+So to proxy the to_s method and then reverse the result, you write:
+
+``` ruby
+str = 'str'
+Muack::API.mock(str).to_s.peek_return{ |s| s.reverse }
+p str.to_s # => 'rts'
+```
+
 ## Muack 0.7.3 -- 2013-10-01
 
 * Added `Muack::API.including(element)` for detecting if the underlying
