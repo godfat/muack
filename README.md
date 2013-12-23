@@ -74,7 +74,7 @@ mock(view).render(:partial => "user_info") {"Information"}
 There's no `twice` modifier in Muack, use `times(2)` instead.
 
 ``` ruby
-mock(view).render.with_any_args.times(2) do |*args|
+mock(view).render.with_any_args.times(2).returns do |*args|
   if args.first == {:partial => "user_info"}
     "User Info"
   else
@@ -108,25 +108,22 @@ User.find('42') # raises a Muack::Unexpected
 
 #### [proxy](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#mockproxy)
 
-Instead of calling `proxy` immediately after calling `mock`, we put
-`proxy` the last because it's a method from `Muack::Modifier`.
+Instead of using another method for proxies, we simply do not pass any
+block to the mocked method. You can think of the default block would be
+the original method.
 
 ``` ruby
 view = controller.template
-mock(view).render(:partial => "right_navigation").proxy
-mock(view).render(:partial => "user_info") do |html|
-  html.should include("John Doe")
-  "Different html"
-end.proxy
+mock(view).render(:partial => "right_navigation")
 ```
 
-If you feel it is weird to put proxy the last, you can also use
-`returns` modifier to put the block last as this:
+If you would like to peek the return value from the original method,
+while returning a different result, you could use `peek_return`.
+Note that `peek_return` works for non-proxies as well, just doesn't
+make too much sense as you could already control the return value.
 
 ``` ruby
-view = controller.template
-mock(view).render(:partial => "right_navigation").proxy
-mock(view).render(:partial => "user_info").proxy.returns do |html|
+mock(view).render(:partial => "user_info").peek_return do |html|
   html.should include("John Doe")
   "Different html"
 end
@@ -136,17 +133,7 @@ The same goes to `stub`.
 
 ``` ruby
 view = controller.template
-stub(view).render(:partial => "user_info") do |html|
-  html.should include("Joe Smith")
-  html
-end.proxy
-```
-
-Or use `returns`:
-
-``` ruby
-view = controller.template
-stub(view).render(:partial => "user_info").proxy.returns do |html|
+stub(view).render(:partial => "user_info").peek_return do |html|
   html.should include("Joe Smith")
   html
 end
@@ -161,8 +148,8 @@ any of the above is supported as well, not only stub.
 any_instance_of(User) do |u|
   stub(u).valid? { false }
   mock(u).errors { []    }
-  mock(u).save.proxy
-  stub(u).reload.proxy
+  mock(u).save
+  stub(u).reload
 end
 ```
 
@@ -179,7 +166,7 @@ Here we just try to do it the Muack's way:
 
 ``` ruby
 subject = Object.new
-stub(subject).foo(1)
+stub(subject).foo(1){}
 subject.foo(1)
 
 spy(subject).foo(1)
@@ -295,6 +282,26 @@ stub(object).foo(is_a(Fixnum), anything){ |age, count, &block|
 }
 ```
 
+Or if you would like to go with `with_any_args`:
+
+``` ruby
+stub(object).foo{ |age, count, &block|
+  raise 'hell' if age < 16
+  ret = block.call count
+  blue? ? ret : 'whatever'
+}.with_any_args
+```
+
+Or if you would like to put `with_any_args` in the front:
+
+``` ruby
+stub(object).foo.with_any_args.returns{ |age, count, &block|
+  raise 'hell' if age < 16
+  ret = block.call count
+  blue? ? ret : 'whatever'
+}
+```
+
 #### [Stubbing method implementation based on argument expectation](https://github.com/rr/rr/blob/e4b4907fd0488738affb4dab8ce88cbe9fa6580e/doc/03_api_overview.md#stubbing-method-implementation-based-on-argument-expectation)
 
 Here is exactly the same as RR.
@@ -328,8 +335,8 @@ object.foo(3)      # fails
 Passing no arguments really means passing no arguments.
 
 ``` ruby
-stub(object).foo
-stub(object).foo(1, 2)
+stub(object).foo{}
+stub(object).foo(1, 2){}
 object.foo(1, 2)   # ok
 object.foo         # ok
 object.foo(3)      # fails
@@ -340,7 +347,7 @@ object.foo(3)      # fails
 Muack also provides `with_any_args` if we don't really care.
 
 ``` ruby
-stub(object).foo.with_any_args
+stub(object).foo{}.with_any_args
 object.foo        # ok
 object.foo(1)     # also ok
 object.foo(1, 2)  # also ok
@@ -352,7 +359,7 @@ object.foo(1, 2)  # also ok
 Just don't pass any argument :)
 
 ``` ruby
-stub(object).foo
+stub(object).foo{}
 object.foo        # ok
 object.foo(1)     # fails
 ```
@@ -362,15 +369,15 @@ object.foo(1)     # fails
 Simply use `times(0)`.
 
 ``` ruby
-mock(object).foo.times(0)
+mock(object).foo{}.times(0)
 object.foo        # fails
 ```
 
 Multiple mock with different argument set is fine, too.
 
 ``` ruby
-mock(object).foo(1, 2).times(0)
-mock(object).foo(3, 4)
+mock(object).foo(1, 2){}.times(0)
+mock(object).foo(3, 4){}
 object.foo(3, 4)  # ok
 object.foo(1, 2)  # fails
 ```
@@ -380,7 +387,7 @@ object.foo(1, 2)  # fails
 By default, a mock only expects a call. Using `times(1)` is actually a no-op.
 
 ``` ruby
-mock(object).foo.times(1)
+mock(object).foo{}.times(1)
 object.foo
 object.foo    # fails
 ```
@@ -390,7 +397,7 @@ object.foo    # fails
 Times! Which is the same as RR.
 
 ``` ruby
-mock(object).foo.times(3)
+mock(object).foo{}.times(3)
 object.foo
 object.foo
 object.foo
@@ -400,7 +407,7 @@ object.foo    # fails
 Alternatively, you could also do this. It's exactly the same.
 
 ``` ruby
-3.times{ mock(object).foo }
+3.times{ mock(object).foo{} }
 object.foo
 object.foo
 object.foo
@@ -438,7 +445,7 @@ object.foo
 Just use `stub`, which is exactly why it is designed.
 
 ``` ruby
-stub(object).foo
+stub(object).foo{}
 object.foo
 object.foo
 object.foo
@@ -449,35 +456,35 @@ object.foo
 `anything` is the same as RR.
 
 ``` ruby
-mock(object).foobar(1, anything)
+mock(object).foobar(1, anything){}
 object.foobar(1, :my_symbol)
 ```
 
 `is_a` is the same as RR.
 
 ``` ruby
-mock(object).foobar(is_a(Time))
+mock(object).foobar(is_a(Time)){}
 object.foobar(Time.now)
 ```
 
 No numeric supports. Simply use `is_a(Numeric)`
 
 ``` ruby
-mock(object).foobar(is_a(Numeric))
+mock(object).foobar(is_a(Numeric)){}
 object.foobar(99)
 ```
 
 No boolean supports, but you can use union (`|`).
 
 ``` ruby
-mock(object).foobar(is_a(TrueClass) | is_a(FalseClass))
+mock(object).foobar(is_a(TrueClass) | is_a(FalseClass)){}
 object.foobar(false)
 ```
 
 Since duck_type is a weird name to me. Here we use `respond_to(:walk, :talk)`.
 
 ``` ruby
-mock(object).foobar(respond_to(:walk, :talk))
+mock(object).foobar(respond_to(:walk, :talk)){}
 arg = Object.new
 def arg.walk; 'waddle'; end
 def arg.talk; 'quack'; end
@@ -488,7 +495,7 @@ You can also use intersection (`&`) for multiple responses.
 Though there's not much point here. Just want to demonstrate.
 
 ``` ruby
-mock(object).foobar(respond_to(:walk) & respond_to(:talk))
+mock(object).foobar(respond_to(:walk) & respond_to(:talk)){}
 arg = Object.new
 def arg.walk; 'waddle'; end
 def arg.talk; 'quack'; end
@@ -499,28 +506,28 @@ Don't pass ranges directly for ranges, use `within`. Or how do we tell
 if we really want the argument to be a `Range` object?
 
 ``` ruby
-mock(object).foobar(within(1..10))
+mock(object).foobar(within(1..10)){}
 object.foobar(5)
 ```
 
 The same goes to regular expression. Use `match` instead.
 
 ``` ruby
-mock(object).foobar(match(/on/))
+mock(object).foobar(match(/on/)){}
 object.foobar("ruby on rails")
 ```
 
 `hash_including` is the same as RR.
 
 ``` ruby
-mock(object).foobar(hash_including(:red => "#FF0000", :blue => "#0000FF"))
+mock(object).foobar(hash_including(:red => "#FF0000", :blue => "#0000FF")){}
 object.foobar({:red => "#FF0000", :blue => "#0000FF", :green => "#00FF00"})
 ```
 
 `satisfy` is the same as RR.
 
 ``` ruby
-mock(object).foobar(satisfy {|arg| arg.length == 2 })
+mock(object).foobar(satisfy {|arg| arg.length == 2 }){}
 object.foobar("xy")
 ```
 
