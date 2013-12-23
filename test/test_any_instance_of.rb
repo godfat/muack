@@ -5,7 +5,7 @@ describe Muack::AnyInstanceOf do
   klass = Class.new{ def f; 0; end }
 
   should 'mock any_instance_of' do
-    any_instance_of(klass){ |instance| mock(instance).say{ true } }
+    any_instance_of(klass){ |inst| mock(inst).say{ true } }
     obj = klass.new
     obj.say              .should.eq true
     obj.respond_to?(:say).should.eq true
@@ -14,7 +14,7 @@ describe Muack::AnyInstanceOf do
   end
 
   should 'proxy any_instance_of' do
-    any_instance_of(klass){ |instance| mock(instance).f.proxy }
+    any_instance_of(klass){ |inst| mock(inst).f }
     obj = klass.new
     obj.f       .should.eq 0
     Muack.verify.should.eq true
@@ -22,7 +22,7 @@ describe Muack::AnyInstanceOf do
   end
 
   should 'proxy any_instance_of with a block' do
-    any_instance_of(klass){ |instance| mock(instance).f{ |i| i+1 }.proxy }
+    any_instance_of(klass){ |inst| mock(inst).f.peek_return{|i|i+1} }
     obj = klass.new
     obj.f       .should.eq 1
     Muack.verify.should.eq true
@@ -30,8 +30,8 @@ describe Muack::AnyInstanceOf do
   end
 
   should 'proxy with multiple any_instance_of call' do
-    any_instance_of(klass){ |instance| mock(instance).f{ |i| i+1 }.proxy }
-    any_instance_of(klass){ |instance| mock(instance).f{ |i| i+2 }.proxy }
+    any_instance_of(klass){ |inst| mock(inst).f.peek_return{ |i| i+1 } }
+    any_instance_of(klass){ |inst| mock(inst).f.peek_return{ |i| i+2 } }
     obj = klass.new
     obj.f.should.eq 1
     obj.f.should.eq 2
@@ -50,7 +50,7 @@ describe Muack::AnyInstanceOf do
   end
 
   should 'stub proxy with any_instance_of and spy' do
-    any_instance_of(klass){ |inst| stub(inst).f{ |i| i+3 }.proxy }
+    any_instance_of(klass){ |inst| stub(inst).f.peek_return{ |i| i+3 } }
     obj = klass.new
     obj.f.should.eq 3
     obj.f.should.eq 3

@@ -4,8 +4,14 @@ require 'muack/error'
 module Muack
   class Modifier < Struct.new(:mock, :defi)
     # Public API
-    def with_any_args
-      defi.args = [WithAnyArgs]
+    def peek_args *args, &block
+      defi.peek_args = block || lambda{ args }
+      self
+    end
+
+    # Public API
+    def peek_return &block
+      defi.peek_return = block
       self
     end
 
@@ -16,8 +22,8 @@ module Muack
     end
 
     # Public API
-    def proxy
-      defi.proxy = true
+    def with_any_args
+      defi.args = [WithAnyArgs]
       self
     end
 

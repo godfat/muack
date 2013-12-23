@@ -70,22 +70,10 @@ module Muack
     end
 
     # used for mocked object to dispatch mocked method
-    def __mock_dispatch_call disp, actual_args, actual_block
-      if disp.proxy
-        value = yield # need the original context for proxy or AnyInstanceOf
-        if disp.block
-          disp.block.call(value)
-        else
-          value
-        end
-      elsif block = disp.block
-        arity = block.arity
-        if arity < 0
-          block.call(*actual_args             , &actual_block)
-        else
-          block.call(*actual_args.first(arity), &actual_block)
-        end
-      end
+    def __mock_dispatch_call disp, actual_args, actual_block, &block
+      args = __mock_peek_args(disp, actual_args)
+      ret  = __mock_actuall_call(disp, args, actual_block, &block)
+      __mock_peek_return(disp, ret)
     end
 
     # used for Muack::Session#verify
@@ -147,16 +135,42 @@ module Muack
 
     def __mock_inject_mock_method target, defi
       mock = self # remember the context
-      target.__send__(:define_method, defi.msg){|*actual_args, &actual_block|
+      target.__send__(:define_method, defi.msg){ |*actual_args, &actual_block|
         disp = mock.__mock_dispatch(defi.msg, actual_args)
-        mock.__mock_dispatch_call(disp, actual_args, actual_block){
+        mock.__mock_dispatch_call(disp, actual_args,
+                                        actual_block){ |args, &block|
           if disp.original_method
-            __send__(disp.original_method, *actual_args, &actual_block)
+            __send__(disp.original_method, *args, &block)
           else
-            super(*actual_args, &actual_block)
+            super(*args, &block)
           end
         }
       }
+    end
+
+    # used for __mock_dispatch_call
+    def __mock_peek_args disp, args
+      if disp.peek_args then disp.peek_args.call(*args) else args end
+    end
+
+    # used for __mock_dispatch_call
+    def __mock_peek_return disp, ret
+      if disp.peek_return then disp.peek_return.call(ret) else ret end
+    end
+
+    # used for __mock_dispatch_call
+    def __mock_actuall_call disp, args, block
+      if block = disp.block
+        arity = block.arity
+        if arity < 0
+          block.call(*args             , &block)
+        else
+          block.call(*args.first(arity), &block)
+        end
+      else # proxy goes here
+        # need the original context for proxy or AnyInstanceOf
+        yield(*args) # ruby limitation: cannot pass block
+      end
     end
 
     def __mock_check_args expected_args, actual_args

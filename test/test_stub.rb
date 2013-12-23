@@ -46,13 +46,13 @@ describe Muack::Stub do
     end
 
     should 'work with spy twice' do
-      stub(Obj).say
+      stub(Obj).say{nil}
       2.times{ Obj.say.should.eq nil }
       spy(Obj).say.times(2)
     end
 
     should 'work with spy spy' do
-      stub(Obj).say
+      stub(Obj).say{nil}
       2.times{ Obj.say.should.eq nil }
       2.times{ spy(Obj).say }
     end
@@ -90,7 +90,7 @@ describe Muack::Stub do
     end
 
     should 'raise Expected if the spy is not satisfied' do
-      stub(Obj).say
+      stub(Obj).say{nil}
       spy( Obj).say
       begin
         Muack.verify
@@ -105,7 +105,7 @@ describe Muack::Stub do
     end
 
     should 'raise Expected if the spy is not satisfied enough' do
-      stub(Obj).say
+      stub(Obj).say{nil}
       Obj.say
       spy( Obj).say(0)
       begin
@@ -119,7 +119,7 @@ describe Muack::Stub do
     end
 
     should 'show correct times for under satisfaction' do
-      stub(Obj).say
+      stub(Obj).say{nil}
       2.times{ Obj.say }
       spy( Obj).say.times(3)
       begin
@@ -135,7 +135,7 @@ describe Muack::Stub do
     end
 
     should 'show correct times for over satisfaction' do
-      stub(Obj).say
+      stub(Obj).say{nil}
       2.times{ Obj.say }
       spy( Obj).say
       begin
