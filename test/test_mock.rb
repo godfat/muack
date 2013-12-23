@@ -107,7 +107,7 @@ describe Muack::Mock do
     end
 
     should 'have correct message for multiple mocks with the same name' do
-      2.times{ mock(Obj).say{nil} }
+      2.times{ mock(Obj).say{} }
       begin
         3.times{ Obj.say }
         'never'.should.eq 'reach'
@@ -121,7 +121,7 @@ describe Muack::Mock do
     end
 
     should 'have correct message for mocks with special satisfier' do
-      mock(Obj).say(anything){nil}
+      mock(Obj).say(anything){}
       begin
         Obj.say(1)
         Obj.say(2)
