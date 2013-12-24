@@ -262,14 +262,6 @@ stub(object)[is_a(Fixnum)].returns{ |a| a + 1 }
 object[1]  #=> 2
 ```
 
-You can also pass a value directly to `returns` if you only want to return
-a simple value.
-
-``` ruby
-stub(object)[is_a(Fixnum)].returns(2)
-object[1]  #=> 2
-```
-
 On the other hand, since Muack is more strict than RR. Passing no arguments
 means you really don't want any argument. Here we need to specify the
 argument for Muack. The example in RR should be changed to this in Muack:
