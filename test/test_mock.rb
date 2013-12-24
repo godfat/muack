@@ -77,12 +77,7 @@ describe Muack::Mock do
       obj.f       .should.eq 0
     end
 
-    should 'return values with returns with a value' do
-      mock(Obj).say.returns(0)
-      Obj.say.should.eq 0
-    end
-
-    should 'return values with returns with a block' do
+    should 'return plain value' do
       mock(Obj).say.returns{0}
       Obj.say.should.eq 0
     end

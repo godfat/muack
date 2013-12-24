@@ -8,19 +8,13 @@ describe Muack::Modifier do
   end
 
   describe 'peek_args' do
-    should 'with values' do
-      str = 'ff'
-      stub(str).to_i.peek_args(16)
-      str.to_i.should.eq 255
-    end
-
-    should 'with block' do
+    should 'plain value' do
       str = 'ff'
       stub(str).to_i.peek_args{16}
       str.to_i.should.eq 255
     end
 
-    should 'with block modifying' do
+    should 'modifying' do
       str = 'ff'
       stub(str).to_i(is_a(Integer)).peek_args{ |radix| radix * 2 }
       str.to_i(8).should.eq 255
