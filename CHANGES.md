@@ -31,6 +31,25 @@ Muack::API.mock(str).to_s.peek_return{ |s| s.reverse }
 p str.to_s # => 'rts'
 ```
 
+* Removed plain value argument in `returns`. From now on, we should
+  always use the block form. Instead, the argument was changed to be
+  an optional option for specifying if the underlying block should be
+  instance executed or not. By default, the block is lexical scoped.
+  If passing `:instance_exec => true` to `returns`, `peek_args`, and
+  `peek_return`, then the block is instead instance scoped, passing
+  to the instance's `instance_exec`. This way, we would be able to
+  touch the inside of mocked object.
+
+Without passing `:instance_exec => true`, `to_i` would be called on
+the top-level object instead. By passing this argument, `to_i` would be
+called in the string.
+
+``` ruby
+str = '123'
+Muack::API.mock(str).int.returns(:instance_exec => true){to_i}
+p str.int # => 123
+```
+
 ## Muack 0.7.3 -- 2013-10-01
 
 * Added `Muack::API.including(element)` for detecting if the underlying

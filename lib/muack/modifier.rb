@@ -4,20 +4,23 @@ require 'muack/error'
 module Muack
   class Modifier < Struct.new(:mock, :defi)
     # Public API
-    def peek_args &block
+    def peek_args opts={}, &block
       defi.peek_args = block
+      instance_exec_mode(block) if opts[:instance_exec]
       self
     end
 
     # Public API
-    def peek_return &block
+    def peek_return opts={}, &block
       defi.peek_return = block
+      instance_exec_mode(block) if opts[:instance_exec]
       self
     end
 
     # Public API
-    def returns &block
+    def returns opts={}, &block
       defi.block = block
+      instance_exec_mode(block) if opts[:instance_exec]
       self
     end
 
@@ -46,6 +49,14 @@ module Muack
     # Public API
     def object
       mock.object
+    end
+
+    private
+    def instance_exec_mode block
+      scope = object # closure variable
+      block.singleton_class.__send__(:define_method, :call) do |*args|
+        scope.instance_exec(*args, &block)
+      end
     end
   end
 end

@@ -77,9 +77,14 @@ describe Muack::Mock do
       obj.f       .should.eq 0
     end
 
-    should 'return plain value' do
+    should 'return with lexical scope' do
       mock(Obj).say.returns{0}
       Obj.say.should.eq 0
+    end
+
+    should 'return with dynamic scope' do
+      mock(Obj).say.returns(:instance_exec => true){object_id}
+      Obj.say.should.eq Obj.object_id
     end
   end
 
@@ -183,7 +188,7 @@ describe Muack::Mock do
 
     should 'show first not enough calls' do
       mock(Obj).say{ 'boo' }.times(2)
-      mock(Obj).saya        .times(2)
+      mock(Obj).saya{}      .times(2)
       begin
         Obj.say
         Muack.verify
