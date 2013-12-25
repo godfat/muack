@@ -2,6 +2,16 @@
 
 ## Muack 1.0.0 -- ?
 
+Improvements:
+
+* The internal conflicting method names are now a bit more informative
+  and unique thus less likely to have conflicts.
+
+* Fixed a bug where mock and stub with the same method were defined.
+  Previously, it would raise an undefined method error upon verifying
+  while we're removing injected method. Now it could properly undefine
+  injected methods.
+
 Incompatible changes:
 
 * Removed proxy method. From now on, if you do not pass a block to a
