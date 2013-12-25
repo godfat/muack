@@ -37,20 +37,6 @@ describe Muack::Mock do
       Muack.reset
     end
 
-    should 'mock multiple times' do
-      3.times{ |i| mock(Obj).say(i){ i } }
-      3.times{ |i| Obj.say(i).should.eq i }
-    end
-
-    should 'mock multiple times with times(n) modifier' do
-      mock(Obj).say{ 0 }.times(3)
-      3.times{ |i| Obj.say.should.eq 0 }
-    end
-
-    should 'mock 0 times with times(0) modifier' do
-      mock(Obj).say{ 0 }.times(0).should.kind_of Muack::Modifier
-    end
-
     should 'mix mock and stub' do
       mock(Obj).say { 0 }
       stub(Obj).saya{ 1 }
@@ -88,16 +74,6 @@ describe Muack::Mock do
       2.times{ obj.f.should.eq 1 }
       Muack.verify.should.eq true
       obj.f       .should.eq 0
-    end
-
-    should 'return with lexical scope' do
-      mock(Obj).say.returns{0}
-      Obj.say.should.eq 0
-    end
-
-    should 'return with dynamic scope' do
-      mock(Obj).say.returns(:instance_exec => true){object_id}
-      Obj.say.should.eq Obj.object_id
     end
   end
 
