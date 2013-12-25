@@ -25,7 +25,7 @@ Muack is much simpler and thus much faster and much more consistent.
 
 ## REQUIREMENTS:
 
-* Tested with MRI (official CRuby) 1.9.3, 2.0.0, Rubinius and JRuby.
+* Tested with MRI (official CRuby) 2.0.0, 2.1.0, Rubinius and JRuby.
 
 ## INSTALLATION:
 
@@ -71,7 +71,7 @@ Let's explain them one by one.
 
 ### Mocks
 
-There are also 3 different kind of mocks in Muack, which are:
+There are also 3 different kinds of mocks in Muack, which are:
 
 * Mocks
 * Stubs
@@ -112,6 +112,17 @@ obvious. However, sometimes we don't care if the injected methods are called
 or not, but sometimes we do care. With stubs and spies, we could always put
 stubs in the before/setup block, and only when we really care if they are
 called or not, we put spies to examine.
+
+On the other hand, stubs aren't limited to testing. If we want to monkey
+patching something, stubs could be useful as we don't care how many times
+the injected methods are called. Jump to _Muack as a mocky patching library_
+section for more detail.
+
+#### Proxy mode
+
+There's
+
+#### any_instance_of mode
 
 ### Mocks Modifiers
 
@@ -249,31 +260,43 @@ p Muack.verify # true
 On the other hand, there's also another advantage of using `returns` than
 passing the block directly to the injected method. With `returns`, there's
 an additional option we could use by passing arguments to `returns`. We
-can't do this in regular injected method declaration because those arguments
+can't do this in regular injected method definition because those arguments
 are for verifying the actual arguments. Jump to _Arguments Verifiers_ section
 for details.
 
-The only option right now is `:instance_exec`. By default, the block passed
-to the injected method is lexically/statically scoped. That means, the scope
-is bound to the current binding. This is the default because usually we don't
-need dynamic scopes, and we simply want to return a plain value, and this is
-much easier to understand, and it is the default for most programming
-languages, and it would definitely reduce surprises.
+The only option right now is `:instance_exec`.
 
-However, occasionally we would want it to be dynamically scoped in order to
-access the internal stuffs in the mocked object. This would also be extremely
-helpful if we're using Muack as a monkey patching library. We don't have to
-copy the original codes in order to monkey patching, we could simply inject
-what we really want to fix the internal stuffs in the broken libraries we're
-using.
+#### instance_exec mode
 
-Here's an example:
+By default, the block passed to the injected method is lexically/statically
+scoped. That means, the scope is bound to the current binding. This is the
+default because usually we don't need dynamic scopes, and we simply want to
+return a plain value, and this is much easier to understand, and it is the
+default for most programming languages, and it would definitely reduce
+surprises. If we really need to operate on the object, we have it, and
+we could touch the internal by calling instance_eval on the object.
+
+However, things are a bit different if we're using `any_instance_of`.
+If we're using `any_instance_of`, then we don't have the instance at
+hand at the time we're defining the block, but only a `Muack::AnyInstanceOf`
+instance to represent the instance. There's no way we could really touch
+the object without `instance_exec` option.
+
+This would also be extremely helpful if we're using Muack as a monkey
+patching library. We don't have to copy the original codes in order to
+monkey patching a class, we could simply inject what we really want to
+fix the internal stuffs in the broken libraries we're using. Jump to
+_Muack as a mocky patching library_ section for more detail.
+
+Here's an quick example:
 
 ``` ruby
-obj = Object.new
-mock(obj).name.returns(:instance_exec => true){ object_id }
-p obj.name     # "#{obj.object_id}"
-p Muack.verify # true
+any_instance_of(Array) do |array|
+  p array.class # Muack::AnyInstanceOf
+  mock(array).name.returns(:instance_exec => true){ inspect }
+end
+p [0, 1].name   # '[0, 1]'
+p Muack.verify  # true
 ```
 
 Note that this `:instance_exec` option also applies to other modifiers which
@@ -281,15 +304,26 @@ accepts a block for its implementation, i.e. `peek_args` and `peek_return`.
 
 #### peek_args
 
+What if we don't really want to change an underlying implementation for a
+given method, but we just want to slightly change the arguments, or we
+might just want to take a look at the arguments? Here's an example using
+`peek_args` to modify the original arguments. Note that here we use the
+proxy mode for the mock, because if we're defining our own behaviour,
+then we already have full control of the arguments. There's no points to
+use both. This also applies to `peek_return`.
+
+``` ruby
+str = 'ff'
+mock(str).to_i.with_any_args.peek_args{ |radix| radix * 2 }
+p str.to_i(8)  # 255
+p Muack.verify # true
+```
+
+`peek_args` also supports `:instance_exec` mode.
+
 #### peek_return
 
 #### object
-
-### Extra Features
-
-#### Proxies
-
-#### any_instance_of
 
 ### Extra Topics
 
