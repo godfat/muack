@@ -10,10 +10,10 @@ by Lin Jen-Shin ([godfat](http://godfat.org))
 
 ## DESCRIPTION:
 
-Muack -- Yet another mocking library.
+Muack -- A fast, small, yet powerful mocking library.
 
-Basically it's an [RR][] clone, but much faster under heavy use.
-It's 32x times faster (750s vs 23s) for running [Rib][] tests.
+Inspired by [RR][], and it's 32x times faster (750s vs 23s) than RR
+for running [Rib][] tests.
 
 [RR]: https://github.com/rr/rr
 [Rib]: https://github.com/godfat/rib
@@ -21,7 +21,7 @@ It's 32x times faster (750s vs 23s) for running [Rib][] tests.
 ## WHY?
 
 Because RR has/had some bugs and it is too complex for me to fix it.
-Muack is much simpler and thus much faster and less likely to have bugs.
+Muack is much simpler and thus much faster and much more consistent.
 
 ## REQUIREMENTS:
 
@@ -33,7 +33,7 @@ Muack is much simpler and thus much faster and less likely to have bugs.
 
 ## SYNOPSIS:
 
-Basically it's an [RR][] clone. Let's see a [Bacon][] example.
+Here's a quick example using [Bacon][].
 
 ``` ruby
 require 'bacon'
@@ -54,6 +54,250 @@ end
 ```
 
 [Bacon]: https://github.com/chneukirchen/bacon
+
+### Overview
+
+There are 3 parts in Muack, which are:
+
+* Mocks
+* Mocks Modifiers
+* Arguments Verifiers (Satisfy)
+
+Mocks are objects with injected methods which we could observe, and mocks
+modifiers are telling how we want to observe the mocks, and finally argument
+verifiers could help us observe the arguments passed to the injected methods.
+
+Let's explain them one by one.
+
+### Mocks
+
+There are also 3 different kind of mocks in Muack, which are:
+
+* Mocks
+* Stubs
+* Spies
+
+You could also think of _mocks_ are _stubs_ + _spies_. Here's the equation:
+
+    mock = stub + spy
+
+Stubs help us inject methods into the objects we want to observe. Spies
+help us observe the behaviours of the objects. As for mocks, they inject
+methods and observe the behaviours in realtime. They complain immediately
+if the behaviours were unexpected. In contrast, if we're not asking spies,
+stubs won't complain themselves.
+
+Here's an example using a mock:
+
+``` ruby
+obj = Object.new
+mock(obj).name{ 'obj' }
+p obj.name     # 'obj'
+p Muack.verify # true
+```
+
+Which is roughly semantically equivalent to using a stub with a spy:
+
+``` ruby
+obj = Object.new
+stub(obj).name{ 'obj' }
+p obj.name     # 'obj'
+spy(obj).name
+p Muack.verify # true
+```
+
+You might wonder, then why mocks or why stubs with spies? The advantage of
+using mocks is that, you only need to specify once. I guess this is quite
+obvious. However, sometimes we don't care if the injected methods are called
+or not, but sometimes we do care. With stubs and spies, we could always put
+stubs in the before/setup block, and only when we really care if they are
+called or not, we put spies to examine.
+
+### Mocks Modifiers
+
+A modifier is something specifying a property of an injected method.
+By making a mock/stub/spy, it would return a modifier descriptor which
+we could then specify properties about the injected method.
+
+Note that we could chain properties for a given modifier descriptor
+because all public methods for declaring a property would return the
+modifier descriptor itself. Let's see the specific usages for each
+properties with concrete examples.
+
+#### times
+
+By using mocks, we are saying that the injected method should be called
+exactly once. However the injected method might be called more than once,
+say, twice. We could specify this with `times` modifier:
+
+``` ruby
+obj = Object.new
+mock(obj).name{ 'obj' }.times(2)
+p obj.name     # 'obj'
+p obj.name     # 'obj'
+p Muack.verify # true
+```
+
+This is actually also semantically equivalent to making the mock twice:
+
+``` ruby
+obj = Object.new
+mock(obj).name{ 'obj' }
+mock(obj).name{ 'obj' }
+p obj.name     # 'obj'
+p obj.name     # 'obj'
+p Muack.verify # true
+```
+
+Note that it does not make sense to specify `times` for stubs, because
+stubs don't care about times. Spies do, though. So this is also
+semantically equivalent to below:
+
+``` ruby
+obj = Object.new
+stub(obj).name{ 'obj' }
+p obj.name     # 'obj'
+p obj.name     # 'obj'
+spy(obj).name.times(2)
+p Muack.verify # true
+```
+
+Or without using times for spy:
+
+``` ruby
+obj = Object.new
+stub(obj).name{ 'obj' }
+p obj.name     # 'obj'
+p obj.name     # 'obj'
+spy(obj).name
+spy(obj).name
+p Muack.verify # true
+```
+
+The advantage of specifying mocks twice is that we could actually provide
+different results for each call. You could think of it as a stack. Here's
+a simple example:
+
+``` ruby
+obj = Object.new
+mock(obj).name{ 0 }
+mock(obj).name{ 1 }
+mock(obj).name{ 2 }
+p obj.name     # 0
+p obj.name     # 1
+p obj.name     # 2
+p Muack.verify # true
+```
+
+Note that this does not apply to stubs because stubs never run out, thus
+making stubs defined later have no effects at all.
+
+``` ruby
+obj = Object.new
+stub(obj).name{ 0 }
+stub(obj).name{ 1 }
+stub(obj).name{ 2 }
+p obj.name     # 0
+p obj.name     # 0
+p obj.name     # 0
+p Muack.verify # true
+```
+
+#### with_any_args
+
+We haven't talked about verifying arguments. With `with_any_args` modifier,
+we're saying that we don't care about the arguments. If we're not specifying
+any arguments like above examples, we're saying there's no arguments at all.
+
+Here we'll show an example for `with_any_args`. If you do want to verify some
+specific arguments, jump to _Arguments Verifiers_ section.
+
+``` ruby
+obj = Object.new
+mock(obj).name{ 'obj' }.with_any_args.times(4)
+p obj.name       # 'obj'
+p obj.name(1)    # 'obj'
+p obj.name(nil)  # 'obj'
+p obj.name(true) # 'obj'
+p Muack.verify
+```
+
+#### returns
+
+For some methods, we can't really pass a block to specify the implementation.
+For example, we can't pass a block to `[]`, which is a Ruby syntax limitation.
+To workaround it, we could use `returns` property:
+
+``` ruby
+obj = Object.new
+mock(obj)[0].returns{ 0 }
+p obj[0]       # 0
+p Muack.verify # true
+```
+
+This is also useful when we want to put the implementation block in the last
+instead of the beginning. Here's an example:
+
+``` ruby
+obj = Object.new
+mock(obj).name.times(2).with_any_args.returns{ 'obj' }
+p obj.name     # 'obj'
+p obj.name     # 'obj'
+p Muack.verify # true
+```
+
+On the other hand, there's also another advantage of using `returns` than
+passing the block directly to the injected method. With `returns`, there's
+an additional option we could use by passing arguments to `returns`. We
+can't do this in regular injected method declaration because those arguments
+are for verifying the actual arguments. Jump to _Arguments Verifiers_ section
+for details.
+
+The only option right now is `:instance_exec`. By default, the block passed
+to the injected method is lexically/statically scoped. That means, the scope
+is bound to the current binding. This is the default because usually we don't
+need dynamic scopes, and we simply want to return a plain value, and this is
+much easier to understand, and it is the default for most programming
+languages, and it would definitely reduce surprises.
+
+However, occasionally we would want it to be dynamically scoped in order to
+access the internal stuffs in the mocked object. This would also be extremely
+helpful if we're using Muack as a monkey patching library. We don't have to
+copy the original codes in order to monkey patching, we could simply inject
+what we really want to fix the internal stuffs in the broken libraries we're
+using.
+
+Here's an example:
+
+``` ruby
+obj = Object.new
+mock(obj).name.returns(:instance_exec => true){ object_id }
+p obj.name     # "#{obj.object_id}"
+p Muack.verify # true
+```
+
+Note that this `:instance_exec` option also applies to other modifiers which
+accepts a block for its implementation, i.e. `peek_args` and `peek_return`.
+
+#### peek_args
+
+#### peek_return
+
+#### object
+
+### Extra Features
+
+#### Proxies
+
+#### any_instance_of
+
+### Extra Topics
+
+#### Muack as a mocky patching library
+
+#### Muack as a development static typing system
+
+### Recipes
 
 ### Coming from RR?
 
