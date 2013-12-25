@@ -125,7 +125,7 @@ module Muack
         raise CannotFindInjectionName.new(level+1, message)
       end
 
-      new_name = "__muack_mock_#{level}_#{message}".to_sym
+      new_name = "__muack_#{name}_#{level}_#{message}".to_sym
       if klass.instance_methods(false).include?(new_name)
         find_new_name(klass, message, level+1)
       else
