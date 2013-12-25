@@ -12,6 +12,11 @@ Improvements:
   while we're removing injected method. Now it could properly undefine
   injected methods.
 
+* Fixed issues mocking private methods. Now it would not only work without
+  a problem, but also preserve the privilege if the original method is a
+  private method. Note that for now, protected methods are treated as
+  public methods though.
+
 Incompatible changes:
 
 * Removed proxy method. From now on, if you do not pass a block to a
