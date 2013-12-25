@@ -4,33 +4,6 @@ require 'muack/error'
 module Muack
   class Modifier < Struct.new(:mock, :defi)
     # Public API
-    def peek_args opts={}, &block
-      defi.peek_args = block
-      instance_exec_mode(block) if opts[:instance_exec]
-      self
-    end
-
-    # Public API
-    def peek_return opts={}, &block
-      defi.peek_return = block
-      instance_exec_mode(block) if opts[:instance_exec]
-      self
-    end
-
-    # Public API
-    def returns opts={}, &block
-      defi.block = block
-      instance_exec_mode(block) if opts[:instance_exec]
-      self
-    end
-
-    # Public API
-    def with_any_args
-      defi.args = [WithAnyArgs]
-      self
-    end
-
-    # Public API
     def times number
       if mock.__mock_class == Stub
         raise StubHasNoTimes.new(object, defi, number)
@@ -43,6 +16,33 @@ module Muack
       else
         raise "What would you expect from calling a method #{number} times?"
       end
+      self
+    end
+
+    # Public API
+    def with_any_args
+      defi.args = [WithAnyArgs]
+      self
+    end
+
+    # Public API
+    def returns opts={}, &block
+      defi.block = block
+      instance_exec_mode(block) if opts[:instance_exec]
+      self
+    end
+
+    # Public API
+    def peek_args opts={}, &block
+      defi.peek_args = block
+      instance_exec_mode(block) if opts[:instance_exec]
+      self
+    end
+
+    # Public API
+    def peek_return opts={}, &block
+      defi.peek_return = block
+      instance_exec_mode(block) if opts[:instance_exec]
       self
     end
 
