@@ -2,7 +2,7 @@
 require 'muack/test'
 
 describe Muack::AnyInstanceOf do
-  klass = Class.new{ def f; 0; end }
+  klass = Class.new{ def f; 0; end; private; def g; 1; end }
 
   should 'mock any_instance_of' do
     any_instance_of(klass){ |inst| mock(inst).say{ true } }
@@ -21,7 +21,15 @@ describe Muack::AnyInstanceOf do
     obj.f       .should.eq 0
   end
 
-  should 'proxy any_instance_of with a block' do
+  should 'proxy any_instance_of for private methods' do
+    any_instance_of(klass){ |inst| mock(inst).g.peek_return{|i|i+1} }
+    obj = klass.new
+    obj.__send__(:g).should.eq 2
+    Muack.verify    .should.eq true
+    obj.__send__(:g).should.eq 1
+  end
+
+  should 'proxy any_instance_of with peek_return' do
     any_instance_of(klass){ |inst| mock(inst).f.peek_return{|i|i+1} }
     obj = klass.new
     obj.f       .should.eq 1

@@ -22,6 +22,16 @@ describe Muack::Mock do
       Obj.to_s.should.eq 'zoo'
     end
 
+    should 'mock private method and preserve privacy' do
+      mock(Obj).private{ 'sai' }
+      Obj.respond_to?(:private      ).should.eq false
+      Obj.respond_to?(:private, true).should.eq true
+      Obj.__send__(:private).should.eq 'sai'
+      Muack.verify.should.eq true
+      Obj.respond_to?(:private      ).should.eq false
+      Obj.__send__(:private).should.eq 'pri'
+    end
+
     should 'mock twice' do
       mock(Obj).say(true){ Obj.saya }
       mock(Obj).saya{ 'coo' }

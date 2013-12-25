@@ -13,6 +13,11 @@ describe Muack::Mock do
       Str.reverse.should.eq 'ooM'
     end
 
+    should 'proxy with private method' do
+      mock(Obj).private.peek_return(&:reverse)
+      Obj.__send__(:private).should.eq 'irp'
+    end
+
     should 'proxy multiple times' do
       2.times{ mock(Str).reverse }
       2.times{ Str.reverse.should.eq 'ooM' }

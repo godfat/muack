@@ -93,7 +93,8 @@ module Muack
         object.singleton_class.module_eval do
           remove_method(defi.msg)
           # restore original method
-          if instance_methods(false).include?(defi.original_method)
+          if instance_methods(false).include?(defi.original_method) ||
+             private_instance_methods(false).include?(defi.original_method)
             alias_method(defi.msg, defi.original_method)
             remove_method(defi.original_method)
           end
@@ -108,16 +109,23 @@ module Muack
     def __mock_inject_method defi
       __mock_injected[defi.msg] = defi
       target = object.singleton_class # would be the class in AnyInstanceOf
-      Mock.store_original_method(target, defi)
-       __mock_inject_mock_method(target, defi)
+      privilege = Mock.store_original_method(target, defi)
+      __mock_inject_mock_method(target, defi, privilege)
     end
 
     def self.store_original_method klass, defi
-      return unless klass.instance_methods(false).include?(defi.msg)
+      privilege = if klass.instance_methods(false).include?(defi.msg)
+        :public # TODO: forget about protected methods?
+      elsif klass.private_instance_methods(false).include?(defi.msg)
+        :private
+      end
+
+      return :public unless privilege
       # store original method
       original_method = find_new_name(klass, defi.msg)
       klass.__send__(:alias_method, original_method, defi.msg)
       defi.original_method = original_method
+      privilege
     end
 
     def self.find_new_name klass, message, level=0
@@ -133,7 +141,7 @@ module Muack
       end
     end
 
-    def __mock_inject_mock_method target, defi
+    def __mock_inject_mock_method target, defi, privilege=:public
       mock = self # remember the context
       target.__send__(:define_method, defi.msg){ |*actual_args, &actual_block|
         disp = mock.__mock_dispatch(defi.msg, actual_args)
@@ -146,6 +154,7 @@ module Muack
           end
         }
       }
+      target.__send__(privilege, defi.msg)
     end
 
     # used for __mock_dispatch_call

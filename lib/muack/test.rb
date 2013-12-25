@@ -10,6 +10,10 @@ Str = 'Moo'
 def Obj.inspect
   'obj'
 end
+def Obj.private
+  'pri'
+end
+Obj.singleton_class.__send__(:private, :private)
 
 Muack::EnsureReset = lambda{
   [Obj, Str].each do |o|
