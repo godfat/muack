@@ -58,6 +58,19 @@ describe Muack::Mock do
                Obj.say .should.eq 0
     end
 
+    should 'mix mock and stub with conflicting method, latter wins' do
+      stub(Obj).say{0}
+      mock(Obj).say{1}
+      Obj.say.should.eq 1
+    end
+
+    should 'mix mock and stub with conflicting method, mock never called' do
+      mock(Obj).say{0}
+      stub(Obj).say{1}
+      Obj.say.should.eq 1
+      lambda{ Muack.verify }.should.raise(Muack::Expected)
+    end
+
     should 'unnamed mock' do
       mock.say{1}.object.say.should.eq 1
     end
