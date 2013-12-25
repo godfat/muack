@@ -94,8 +94,8 @@ module Muack
           remove_method(defi.msg)
           # restore original method
           if instance_methods(false).include?(defi.original_method)
-            alias_method defi.msg, defi.original_method
-            remove_method defi.original_method
+            alias_method(defi.msg, defi.original_method)
+            remove_method(defi.original_method)
           end
         end
       end
