@@ -53,5 +53,30 @@ describe Muack::Modifier do
       stub(str).to_i(is_a(Integer)).peek_args{ |radix| radix * 2 }
       str.to_i(8).should.eq 255
     end
+
+    should 'preserve args' do
+      stub(Obj).say{|*a|a}.with_any_args.peek_args{|*a|a}
+      Obj.say(0,1).should.eq [0,1]
+    end
+
+    should 'pass first args' do
+      stub(Obj).say{|*a|a}.with_any_args.peek_args{|a|a}
+      Obj.say(0,1).should.eq [0]
+    end
+
+    should 'pass nothing with nil' do
+      stub(Obj).say{|*a|a}.with_any_args.peek_args{}
+      Obj.say(0,1).should.eq []
+    end
+
+    should 'pass nothing with empty array' do
+      stub(Obj).say{|*a|a}.with_any_args.peek_args{[]}
+      Obj.say(0,1).should.eq []
+    end
+
+    should 'pass an empty array with [[]]' do
+      stub(Obj).say{|*a|a}.with_any_args.peek_args{[[]]}
+      Obj.say(0,1).should.eq [[]]
+    end
   end
 end
