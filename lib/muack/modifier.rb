@@ -1,4 +1,5 @@
 
+require 'muack/block'
 require 'muack/error'
 
 module Muack
@@ -27,22 +28,19 @@ module Muack
 
     # Public API
     def returns opts={}, &block
-      defi.block = block
-      instance_exec_mode(block) if opts[:instance_exec]
+      defi.returns = create_block(block, opts)
       self
     end
 
     # Public API
     def peek_args opts={}, &block
-      defi.peek_args = block
-      instance_exec_mode(block) if opts[:instance_exec]
+      defi.peek_args = create_block(block, opts)
       self
     end
 
     # Public API
     def peek_return opts={}, &block
-      defi.peek_return = block
-      instance_exec_mode(block) if opts[:instance_exec]
+      defi.peek_return = create_block(block, opts)
       self
     end
 
@@ -52,11 +50,8 @@ module Muack
     end
 
     private
-    def instance_exec_mode block
-      scope = object # closure variable
-      block.singleton_class.__send__(:define_method, :call) do |*args|
-        scope.instance_exec(*args, &block)
-      end
+    def create_block block, opts
+      if opts[:instance_exec] then Block.new(block) else block end
     end
   end
 end

@@ -2,6 +2,7 @@
 require 'muack/definition'
 require 'muack/modifier'
 require 'muack/failure'
+require 'muack/block'
 require 'muack/error'
 
 module Muack
@@ -70,10 +71,28 @@ module Muack
     end
 
     # used for mocked object to dispatch mocked method
-    def __mock_dispatch_call disp, actual_args, actual_block, &block
-      args = __mock_peek_args(disp, actual_args)
-      ret  = __mock_actuall_call(disp, args, actual_block, &block)
-      __mock_peek_return(disp, ret)
+    def __mock_dispatch_call context, disp, actual_args, actual_block, &_yield
+      args = if disp.peek_args
+               __mock_block_call(context, disp.peek_args, actual_args, true)
+             else
+               actual_args
+             end
+
+      ret = if disp.returns
+              __mock_block_call(context, disp.returns, args, true)
+            elsif disp.original_method # proxies for singleton methods
+              context.__send__(disp.original_method, *args, &actual_block)
+            else # proxies for instance methods
+              # need the original context for calling `super`
+              # ruby: can't pass a block to yield, so we name it _yield
+              _yield.call(*args, &actual_block)
+            end
+
+      if disp.peek_return
+        __mock_block_call(context, disp.peek_return, ret, false)
+      else
+        ret
+      end
     end
 
     # used for Muack::Session#verify
@@ -145,40 +164,24 @@ module Muack
       mock = self # remember the context
       target.__send__(:define_method, defi.msg){ |*actual_args, &actual_block|
         disp = mock.__mock_dispatch(defi.msg, actual_args)
-        mock.__mock_dispatch_call(disp, actual_args,
-                                        actual_block){ |args, &block|
-          if disp.original_method
-            __send__(disp.original_method, *args, &block)
-          else
-            super(*args, &block)
-          end
-        }
+        mock.__mock_dispatch_call(self, disp, actual_args,
+                                              actual_block) do |args, &block|
+          super(*args, &block)
+        end
       }
       target.__send__(privilege, defi.msg)
     end
 
     # used for __mock_dispatch_call
-    def __mock_peek_args disp, args
-      if disp.peek_args then disp.peek_args.call(*args) else args end
-    end
-
-    # used for __mock_dispatch_call
-    def __mock_peek_return disp, ret
-      if disp.peek_return then disp.peek_return.call(ret) else ret end
-    end
-
-    # used for __mock_dispatch_call
-    def __mock_actuall_call disp, args, block
-      if block = disp.block
-        arity = block.arity
-        if arity < 0
-          block.call(*args             , &block)
-        else
-          block.call(*args.first(arity), &block)
-        end
-      else # proxy goes here
-        # need the original context for proxy or AnyInstanceOf
-        yield(*args) # ruby limitation: cannot pass block
+    def __mock_block_call context, block, value, splat
+      return unless block
+      # for AnyInstanceOf, we don't have actually context at the time
+      # we're defining it, so we update it here
+      block.context = context if block.kind_of?(Block)
+      if splat
+        block.call(*value)
+      else
+        block.call(value) # peek_return doesn't need splat
       end
     end
 

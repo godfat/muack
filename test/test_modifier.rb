@@ -79,4 +79,24 @@ describe Muack::Modifier do
       Obj.say(0,1).should.eq [[]]
     end
   end
+
+  describe 'peek_return' do
+    should 'with lexical scope' do
+      str = 'ff'
+      stub(str).to_i.peek_return{16}
+      str.to_i.should.eq 16
+    end
+
+    should 'with dynamic scope' do
+      str = '16'
+      stub(str).to_i.peek_return(:instance_exec => true){Integer(self)+1}
+      str.to_i.should.eq 17
+    end
+
+    should 'modify' do
+      str = 'ff'
+      stub(str).to_i(is_a(Integer)).peek_return{ |result| result * 2 }
+      str.to_i(16).should.eq 510
+    end
+  end
 end

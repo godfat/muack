@@ -13,6 +13,15 @@ describe Muack::AnyInstanceOf do
     obj.respond_to?(:say).should.eq false
   end
 
+  should 'mock any_instance_of with instance_exec' do
+    any_instance_of(klass){ |inst|
+      mock(inst).say.returns(:instance_exec => true){ f } }
+    obj = klass.new
+    obj.say              .should.eq obj.f
+    Muack.verify         .should.eq true
+    obj.respond_to?(:say).should.eq false
+  end
+
   should 'proxy any_instance_of' do
     any_instance_of(klass){ |inst| mock(inst).f }
     obj = klass.new
