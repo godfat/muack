@@ -545,6 +545,188 @@ in the above example.
 
 ### Arguments Verifiers (Satisfy)
 
+If we're not passing any arguments to the injected method we define, then
+basically we're saying that there's no arguments should be passed to the
+method. If we don't care about the arguments, then we should use
+`with_any_args` modifier. If we want the *exact* arguments, then we
+should just pass the arguments, which would be checked with `==` operator.
+
+Here's an example:
+
+``` ruby
+obj = Object.new
+mock(obj).say('Hi'){ |arg| arg }
+p obj.say('Hi') # 'Hi'
+p Muack.verify  # true
+```
+
+This also applies to multiple arguments:
+
+``` ruby
+obj = Object.new
+mock(obj).say('Hello', 'World'){ |*args| args.join(', ') }
+p obj.say('Hello', 'World') # 'Hello, World'
+p Muack.verify  # true
+```
+
+What if we don't want to be so exact? Then we should use verifiers.
+We'll introduce each of them in next section. Note that verifiers
+are not recursive though. If you need complex argument verification,
+you'll need to use `satisfy` verifier which you could give an arbitrary
+block to verify anything.
+
+#### is_a
+
+`is_a` would check if the argument is a kind of the given class.
+Actually, it's calling `kind_of?` underneath.
+
+``` ruby
+obj = Object.new
+mock(obj).say(is_a(String)){ |arg| arg }
+p obj.say('something') # 'something'
+p Muack.verify         # true
+```
+
+#### anything
+
+`anything` is a wildcard argument verifier. It matches anything.
+Although this actually verifies nothing, we could still think of
+this as an arity verifier. Since one anything is not two anythings.
+
+``` ruby
+obj = Object.new
+mock(obj).say(anything){ |arg| arg }.times(2)
+p obj.say(0)    # 0
+p obj.say(true) # true
+p Muack.verify  # true
+```
+
+#### match
+
+`match` would check the argument with `match` method. Usually this is
+used with regular expression, but anything which responds to `match`
+should work.
+
+``` ruby
+obj = Object.new
+mock(obj).say(match(/\w+/)){ |arg| arg }
+p obj.say('Hi') # 'Hi'
+p Muack.verify  # true
+```
+
+Note that please don't pass the regular expression directly without
+wrapping it with a match verifier, or how do we distinguish if we
+really want to make sure the argument is exactly the regular expression?
+
+#### hash_including
+
+`hash_including` would check if the given hash is the actual
+argument's subset.
+
+``` ruby
+obj = Object.new
+mock(obj).say(hash_including(:a => 0)){ |arg| arg }
+p obj.say(:a => 0, :b => 1) # {:a => 0, :b => 1}
+p Muack.verify # true
+```
+
+#### including
+
+`including` would check if the actual argument includes the given value
+via `include?` method.
+
+``` ruby
+obj = Object.new
+mock(obj).say(including(0)){ |arg| arg }
+p obj.say([0,1]) # [0,1]
+p Muack.verify   # true
+```
+
+#### within
+
+`within` is the reverse version of `including`, verifying if the actual
+argument is included in the given value.
+
+``` ruby
+obj = Object.new
+mock(obj).say(within([0, 1])){ |arg| arg }
+p obj.say(0)   # 0
+p Muack.verify # true
+```
+
+#### respond_to
+
+`respond_to` would check if the actual argument would be responding to
+the given message, checked via `respond_to?`, also known as duck typing.
+
+``` ruby
+obj = Object.new
+mock(obj).say(respond_to(:size)){ |arg| arg }
+p obj.say([])  # []
+p Muack.verify # true
+```
+
+Note that you could give multiple messages to `respond_to`.
+
+``` ruby
+obj = Object.new
+mock(obj).say(respond_to(:size, :reverse)){ |arg| arg }
+p obj.say([])  # []
+p Muack.verify # true
+```
+
+#### satisfy
+
+`satisfy` accepts a block to let you do arbitrary verification.
+nil and false are considered false, otherwise true, just like in
+regular if expression.
+
+``` ruby
+obj = Object.new
+mock(obj).say(satisfy{ |arg| arg % 2 == 0 }){ |arg| arg }
+p obj.say(0)   # 0
+p Muack.verify # true
+```
+
+#### Disjunction (|)
+
+If what we want is the actual argument be within either `0..1` or `3..4`?
+We don't really have to use `satisfy` to build custom verifier, we could
+compose verifiers with disjunction operator (|).
+
+``` ruby
+obj = Object.new
+mock(obj).say(within(0..1) | within(3..4)){ |arg| arg }.times(2)
+p obj.say(0)   # 0
+p obj.say(4)   # 4
+p Muack.verify # true
+```
+
+Or boolean, you might say:
+
+``` ruby
+obj = Object.new
+mock(obj).say(is_a(TrueClass) | is_a(FalseClass)){ |arg| arg }.times(2)
+p obj.say(true)  # true
+p obj.say(false) # false
+p Muack.verify   # true
+```
+
+#### Conjunction (&)
+
+If what we want is the actual argument not only a kind of something,
+but also responds to something. For example, an Enumerable requires the
+class implements each method. We could use conjunction for this.
+
+``` ruby
+obj = Object.new
+mock(obj).say(is_a(Enumerable) & respond_to(:each)){}.times(3)
+p obj.say( [] ) # nil
+p obj.say( {} ) # nil
+p obj.say(0..1) # nil
+p Muack.verify  # true
+```
+
 ### Caveat
 
 * mixing mocks and stubs
