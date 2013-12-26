@@ -5,10 +5,10 @@ module Muack
       !!block.call(actual_arg)
     end
 
-    def | rhs; Satisfy::Union.new(self, rhs); end
-    def & rhs; Satisfy::Inter.new(self, rhs); end
+    def | rhs; Satisfy::Disj.new(self, rhs); end
+    def & rhs; Satisfy::Conj.new(self, rhs); end
 
-    class Union < Satisfy
+    class Disj < Satisfy
       def initialize lhs, rhs
         @lhs, @rhs = lhs, rhs
         super(lambda{ |actual_arg| lhs.match(actual_arg) ||
@@ -19,7 +19,7 @@ module Muack
       alias_method :inspect, :to_s
     end
 
-    class Inter < Satisfy
+    class Conj < Satisfy
       def initialize lhs, rhs
         @lhs, @rhs = lhs, rhs
         super(lambda{ |actual_arg| lhs.match(actual_arg) &&

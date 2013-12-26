@@ -270,7 +270,7 @@ describe Muack::Satisfy do
     end
   end
 
-  describe Muack::Satisfy::Union do
+  describe Muack::Satisfy::Disj do
     should 'have human readable to_s and inspect' do
       matcher = is_a(TrueClass) | is_a(FalseClass)
       expected = 'Muack::API.is_a(TrueClass) | Muack::API.is_a(FalseClass)'
@@ -303,7 +303,7 @@ describe Muack::Satisfy do
     end
   end
 
-  describe Muack::Satisfy::Inter do
+  describe Muack::Satisfy::Conj do
     should 'have human readable to_s and inspect' do
       matcher = respond_to(:ancestors) & is_a(Class)
       expected = 'Muack::API.respond_to(:ancestors) & Muack::API.is_a(Class)'
