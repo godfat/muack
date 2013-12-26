@@ -118,6 +118,21 @@ patching something, stubs could be useful as we don't care how many times
 the injected methods are called. Jump to _Muack as a mocky patching library_
 section for more detail.
 
+Note that you could also mix mocks and stubs for a given object.
+Here's an example:
+
+``` ruby
+obj = Object.new
+stub(obj).name{ 'obj' }
+mock(obj).id  { 12345 }
+p obj.name     # 'obj'
+p obj.id       # 12345
+p Muack.verify # true
+```
+
+However you should not mix mocks and stubs with the same method, or you
+might encounter some unexpected result. Jump to _Caveat_ for more detail.
+
 #### Anonymous mode
 
 Sometimes we just want to stub something without a concrete object in mind.
@@ -161,9 +176,110 @@ method. Jump to _Mocks Modifiers_ for details.
 
 #### Proxy mode
 
-There's
+There are chances that we don't really want to change the underlying
+implementation for a given method, but we still want to make sure the
+named method is called, and that's what we're testing for.
+
+In those cases, proxy mode would be quite helpful. To turn a mock or stub
+into proxy mode we simply do not provide any block to the injected method,
+but just name it. Here's an example:
+
+``` ruby
+str = 'str'
+mock(str).reverse
+p str.reverse  # 'rts'
+p Muack.verify # true
+```
+
+Note that if reverse was not called exactly once, the mock would complain.
+We could also use stub + spy to do the same thing as well:
+
+``` ruby
+str = 'str'
+stub(str).reverse
+p str.reverse  # 'rts'
+spy(str).reverse
+p Muack.verify # true
+```
+
+You might also want to use `peek_args` and `peek_return` modifier along with
+proxies in order to slightly tweak the original implementation. Jump to
+_Muack as a mocky patching library_ section for more detail.
 
 #### any_instance_of mode
+
+We only talked about mocking a specific object, but never mentioned what if
+the objects we want to mock aren't at hand at the time we define mocks?
+In those cases, instead of trying to mock object creation and return the
+mock we defined, we might want to simply mock any instance of a particular
+class, since this would make the process much easier.
+
+Here we could use a special "mock" called `any_instance_of`, which takes a
+class and returns a `Muack::AnyInstanceOf` which represents the instance of
+the class we just passed. Having this special representation, we could treat
+it as if a real instance and define regular mocks/stubs on it. It would then
+applies to any instance of the class we gave.
+
+Example speaks:
+
+``` ruby
+array = any_instance_of(Array)
+stub(array).name{ 'array' }
+p [ ].name     # 'array'
+p [0].name     # 'array'
+p Muack.verify # true
+```
+
+And as most of the time we don't care about the representation after mocks
+were defined, we could use the block form:
+
+``` ruby
+any_instance_of(Array) do |array|
+  stub(array).name{ 'array' }
+  stub(array).id  { 1234567 }
+end
+p [ ].name   # 'array'
+p [0].id     # 1234567
+p Muack.verify # true
+```
+
+Note that if you need to access the real instance instead of the
+representation in the injected method, you might want to enable
+instance_exec mode. Please jump to _instance_exec mode_ section
+for more detail.
+
+Here's an quick example:
+
+``` ruby
+any_instance_of(Array) do |array|
+  p array.class # Muack::AnyInstanceOf
+  mock(array).name.returns(:instance_exec => true){ inspect }
+end
+p [0, 1].name   # '[0, 1]'
+p Muack.verify  # true
+```
+
+Lastly, you could also use `any_instance_of` along with proxy mode,
+or any other combination you could think of:
+
+``` ruby
+any_instance_of(Array) do |array|
+  stub(array).name{ 'array' }
+  mock(array).max
+end
+p [ ].name     # 'array'
+p [0].max      # 0
+p Muack.verify # true
+```
+
+Though you should still not mix mocks and stubs with the same method,
+and as you could tell from the above example, Muack would not complain
+for every array without calling `max` once, but only for arrays which
+really called max. That means, mocks in any_instance_of would only make
+sure the injected method is called 0 or N times as you specified.
+
+This is an implementation limitation for not using ObjectSpace.
+Please jump to _Caveat_ for more detail.
 
 ### Mocks Modifiers
 
@@ -427,9 +543,12 @@ p Muack.verify # true
 We could also omit `|_|` if we don't care about the original return value
 in the above example.
 
+### Arguments Verifiers (Satisfy)
+
 ### Caveat
 
-mixing mocks and stubs
+* mixing mocks and stubs
+* any_instance_of don't enforce first call
 
 ### Extra Topics
 
