@@ -404,7 +404,7 @@ p obj.name       # 'obj'
 p obj.name(1)    # 'obj'
 p obj.name(nil)  # 'obj'
 p obj.name(true) # 'obj'
-p Muack.verify
+p Muack.verify   # true
 ```
 
 #### returns
