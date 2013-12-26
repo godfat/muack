@@ -118,6 +118,47 @@ patching something, stubs could be useful as we don't care how many times
 the injected methods are called. Jump to _Muack as a mocky patching library_
 section for more detail.
 
+#### Anonymous mode
+
+Sometimes we just want to stub something without a concrete object in mind.
+By calling `mock` or `stub` without any argument, we're creating an anonymous
+mock/stub. This is because the default argument for `mock` and `stub` is just
+`Object.new`.
+
+But how do we access the anonymously created object? We'll use the `object`
+method on the modifier to access it. Here's an example:
+
+``` ruby
+obj = mock.name{ 'obj' }.object
+p obj.name     # 'obj'
+p Muack.verify # true
+```
+
+This is exactly equivalent to this:
+
+``` ruby
+mock(obj = Object.new).name{ 'obj' }
+p obj.name     # 'obj'
+p Muack.verify # true
+```
+
+Also, if we want to mock over multiple methods, we could also take the
+advantage of block form of `mock` and `stub` method.
+
+``` ruby
+obj = mock{ |m|
+  m.name{ 'obj' }
+  m.id  { 12345 }
+}.object
+p obj.name     # 'obj'
+p obj.id       # 12345
+p Muack.verify # true
+```
+
+We can't omit the `object` method here because after defining the injected
+method, we'll get a modifier to describe the properties of the injected
+method. Jump to _Mocks Modifiers_ for details.
+
 #### Proxy mode
 
 There's
@@ -200,14 +241,31 @@ p obj.name     # 2
 p Muack.verify # true
 ```
 
+We could also use the block form for convenience:
+
+``` ruby
+obj = Object.new
+mock(obj) do |m|
+  m.name{ 0 }
+  m.name{ 1 }
+  m.name{ 2 }
+end
+p obj.name     # 0
+p obj.name     # 1
+p obj.name     # 2
+p Muack.verify # true
+```
+
 Note that this does not apply to stubs because stubs never run out, thus
 making stubs defined later have no effects at all.
 
 ``` ruby
 obj = Object.new
-stub(obj).name{ 0 }
-stub(obj).name{ 1 }
-stub(obj).name{ 2 }
+stub(obj) do |m|
+  m.name{ 0 }
+  m.name{ 1 }
+  m.name{ 2 }
+end
 p obj.name     # 0
 p obj.name     # 0
 p obj.name     # 0
@@ -307,10 +365,11 @@ accepts a block for its implementation, i.e. `peek_args` and `peek_return`.
 What if we don't really want to change an underlying implementation for a
 given method, but we just want to slightly change the arguments, or we
 might just want to take a look at the arguments? Here's an example using
-`peek_args` to modify the original arguments. Note that here we use the
-proxy mode for the mock, because if we're defining our own behaviour,
-then we already have full control of the arguments. There's no points to
-use both. This also applies to `peek_return`.
+`peek_args` to modify the original arguments.
+
+Note that here we use the proxy mode for the mock, because if we're defining
+our own behaviour, then we already have full control of the arguments.
+There's no points to use both. This also applies to `peek_return`.
 
 ``` ruby
 str = 'ff'
@@ -319,11 +378,58 @@ p str.to_i(8)  # 255
 p Muack.verify # true
 ```
 
-`peek_args` also supports `:instance_exec` mode.
+`peek_args` also supports `:instance_exec` mode. Here's an example:
+
+``` ruby
+any_instance_of(Array) do |array|
+  stub(array).push.with_any_args.
+    peek_args(:instance_exec => true){ |_| size }
+end
+a = []
+p a.push       # [0]
+p a.push       # [0, 1]
+p a.push       # [0, 1, 2]
+p Muack.verify # true
+```
+
+We could also omit `|_|` if we don't care about the original argument
+in the above example.
 
 #### peek_return
 
-#### object
+What if we don't really want to change an underlying implementation for a
+given method, but we just want to slightly change the return value, or we
+might just want to take a look at the return? Here's an example using
+`peek_return` to modify the original return value.
+
+``` ruby
+str = 'ff'
+mock(str).to_i.with_any_args.peek_return{ |int| int * 2 }
+p str.to_i(16) # 510
+p Muack.verify # true
+```
+
+`peek_return` also supports `:instance_exec` mode. Here's an example:
+
+``` ruby
+any_instance_of(Array) do |array|
+  stub(array).push.with_any_args.
+    peek_return(:instance_exec => true){ |_| size }
+end
+a = []
+p a.push(0)    # 1
+p a.push(0)    # 2
+p a.push(0)    # 3
+p a            # [0, 0, 0]
+p Muack.verify # true
+```
+
+We could also omit `|_|` if we don't care about the original return value
+in the above example.
+
+### Caveat
+
+mixing mocks and stubs
 
 ### Extra Topics
 
