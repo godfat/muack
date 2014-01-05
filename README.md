@@ -798,6 +798,81 @@ So remember to count on all instances, but not individual ones.
 
 #### Muack as a mocky patching library
 
+Consider you're using a broken library and you need an immediate fix without
+waiting for upstream to merge your patch, and release a new version.
+
+You could fix it more elegantly by subclassing the original class, or try to
+include or extend a module to make the original class work correctly. But
+sometimes we just cannot do this because of the implementation of the
+original code. They might not be extensible at all. Consider if there's a
+method contains 1,000 lines... There's no way to change it in the middle
+of the method other than touching the lines directly, unless we have some
+line based AOP tools... which is not really practical.
+
+In this case, we could fork it and maintain everything by ourselves, and
+merge from upstream occasionally. However we might only want to do this as
+the last resort since this could cost a lot.
+
+Alternatively, we can only copy the original code, and put it somewhere, and
+load it after the original code was loaded, so we have the patched and
+correct code running. This is also called monkey patching, patching like a
+monkey. Generally this is a bad idea, but sometimes we can only do this to
+workaround some broken libraries. For example, some libraries might not be
+maintained, or the authors refused to fix this due to other reasonable or
+unreasonable reason.
+
+The most notable drawback of monkey patching is that, we're copying a lot of
+codes which could be changed upstream, and we might not be aware of that,
+and update our monkey patch accordingly. This could cause some incompatible
+issues.
+
+That means, the fewer copied codes, the better. Muack could actually help
+in this case. I called this mocky patching. The advantage of using this
+technique is that, we have `peek_args` and `peek_return` which we could
+modify the arguments or return values in runtime, without changing any
+implementation of a particular method.
+
+Here's a real world example with rails_admin. The problem in rails_admin is
+that, it assumes every associated records should have already been saved,
+thus having an id, and there's also a particular show page for it.
+
+However, in our application, we could have associated records not yet saved
+in the database. rails_admin would try to retrieve routes for those unsaved
+records, and rails would raise RoutingError because rails_admin is passing
+no id for a show path.
+
+The idea of this fix is simple. Just don't try to get the show page for
+records which are not yet saved, i.e. records without an id. However this
+is actually extremely hard to fix in rails_admin without monkey patching!
+
+I'll skip all those details and my rants. In the end, I fixed this by
+trying to peek the arguments for a particular method, and if and only if
+the passed records are not yet saved in the database, we fake the arguments.
+Otherwise, we just bypass and fallback to the original implementation.
+
+Here's the code:
+
+```  ruby
+Muack::API.stub(RailsAdmin::Config::Actions).find.with_any_args.
+  peek_args do |*args|
+    custom_key, bindings = args
+    if bindings && bindings[:object] && bindings[:object].id.nil?
+      [nil, {}] # There's no show page for unsaved records
+    else
+      args # Bypass arguments
+    end
+  end
+```
+
+If we don't do mocky patching but monkey patching, we'll end up with
+copying the entire method for RailsAdmin::Config::Actions.find, which then,
+we'll be responsible for updating this method if some of the original
+implementation changed.
+
+Note that in mocky patching, we should always use stub and never call
+`Muack.verify` or `Muack.reset`, or that would defeat the purpose of
+mocky patching.
+
 #### Muack as a development static typing system
 
 ### Recipes
