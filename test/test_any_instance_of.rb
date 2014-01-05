@@ -66,6 +66,13 @@ describe Muack::AnyInstanceOf do
     obj.f.should.eq 0
   end
 
+  should 'share the same counts for different instances' do
+    times = 2
+    any_instance_of(klass){ |inst| mock(inst).f{0}.times(times) }
+    times.times{ klass.new.f.should.eq 0 }
+    Muack.verify.should.eq true
+  end
+
   should 'stub proxy with any_instance_of and spy' do
     any_instance_of(klass){ |inst| stub(inst).f.peek_return{ |i| i+3 } }
     obj = klass.new
