@@ -393,6 +393,9 @@ p obj.name     # 0
 p Muack.verify # true
 ```
 
+Note that if you do not want a given method be called at all, you could
+use `times(0)` to enforce this.
+
 #### with_any_args
 
 We haven't talked about verifying arguments. With `with_any_args` modifier,
