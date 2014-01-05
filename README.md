@@ -772,10 +772,10 @@ other methods.
 obj = Object.new
 stub(obj).name{ 'obj' }
 mock(obj).id  { 12345 }
-obj.name     # 'obj'
-obj.name     # 'obj'
-obj.id       # 12345
-Muack.verify # true
+p obj.name     # 'obj'
+p obj.name     # 'obj'
+p obj.id       # 12345
+p Muack.verify # true
 ```
 
 However, it might act unexpectedly if we mock and stub on the same object
@@ -806,18 +806,18 @@ With one instance:
 ``` ruby
 any_instance_of(Array){ |array| mock(array).f{true}.times(2) }
 a = []
-a.f          # true
-a.f          # true
-Muack.verify # true
+p a.f          # true
+p a.f          # true
+p Muack.verify # true
 ```
 
 With two instances:
 
 ``` ruby
 any_instance_of(Array){ |array| mock(array).f{true}.times(2) }
-[].f         # true
-[].f         # true
-Muack.verify # true
+p [].f         # true
+p [].f         # true
+p Muack.verify # true
 ```
 
 So remember to count on all instances, but not individual ones.
