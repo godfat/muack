@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Lin Jen-Shin (godfat)"]
-  s.date = "2014-01-05"
+  s.date = "2014-01-06"
   s.description = "Muack -- A fast, small, yet powerful mocking library.\n\nInspired by [RR][], and it's 32x times faster (750s vs 23s) than RR\nfor running [Rib][] tests.\n\n[RR]: https://github.com/rr/rr\n[Rib]: https://github.com/godfat/rib"
   s.email = ["godfat (XD) godfat.org"]
   s.files = [
@@ -38,10 +38,10 @@ Gem::Specification.new do |s|
   "task/README.md",
   "task/gemgem.rb",
   "test/test_any_instance_of.rb",
+  "test/test_from_readme.rb",
   "test/test_mock.rb",
   "test/test_modifier.rb",
   "test/test_proxy.rb",
-  "test/test_readme.rb",
   "test/test_satisfy.rb",
   "test/test_stub.rb"]
   s.homepage = "https://github.com/godfat/muack"
@@ -50,10 +50,10 @@ Gem::Specification.new do |s|
   s.summary = "Muack -- A fast, small, yet powerful mocking library."
   s.test_files = [
   "test/test_any_instance_of.rb",
+  "test/test_from_readme.rb",
   "test/test_mock.rb",
   "test/test_modifier.rb",
   "test/test_proxy.rb",
-  "test/test_readme.rb",
   "test/test_satisfy.rb",
   "test/test_stub.rb"]
 end
