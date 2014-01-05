@@ -803,17 +803,17 @@ waiting for upstream to merge your patch, and release a new version.
 
 You could fix it more elegantly by subclassing the original class, or try to
 include or extend a module to make the original class work correctly. But
-sometimes we just cannot do this because of the implementation of the
-original code. They might not be extensible at all. Consider if there's a
-method contains 1,000 lines... There's no way to change it in the middle
-of the method other than touching the lines directly, unless we have some
-line based AOP tools... which is not really practical.
+sometimes we just cannot do this because of the implementation. They might
+not be extensible at all. Consider if there's a method contains 1,000
+lines... There's no way to change it in the middle of the method other than
+touching the lines directly, unless we have some line based AOP tools...
+which is not really practical.
 
 In this case, we could fork it and maintain everything by ourselves, and
 merge from upstream occasionally. However we might only want to do this as
 the last resort since this could cost a lot.
 
-Alternatively, we can only copy the original code, and put it somewhere, and
+Alternatively, we can copy the original code, and put it somewhere, and
 load it after the original code was loaded, so we have the patched and
 correct code running. This is also called monkey patching, patching like a
 monkey. Generally this is a bad idea, but sometimes we can only do this to
