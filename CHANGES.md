@@ -17,6 +17,9 @@ Improvements:
   private method. Note that for now, protected methods are treated as
   public methods though.
 
+* Fixed a bug where user customized Satisfy could crash if it's located
+  on a top-level. i.e. class names without ::.
+
 Incompatible changes:
 
 * Removed proxy method. From now on, if you do not pass a block to a
