@@ -901,7 +901,7 @@ Note that in mocky patching, we should always use stub and never call
 `Muack.verify` or `Muack.reset`, or that would defeat the purpose of
 mocky patching.
 
-#### Muack as a development static typing system
+#### Muack as a development runtime static typing system
 
 Ever consider a static type system in Ruby? You could actually see a lot of
 asserts inserted in the beginning of some methods in some libraries. For
