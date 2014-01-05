@@ -247,6 +247,11 @@ describe Muack::Satisfy do
       matcher.inspect.should.start_with expected
     end
 
+    should 'not crash for top-level subclass' do
+      Class.new(Muack::Satisfy){ def self.name; 'TopLevel'; end }.new.
+        api_name.should.eq 'top_level'
+    end
+
     should 'satisfy' do
       mock(Str).say(satisfy{ |arg| arg % 2 == 0 }){ |arg| arg + 1 }
       Str.say(14).should.eq 15

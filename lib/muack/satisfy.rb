@@ -36,7 +36,7 @@ module Muack
     alias_method :inspect, :to_s
 
     def api_name
-      self.class.name[/::(\w+)$/, 1].
+      self.class.name[/(::)*(\w+)$/, 2].
         gsub(/([A-Z][a-z]*)+?(?=[A-Z][a-z]*)/, '\\1_').downcase
     end
 
