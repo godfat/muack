@@ -940,7 +940,7 @@ call `Muack.reset`, or, simply don't do any stubs in production config.
 
 Consider we have two classes:
 
-``` ruby
+```  ruby
 Food = Class.new
 User = Class.new{ attr_accessor :food }
 ```
@@ -948,7 +948,7 @@ User = Class.new{ attr_accessor :food }
 And we could make sure User#food is always a kind of `Food` by putting this
 into a development config or so:
 
-``` ruby
+```  ruby
 Muack::API.module_eval do
   any_instance_of(User) do |user|
     stub(user).food = is_a(Food)
@@ -958,7 +958,7 @@ end
 
 And then if we're trying to set a food other than a `Food`...
 
-``` ruby
+```  ruby
 u, f = User.new, Food.new
 u.food = f # ok
 u.food = 1 # raise Muack::Unexpected
@@ -971,7 +971,7 @@ verifiers. For example, we could do this to check if the food is frozen:
 Food = Class.new
 User = Class.new{ attr_accessor :food }
 
-class FoodFrozen < Muack::Satisfy
+FoodFrozen = Class.new(Muack::Satisfy)
   def initialize
     super lambda{ |actual_arg| actual_arg.frozen? }
   end
