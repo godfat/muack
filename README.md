@@ -510,9 +510,9 @@ any_instance_of(Array) do |array|
     peek_args(:instance_exec => true){ |_| size }
 end
 a = []
-p a.push       # [0]
-p a.push       # [0, 1]
-p a.push       # [0, 1, 2]
+p a.push.dup   # [0]
+p a.push.dup   # [0, 1]
+p a.push.dup   # [0, 1, 2]
 p Muack.verify # true
 ```
 
@@ -971,7 +971,7 @@ verifiers. For example, we could do this to check if the food is frozen:
 Food = Class.new
 User = Class.new{ attr_accessor :food }
 
-FoodFrozen = Class.new(Muack::Satisfy)
+FoodFrozen = Class.new(Muack::Satisfy) do
   def initialize
     super lambda{ |actual_arg| actual_arg.frozen? }
   end
@@ -984,8 +984,8 @@ Muack::API.module_eval do
 end
 
 u = User.new
-u.food = Food.new.freeze # ok
-u.food = Food.new        # raise Muack::Unexpected
+p u.food = Food.new.freeze # ok
+p u.food = Food.new        # raise Muack::Unexpected
 ```
 
 Please check _Arguments Verifiers (Satisfy)_ section for more argument
@@ -1008,7 +1008,7 @@ verifiers details.
 
 Apache License 2.0
 
-Copyright (c) 2013, Lin Jen-Shin (godfat)
+Copyright (c) 2013~2014, Lin Jen-Shin (godfat)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
