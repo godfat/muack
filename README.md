@@ -274,12 +274,17 @@ p Muack.verify # true
 
 Though you should still not mix mocks and stubs with the same method,
 and as you could tell from the above example, Muack would not complain
-for every array without calling `max` once, but only for arrays which
-really called max. That means, mocks in any_instance_of would only make
-sure the injected method is called 0 or N times as you specified.
+for every array without calling `max` once. This is because any_instance_of
+would count on all instances, instead of individual instances. Here
+we're actually telling Muack that `max` should be called exactly once
+amongst all instances of array, and it is indeed called exactly once
+amongst two instances here.
 
-This is an implementation limitation for not using ObjectSpace.
-Please jump to _Caveat_ for more detail.
+This might or might not be what we want. But think it twice, if we're
+mocking any instance of a very basic class in Ruby, testing against
+individual instances could be too strict since it's used everywhere!
+
+Please check _Caveat_ section for more details.
 
 ### Mocks Modifiers
 
@@ -729,8 +734,65 @@ p Muack.verify  # true
 
 ### Caveat
 
-* mixing mocks and stubs
-* any_instance_of don't enforce first call
+#### Mixing mocks and stubs
+
+We could and probably would also want to mix mocks and stubs, for example,
+we might be concerned about some methods for a given object, but not the
+other methods.
+
+``` ruby
+obj = Object.new
+stub(obj).name{ 'obj' }
+mock(obj).id  { 12345 }
+obj.name     # 'obj'
+obj.name     # 'obj'
+obj.id       # 12345
+Muack.verify # true
+```
+
+However, it might act unexpectedly if we mock and stub on the same object
+for the same method. It would somehow act like the latter would always win!
+So if we define mock later for the same method, previously defined stub
+would never be called. On the other hand, if we define stub later for the
+same method, previously defined mock would always complain because it would
+never be called, either!
+
+This does not mean previously defined mocks or stubs get overwritten, because
+it would still take effect. It's just that there's no way they could get
+called. So this is mostly not desired.
+
+The ideal solution to this would be raising an error immediately, or really
+make it could be overwritten. However I didn't find a good way to handle this
+without rewriting the internal details. So I'll just leave it as it is,
+and hope no one would ever try to do this.
+
+#### any_instance_of shares all calls for a given class
+
+We might assume that mocks with any_instance_of would work exactly the same
+as regular mocks, but this is actually not the case. Regular mocks count
+on every individual instance, but all instances share the same count for
+any_instance_of.
+
+With one instance:
+
+``` ruby
+any_instance_of(Array){ |array| mock(array).f{true}.times(2) }
+a = []
+a.f          # true
+a.f          # true
+Muack.verify # true
+```
+
+With two instances:
+
+``` ruby
+any_instance_of(Array){ |array| mock(array).f{true}.times(2) }
+[].f         # true
+[].f         # true
+Muack.verify # true
+```
+
+So remember to count on all instances, but not individual ones.
 
 ### Extra Topics
 
