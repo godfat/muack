@@ -577,7 +577,32 @@ p obj.say('Hello', 'World') # 'Hello, World'
 p Muack.verify  # true
 ```
 
-What if we don't want to be so exact? Then we should use verifiers.
+We could also retrieve the block argument:
+
+``` ruby
+obj = Object.new
+mock(obj).say{ |&block| block.call('Hi') }
+obj.say{ |msg| p msg } # 'Hi'
+p Muack.verify  # true
+```
+
+Moreover, we could also have stubs on the same method for different
+arguments. We could think of this as a sort of pattern matching, and Muack
+would try to find the best matched stub for us.
+
+``` ruby
+obj = Object.new
+stub(obj).find(0){ 0 }
+stub(obj).find(1){ 1 }
+p obj.find(1)  # 1
+p obj.find(0)  # 0
+p Muack.verify # true
+```
+
+If `obj.find(2)` is called and Muack cannot find a matched stub, it would
+raise a `Muack::Unexpected` and list the candidates for us.
+
+However, What if we don't want to be so exact? Then we should use verifiers.
 We'll introduce each of them in next section. Note that verifiers
 are not recursive though. If you need complex argument verification,
 you'll need to use `satisfy` verifier which you could give an arbitrary
