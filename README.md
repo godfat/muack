@@ -875,6 +875,97 @@ mocky patching.
 
 #### Muack as a development static typing system
 
+Ever consider a static type system in Ruby? You could actually see a lot of
+asserts inserted in the beginning of some methods in some libraries. For
+example, there are `assert_valid_key_size`, `assert_kind_of`, etc, in
+[dm-core][], and `assert_valid_keys`, `assert_valid_transaction_action`,
+and various random asserts in activerecord.
+
+You could find them by searching against `raise ArgumentError` because
+rails is much less consistent and sometimes it's hard to find a pattern in
+rails. But you get the idea, those `ArgumentError` would much help us debug
+our code from misusing the API, and that's exactly the point of type system,
+or more specifically, static type system.
+
+We could also use some static analysis tools to do something like this, for
+example, there's [ruby-lint][]. However, as you might already know, since
+Ruby is so dynamic, static analysis tools cannot really do a great job if
+our code is quite dynamic. Of course we could write it more statically,
+and treat our static analysis tools better, but that might not be the spirit
+of Ruby somehow.
+
+Alternatively, it would be great to do this static type checking
+dynamically... I mean, in the runtime rather than compile time. This
+means it would be much more accurate, just like those asserts in the
+above examples.
+
+However, if we're doing those checks in a hot path, for example, right
+inside a loop looping over a million times, this would definitely slow
+things down if we're checking them in the runtime. Even if we put `$DEBUG`
+guards around those check, we're still suffering from checking the flag.
+
+It would be great if we could actually just remove those checks in
+production, while turn it on when we're developing or debugging.
+Muack could actually fulfill this desire, as it could inject codes
+externally and seamlessly, and we could remove them anytime when we
+call `Muack.reset`, or, simply don't do any stubs in production config.
+
+Consider we have two classes:
+
+``` ruby
+Food = Class.new
+User = Class.new{ attr_accessor :food }
+```
+
+And we could make sure User#food is always a kind of `Food` by putting this
+into a development config or so:
+
+``` ruby
+Muack::API.module_eval do
+  any_instance_of(User) do |user|
+    stub(user).food = is_a(Food)
+  end
+end
+```
+
+And then if we're trying to set a food other than a `Food`...
+
+``` ruby
+u, f = User.new, Food.new
+u.food = f # ok
+u.food = 1 # raise Muack::Unexpected
+```
+
+This could go wild and we could customize our own domain specific argument
+verifiers. For example, we could do this to check if the food is frozen:
+
+``` ruby
+Food = Class.new
+User = Class.new{ attr_accessor :food }
+
+class FoodFrozen < Muack::Satisfy
+  def initialize
+    super lambda{ |actual_arg| actual_arg.frozen? }
+  end
+end
+
+Muack::API.module_eval do
+  any_instance_of(User) do |user|
+    stub(user).food = FoodFrozen.new
+  end
+end
+
+u = User.new
+u.food = Food.new.freeze # ok
+u.food = Food.new        # raise Muack::Unexpected
+```
+
+Please check _Arguments Verifiers (Satisfy)_ section for more argument
+verifiers details.
+
+[dm-core]: https://github.com/datamapper/dm-core
+[ruby-lint]: https://github.com/YorickPeterse/ruby-lint
+
 ### Recipes
 
 ### Coming from RR?
