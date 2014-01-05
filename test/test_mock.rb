@@ -22,6 +22,11 @@ describe Muack::Mock do
       Obj.to_s.should.eq 'zoo'
     end
 
+    should 'pass the actual block' do
+      mock(Obj).say{ |&block| block.call('Hi') }
+      Obj.say{ |msg| msg }.should.eq 'Hi'
+    end
+
     should 'mock private method and preserve privacy' do
       mock(Obj).private{ 'sai' }
       Obj.respond_to?(:private      ).should.eq false

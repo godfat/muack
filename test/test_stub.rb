@@ -33,6 +33,11 @@ describe Muack::Stub do
       Str.say('  ').should.eq 'Hoo'
     end
 
+    should 'pass the actual block' do
+      stub(Obj).say{ |&block| block.call('Hi') }
+      Obj.say{ |msg| msg }.should.eq 'Hi'
+    end
+
     should 'accept block form' do
       stub(Obj){ |o| o.say{0}; o.saya{1} }
       Obj.saya.should.eq 1

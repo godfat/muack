@@ -6,6 +6,8 @@ require 'muack/block'
 require 'muack/error'
 
 module Muack
+  EmptyBlock = proc{}
+
   class Mock < BasicObject
     attr_reader :object
     def initialize object
@@ -73,13 +75,15 @@ module Muack
     # used for mocked object to dispatch mocked method
     def __mock_dispatch_call context, disp, actual_args, actual_block, &_yield
       args = if disp.peek_args
-               __mock_block_call(context, disp.peek_args, actual_args, true)
+               __mock_block_call(context, disp.peek_args,
+                                 actual_args, actual_block, true)
              else
                actual_args
              end
 
       ret = if disp.returns
-              __mock_block_call(context, disp.returns, args, true)
+              __mock_block_call(context, disp.returns,
+                                args, actual_block, true)
             elsif disp.original_method # proxies for singleton methods
               context.__send__(disp.original_method, *args, &actual_block)
             else # proxies for instance methods
@@ -89,7 +93,7 @@ module Muack
             end
 
       if disp.peek_return
-        __mock_block_call(context, disp.peek_return, ret, false)
+        __mock_block_call(context, disp.peek_return, ret, EmptyBlock, false)
       else
         ret
       end
@@ -173,15 +177,15 @@ module Muack
     end
 
     # used for __mock_dispatch_call
-    def __mock_block_call context, block, value, splat
+    def __mock_block_call context, block, actual_args, actual_block, splat
       return unless block
       # for AnyInstanceOf, we don't have actually context at the time
       # we're defining it, so we update it here
       block.context = context if block.kind_of?(Block)
       if splat
-        block.call(*value)
-      else
-        block.call(value) # peek_return doesn't need splat
+        block.call(*actual_args, &actual_block)
+      else # peek_return doesn't need splat
+        block.call(actual_args, &actual_block)
       end
     end
 
