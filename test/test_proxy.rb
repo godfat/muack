@@ -28,6 +28,12 @@ describe Muack::Mock do
       2.times{ Str.class.should.eq String }
     end
 
+    should 'proxy with super method for multiple arguments' do
+      args = %w[o u]
+      mock(Str).tr(*args)
+      Str.tr(*args).should.eq 'Muu'
+    end
+
     should 'return modifier itself for any modifier methods' do
       mock(Str).to_s.peek_return{ |s| s.reverse }.times(2).
         with_any_args.with_any_args

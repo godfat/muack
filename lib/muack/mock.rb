@@ -89,7 +89,7 @@ module Muack
             else # proxies for instance methods
               # need the original context for calling `super`
               # ruby: can't pass a block to yield, so we name it _yield
-              _yield.call(*args, &actual_block)
+              _yield.call(args, &actual_block)
             end
 
       if disp.peek_return
