@@ -1,6 +1,11 @@
 # CHANGES
 
-## Muack 1.0.0 -- ?
+## Muack 1.0.1 -- 2014-01-07
+
+* Fixed a regression where proxy with multiple arguments might not pass
+  all arguments along.
+
+## Muack 1.0.0 -- 2014-01-06
 
 Improvements:
 
