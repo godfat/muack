@@ -27,6 +27,11 @@ describe Muack::Mock do
       Obj.say{ |msg| msg }.should.eq 'Hi'
     end
 
+    should 'pass multiple arguments' do
+      mock(Obj).say{ |*args| args.reverse }.with_any_args
+      Obj.say(0, 1).should.eq [1, 0]
+    end
+
     should 'mock private method and preserve privacy' do
       mock(Obj).private{ 'sai' }
       Obj.respond_to?(:private      ).should.eq false

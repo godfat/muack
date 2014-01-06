@@ -40,9 +40,17 @@ describe Muack::Mock do
       2.times{ Str.to_s.should.eq 'ooM' }
     end
 
-    should 'proxy and call the block' do
+    should 'proxy and call the original method' do
       mock(Obj).method_missing(:inspect).peek_return{ |str| str.reverse }
       Obj.inspect.should.eq 'jbo'
+    end
+
+    should 'proxy and call the original method for multiple arguments' do
+      args = %w[o u]
+      mock(Obj).aloha(*args)
+      mock(Obj).aloha
+      Obj.aloha(*args).should.eq args
+      Obj.aloha.should.eq [0, 1]
     end
 
     should 'proxy and call the block with super' do

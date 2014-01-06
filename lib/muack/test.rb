@@ -13,6 +13,9 @@ end
 def Obj.private
   'pri'
 end
+def Obj.aloha a=0, b=1
+  [a, b]
+end
 Obj.singleton_class.__send__(:private, :private)
 
 Muack::EnsureReset = lambda{
