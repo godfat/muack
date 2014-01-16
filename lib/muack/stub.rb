@@ -10,7 +10,8 @@ module Muack
     def __mock_dispatch msg, actual_args
       if defi = __mock_defis[msg].find{ |d|
                   __mock_check_args(d.args, actual_args) }
-        __mock_disps_push(defi) # our spies are interested in this
+        # our spies are interested in this
+        __mock_disps_push(Definition.new(msg, actual_args))
         defi
       else
         Mock.__send__(:raise, # Wrong argument

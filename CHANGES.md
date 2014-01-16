@@ -1,5 +1,12 @@
 # CHANGES
 
+## Muack 1.0.2 -- 2014-01-17
+
+* Fixed a bug where spies do not really verify against actual arguments,
+  but the definition from stubs. This might make stubs a bit slower as
+  now it needs to really create objects storing actual arguments.
+  Previously, it only reused its definitions thus no objects were created.
+
 ## Muack 1.0.1 -- 2014-01-07
 
 * Fixed a regression where proxy with multiple arguments might not pass

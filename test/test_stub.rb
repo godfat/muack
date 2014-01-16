@@ -61,6 +61,18 @@ describe Muack::Stub do
       2.times{ Obj.say.should.eq nil }
       2.times{ spy(Obj).say }
     end
+
+    should 'verify spy arguments' do
+      stub(Obj).say(1){|a|a}
+      Obj.say(1).should.eq 1
+      spy( Obj).say(1)
+    end
+
+    should 'properly verify spy arguments' do
+      stub(Obj).say(is_a(String)){|a|a}
+      Obj.say('Hi!').should.eq 'Hi!'
+      spy( Obj).say(is_a(String))
+    end
   end
 
   describe 'Muack.verify==false' do
