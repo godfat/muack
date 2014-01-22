@@ -9,13 +9,12 @@ describe 'from README.md' do
   after{ Muack.reset }
 
   Context = Module.new{
-    def p res
-      (@results ||= []) << res
-    end
+    def results; @results ||= []; end
+    def p res  ; results << res ; end
 
     def verify expects
-      return unless @results
-      @results.zip(expects).each do |(res, exp)|
+      return if results.empty?
+      results.zip(expects).each do |(res, exp)|
         next if exp == 'ok'
         if exp.start_with?('raise')
           res.should.kind_of eval(exp.sub('raise', ''))
