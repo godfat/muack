@@ -1,5 +1,11 @@
 # CHANGES
 
+## Muack 1.0.3 -- 2014-03-11
+
+* From now on, `Muack::API.hash_including` could accept `Muack::Satisfy` as
+  values. That means we could now use `hash_including(:key => is_a(String))`
+  or `hash_including(:url => match(/^https/))` and so on so forth.
+
 ## Muack 1.0.2 -- 2014-01-17
 
 * Fixed a bug where spies do not really verify against actual arguments,

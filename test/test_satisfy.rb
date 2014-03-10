@@ -115,6 +115,13 @@ describe Muack::Satisfy do
       Muack::EnsureReset.call
     end
 
+    should 'satisfy with satisfy' do
+      mock(Str).say(hash_including(:b => is_a(Fixnum))){ |arg| arg[:b] }
+      Str.say(:a => 1, :b => 2).should.eq 2
+      Muack.verify.should.eq true
+      Muack::EnsureReset.call
+    end
+
     should 'raise Unexpected error if passing unexpected argument' do
       mock(Obj).say(hash_including(:b => 2)){ 'boo' }
       begin
@@ -123,6 +130,22 @@ describe Muack::Satisfy do
       rescue Muack::Unexpected => e
         e.expected.should.eq 'obj.say(Muack::API.hash_including({:b=>2}))'
         e.was     .should.eq 'obj.say({:a=>1})'
+        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+      ensure
+        Muack.reset
+        Muack::EnsureReset.call
+      end
+    end
+
+    should 'raise Unexpected error if passing unsatisfied argument' do
+      mock(Obj).say(hash_including(:b => is_a(String))){ 'boo' }
+      begin
+        Obj.say(:b => 1)
+        'never'.should.eq 'reach'
+      rescue Muack::Unexpected => e
+        e.expected.should.eq \
+          'obj.say(Muack::API.hash_including({:b=>Muack::API.is_a(String)}))'
+        e.was     .should.eq 'obj.say({:b=>1})'
         e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
       ensure
         Muack.reset

@@ -66,7 +66,14 @@ module Muack
   class HashIncluding < Satisfy
     def initialize hash
       super lambda{ |actual_arg|
-        actual_arg.values_at(*hash.keys) == hash.values }, [hash]
+        actual_arg.values_at(*hash.keys).zip(hash.values).all? do |(av, ev)|
+          if ev.kind_of?(Satisfy)
+            ev.match(av)
+          else
+            ev == av
+          end
+        end
+      }, [hash]
     end
   end
 
