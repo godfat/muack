@@ -3,7 +3,7 @@ require 'bacon'
 require 'muack'
 
 Bacon.summary_on_exit
-Bacon::Context.include Muack::API
+Bacon::Context.__send__(:include, Muack::API)
 
 Obj = Object.new
 Str = 'Moo'
