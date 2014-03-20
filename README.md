@@ -39,7 +39,7 @@ Here's a quick example using [Bacon][].
 require 'bacon'
 require 'muack'
 
-include Muack::API
+Bacon::Context.include Muack::API
 
 describe 'Hello' do
   before{ Muack.reset  }

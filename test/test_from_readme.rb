@@ -9,6 +9,8 @@ describe 'from README.md' do
   after{ Muack.reset }
 
   Context = Module.new{
+    include Muack::API
+
     def results; @results ||= []; end
     def p res  ; results << res ; end
 
