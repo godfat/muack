@@ -25,7 +25,7 @@ Muack is much simpler and thus much faster and much more consistent.
 
 ## REQUIREMENTS:
 
-* Tested with MRI (official CRuby) 2.0.0, 2.1.0, Rubinius and JRuby.
+* Tested with MRI (official CRuby), Rubinius and JRuby.
 
 ## INSTALLATION:
 
