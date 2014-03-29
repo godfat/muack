@@ -1,5 +1,9 @@
 # CHANGES
 
+## Muack 1.0.4 -- 2014-03-29
+
+* Now we could `Muack.verify(obj)` or `Muack.reset(obj)` a single object.
+
 ## Muack 1.0.3 -- 2014-03-11
 
 * From now on, `Muack::API.hash_including` could accept `Muack::Satisfy` as
