@@ -14,14 +14,27 @@ module Muack
       (@others ||= {})["ai #{kls.__id__}"] ||= AnyInstanceOf.new(kls)
     end
 
-    def verify
-      each_value.all?(&:__mock_verify)
+    def verify obj=nil
+      if obj
+        with(obj, :[]).all?(&:__mock_verify)
+      else
+        each_value.all?(&:__mock_verify)
+      end
     end
 
-    def reset
-      instance_variable_defined?(:@others) && @others.clear
-      reverse_each{ |_, m| m.__mock_reset }
-      clear
+    def reset obj=nil
+      if obj
+        with(obj, :delete).each(&:__mock_reset)
+      else
+        instance_variable_defined?(:@others) && @others.clear
+        reverse_each{ |_, m| m.__mock_reset }
+        clear
+      end
+    end
+
+    private
+    def with obj, meth
+      %w[mk sb sy].map{ |k| __send__(meth, "#{k} #{obj.__id__}") }.compact
     end
   end
 end

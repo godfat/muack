@@ -133,6 +133,42 @@ p Muack.verify # true
 However you should not mix mocks and stubs with the same method, or you
 might encounter some unexpected result. Jump to _Caveat_ for more detail.
 
+### reset and verify
+
+Calling `Muack.reset` is essentially resetting all mocks, returning all
+objects/classes back to their original states. In the very first example,
+we do this in a before block to make sure that we're in a clean state.
+
+Calling `Muack.verify` is essentially verifying if all mocks and spies are
+satisfied, if so, it would return true; otherwise, raising an exception.
+Then, no matter verification passed or not, Muack would reset itself.
+
+That means we don't really need to call `Muack.reset` in a before block if
+we're pretty sure that all test cases would call `Muack.verify` in the end,
+resetting everything.
+
+On the other hand, we could also reset or verify a single object without
+affecting the others. This is helpful in the cases of mocking some very
+basic objects like Time, without causing too much side effect.
+
+``` ruby
+name = 'str'
+stub(name).to_s{ 'hi'       }
+stub(Time).new { Time.at(0) }
+mock(Time).now { Time.new   }
+
+p name.to_s          # 'hi'
+p Time.now.to_i      # 0
+p Time.new.to_i      # 0
+p Muack.verify(Time) # true
+p name.to_s          # 'hi'
+p Time.now.to_i > 0  # true
+p Time.new.to_i > 0  # true
+Muack.reset(name)
+p name.to_s          # 'str'
+p Muack.verify       # true
+```
+
 #### Anonymous mode
 
 Sometimes we just want to stub something without a concrete object in mind.

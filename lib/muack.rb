@@ -3,20 +3,20 @@ require 'muack/session'
 require 'muack/satisfy'
 
 module Muack
-  def self.verify
-    session.verify
+  def self.verify obj=nil
+    session.verify(obj)
   ensure
-    reset
+    reset(obj)
   end
 
   def self.session
     Thread.current[:muack_session] ||= Muack::Session.new
   end
 
-  def self.reset
+  def self.reset obj=nil
     session = Thread.current[:muack_session]
-    session && session.reset
-    Thread.current[:muack_session] = nil
+    session && session.reset(obj)
+    Thread.current[:muack_session] = nil unless obj
   end
 
   module API
