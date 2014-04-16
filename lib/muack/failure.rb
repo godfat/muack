@@ -16,7 +16,7 @@ module Muack
       @was = "#{obj.inspect}.#{msg}(" \
              "#{args.map(&:inspect).join(', ')})"
       if expected_defis.empty?
-        super("\nExpected: #{@was}\n          was not called.")
+        super("\nUnexpected call: #{@was}")
       else
         build_expected(obj, expected_defis)
         super("\nExpected: #{expected}\n but was: #{was}")

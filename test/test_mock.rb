@@ -160,7 +160,7 @@ describe Muack::Mock do
       rescue Muack::Unexpected => e
         e.expected.should.eq nil
         e.was     .should.eq 'obj.say()'
-        e.message .should.start_with "\nExpected: #{e.was}\n"
+        e.message .should.eq "\nUnexpected call: #{e.was}"
       end
     end
 
@@ -172,7 +172,7 @@ describe Muack::Mock do
       rescue Muack::Unexpected => e
         e.expected.should.eq nil
         e.was     .should.eq 'obj.say(true)'
-        e.message .should.start_with "\nExpected: #{e.was}\n"
+        e.message .should.eq "\nUnexpected call: #{e.was}"
       end
     end
 
