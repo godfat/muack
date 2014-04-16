@@ -47,13 +47,13 @@ describe Muack::Stub do
     should 'work with spy' do
       stub(Obj).say{0}
       Obj.say.should.eq 0
-      spy(Obj).say
+       spy(Obj).say
     end
 
     should 'work with spy twice' do
       stub(Obj).say{}
       2.times{ Obj.say.should.eq nil }
-      spy(Obj).say.times(2)
+       spy(Obj).say.times(2)
     end
 
     should 'work with spy spy' do
@@ -65,13 +65,13 @@ describe Muack::Stub do
     should 'verify spy arguments' do
       stub(Obj).say(1){|a|a}
       Obj.say(1).should.eq 1
-      spy( Obj).say(1)
+       spy(Obj).say(1)
     end
 
     should 'properly verify spy arguments' do
       stub(Obj).say(is_a(String)){|a|a}
       Obj.say('Hi!').should.eq 'Hi!'
-      spy( Obj).say(is_a(String))
+       spy(Obj).say(is_a(String))
     end
   end
 
@@ -108,7 +108,7 @@ describe Muack::Stub do
 
     should 'raise Expected if the spy is not satisfied' do
       stub(Obj).say{}
-      spy( Obj).say
+       spy(Obj).say
       begin
         Muack.verify
         'never'.should.eq 'reach'
@@ -124,7 +124,7 @@ describe Muack::Stub do
     should 'raise Expected if the spy is not satisfied enough' do
       stub(Obj).say{}
       Obj.say
-      spy( Obj).say(0)
+       spy(Obj).say(0)
       begin
         Muack.verify
         'never'.should.eq 'reach'
@@ -138,7 +138,7 @@ describe Muack::Stub do
     should 'show correct times for under satisfaction' do
       stub(Obj).say{}
       2.times{ Obj.say }
-      spy( Obj).say.times(3)
+       spy(Obj).say.times(3)
       begin
         Muack.verify
         'never'.should.eq 'reach'
@@ -154,7 +154,7 @@ describe Muack::Stub do
     should 'show correct times for over satisfaction' do
       stub(Obj).say{}
       2.times{ Obj.say }
-      spy( Obj).say
+       spy(Obj).say
       begin
         Muack.verify
         'never'.should.eq 'reach'
