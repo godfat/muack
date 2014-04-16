@@ -73,6 +73,14 @@ describe Muack::Stub do
       Obj.say('Hi!').should.eq 'Hi!'
        spy(Obj).say(is_a(String))
     end
+
+    should 'ignore messages spies not interested' do
+      stub(Obj).saya{0}
+      stub(Obj).sayb{1}
+      Obj.saya.should.eq 0
+      Obj.sayb.should.eq 1
+       spy(Obj).saya
+    end
   end
 
   describe 'Muack.verify==false' do

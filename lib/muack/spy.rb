@@ -10,7 +10,9 @@ module Muack
 
     # used for Muack::Session#verify
     def __mock_verify
-      @secret.each{ |defi| __mock_dispatch(defi.msg, defi.args) }
+      @secret.each do |defi|
+        __mock_dispatch(defi.msg, defi.args) if __mock_defis.key?(defi.msg)
+      end
       super # simulate dispatching before passing to mock to verify
     end
 
