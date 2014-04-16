@@ -77,9 +77,10 @@ There are also 3 different kinds of mocks in Muack, which are:
 * Stubs
 * Spies
 
-You could also think of _mocks_ are _stubs_ + _spies_. Here's the equation:
+You could think of _mocks_ are sort of _stubs_ combined with _spies_. Here's
+the inequation:
 
-    mock = stub + spy
+    mock >= stub + spy
 
 Stubs help us inject methods into the objects we want to observe. Spies
 help us observe the behaviours of the objects. As for mocks, they inject
@@ -113,13 +114,21 @@ or not, but sometimes we do care. With stubs and spies, we could always put
 stubs in the before/setup block, and only when we really care if they are
 called or not, we put spies to examine.
 
-On the other hand, stubs aren't limited to testing. If we want to monkey
-patching something, stubs could be useful as we don't care how many times
-the injected methods are called. Jump to _Muack as a mocky patching library_
-section for more detail.
+The other difference is that, spies could partially verify the corresponding
+stubs, but not necessarily completely as mocks. For example, we could stub
+two methods, but only verify one of them with a spy.
 
-Note that you could also mix mocks and stubs for a given object.
-Here's an example:
+``` ruby
+obj = Object.new
+stub(obj).name{ 'obj' }
+stub(obj).id  { 12345 }
+p obj.name     # 'obj'
+p obj.id       # 12345
+spy(obj).name
+p Muack.verify # true
+```
+
+This is similar as mixing mocks and stubs, as in the following example:
 
 ``` ruby
 obj = Object.new
@@ -132,6 +141,11 @@ p Muack.verify # true
 
 However you should not mix mocks and stubs with the same method, or you
 might encounter some unexpected result. Jump to _Caveat_ for more detail.
+
+On the other hand, stubs aren't limited to testing. If we want to monkey
+patching something, stubs could be useful as we don't care how many times
+the injected methods are called. Jump to _Muack as a mocky patching library_
+section for more detail.
 
 ### reset and verify
 

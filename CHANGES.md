@@ -1,5 +1,22 @@
 # CHANGES
 
+## Muack 1.1.0 -- 2014-04-17
+
+Improvements:
+
+* Now we show "Unexpected call" instead of "Expected ... was not called".
+  This should make it easier to read and understand.
+
+Incompatible changes:
+
+* Previously, if you're using a spy, it would examine all the messages for
+  the given stub. However this might not be desired as then we need to
+  specify everything in the stub for the say. Tedious. From now on, spies
+  would only examine specified messages, ignoring unspecified stubbed
+  methods. This sort of breaks the concept that "mocks = stubs + spies"
+  as spies would not fully examine the stubs now. It's now more like:
+  "mocks >= stubs + spies".
+
 ## Muack 1.0.4 -- 2014-03-29
 
 * Now we could `Muack.verify(obj)` or `Muack.reset(obj)` a single object.
