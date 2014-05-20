@@ -1,5 +1,32 @@
 # CHANGES
 
+## Muack 1.1.1 -- 2014-05-21
+
+It's no longer necessary to make spy the last call. Below now works:
+
+``` ruby
+obj = Object.new
+stub(obj).say{}
+2.times do
+  obj.say
+  spy(obj).say
+end
+```
+
+Previously, only this works:
+
+``` ruby
+obj = Object.new
+stub(obj).say{}
+2.times{ obj.say }
+2.times{ spy(obj).say }
+```
+
+This would be very useful when using Muack with [RubyQC][], in which cases
+we don't know how many times the spied object would be called.
+
+[RubyQC]: https://github.com/godfat/rubyqc
+
 ## Muack 1.1.0 -- 2014-04-17
 
 Improvements:
