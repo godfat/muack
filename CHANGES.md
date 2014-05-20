@@ -11,7 +11,7 @@ Incompatible changes:
 
 * Previously, if you're using a spy, it would examine all the messages for
   the given stub. However this might not be desired as then we need to
-  specify everything in the stub for the say. Tedious. From now on, spies
+  specify everything in the stub for the spy. Tedious. From now on, spies
   would only examine specified messages, ignoring unspecified stubbed
   methods. This sort of breaks the concept that "mocks = stubs + spies"
   as spies would not fully examine the stubs now. It's now more like:
