@@ -62,6 +62,14 @@ describe Muack::Stub do
       2.times{ spy(Obj).say }
     end
 
+    should 'work with call spy and call spy' do
+      stub(Obj).say{}
+      2.times do
+        Obj.say.should.eq nil
+        spy(Obj).say
+      end
+    end
+
     should 'verify spy arguments' do
       stub(Obj).say(1){|a|a}
       Obj.say(1).should.eq 1

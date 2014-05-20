@@ -5,12 +5,12 @@ module Muack
   class Spy < Mock
     def initialize stub
       super(stub.object)
-      @secret = stub.__mock_disps.values.flatten # steal disps
+      @stub = stub
     end
 
     # used for Muack::Session#verify
     def __mock_verify
-      @secret.each do |defi|
+      @stub.__mock_disps.values.flatten.each do |defi|
         __mock_dispatch(defi.msg, defi.args) if __mock_defis.key?(defi.msg)
       end
       super # simulate dispatching before passing to mock to verify
