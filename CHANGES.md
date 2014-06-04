@@ -1,5 +1,10 @@
 # CHANGES
 
+## Muack 1.1.2 -- ?
+
+`Muack::Session` is no longer a hash. Hope no one is trying to store anything
+into it so this change would break nothing.
+
 ## Muack 1.1.1 -- 2014-05-21
 
 It's no longer necessary to make spy the last call. Below now works:
