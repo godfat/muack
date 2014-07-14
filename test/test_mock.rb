@@ -8,31 +8,31 @@ describe Muack::Mock do
       Muack::EnsureReset.call
     end
 
-    should 'inspect' do
+    would 'inspect' do
       mock(Obj).inspect.should.eq "Muack::API.mock(obj)"
     end
 
-    should 'mock with regular method' do
+    would 'mock with regular method' do
       mock(Obj).say(true){ 'boo' }
       Obj.say(true).should.eq 'boo'
     end
 
-    should 'mock existing method' do
+    would 'mock existing method' do
       mock(Obj).to_s{ 'zoo' }
       Obj.to_s.should.eq 'zoo'
     end
 
-    should 'pass the actual block' do
+    would 'pass the actual block' do
       mock(Obj).say{ |&block| block.call('Hi') }
       Obj.say{ |msg| msg }.should.eq 'Hi'
     end
 
-    should 'pass multiple arguments' do
+    would 'pass multiple arguments' do
       mock(Obj).say{ |*args| args.reverse }.with_any_args
       Obj.say(0, 1).should.eq [1, 0]
     end
 
-    should 'mock private method and preserve privacy' do
+    would 'mock private method and preserve privacy' do
       mock(Obj).private{ 'sai' }
       Obj.respond_to?(:private      ).should.eq false
       Obj.respond_to?(:private, true).should.eq true
@@ -42,13 +42,13 @@ describe Muack::Mock do
       Obj.__send__(:private).should.eq 'pri'
     end
 
-    should 'mock twice' do
+    would 'mock twice' do
       mock(Obj).say(true){ Obj.saya }
       mock(Obj).saya{ 'coo' }
       Obj.say(true).should.eq 'coo'
     end
 
-    should 'also mock with with' do
+    would 'also mock with with' do
       mock(Str).method_missing(:say, 0){ 0 }
       Str.say(0).should.eq 0
       Muack.verify.should.eq true
@@ -57,45 +57,45 @@ describe Muack::Mock do
       Muack.reset
     end
 
-    should 'mix mock and stub' do
+    would 'mix mock and stub' do
       mock(Obj).say { 0 }
       stub(Obj).saya{ 1 }
       3.times{ Obj.saya.should.eq 1 }
                Obj.say .should.eq 0
     end
 
-    should 'mix mock and stub with conflicting method, latter wins' do
+    would 'mix mock and stub with conflicting method, latter wins' do
       stub(Obj).say{0}
       mock(Obj).say{1}
       Obj.say.should.eq 1
     end
 
-    should 'mix mock and stub with conflicting method, try to hit stub' do
+    would 'mix mock and stub with conflicting method, try to hit stub' do
       stub(Obj).say{0}
       mock(Obj).say{1}
       Obj.say.should.eq 1
       lambda{ Obj.say }.should.raise(Muack::Expected)
     end
 
-    should 'mix mock and stub with conflicting method, mock never called' do
+    would 'mix mock and stub with conflicting method, mock never called' do
       mock(Obj).say{0}
       stub(Obj).say{1}
       Obj.say.should.eq 1
       lambda{ Muack.verify }.should.raise(Muack::Expected)
     end
 
-    should 'unnamed mock' do
+    would 'unnamed mock' do
       mock.say{1}.object.say.should.eq 1
     end
 
-    should 'mock and call, mock and call' do
+    would 'mock and call, mock and call' do
       mock(Obj).say{0}
       Obj.say.should.eq 0
       mock(Obj).say{1}
       Obj.say.should.eq 1
     end
 
-    should 'not remove original singleton method' do
+    would 'not remove original singleton method' do
       obj = Class.new{ def self.f; 0; end }
       2.times{ mock(obj).f{ 1 }  }
       2.times{ obj.f.should.eq 1 }
@@ -110,111 +110,85 @@ describe Muack::Mock do
       Muack::EnsureReset.call
     end
 
-    should 'raise Unexpected error if passing unexpected argument' do
+    would 'raise Unexpected error if passing unexpected argument' do
       mock(Obj).say(true){ 'boo' }
-      begin
-        Obj.say(false)
-        'never'.should.eq 'reach'
-      rescue Muack::Unexpected => e
-        e.expected.should.eq 'obj.say(true)'
-        e.was     .should.eq 'obj.say(false)'
-        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
-      end
+      e = should.raise(Muack::Unexpected){ Obj.say(false) }
+      e.expected.should.eq 'obj.say(true)'
+      e.was     .should.eq 'obj.say(false)'
+      e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
-    should 'have correct message for multiple mocks with the same name' do
+    would 'have correct message for multiple mocks with the same name' do
       2.times{ mock(Obj).say{} }
-      begin
-        3.times{ Obj.say }
-        'never'.should.eq 'reach'
-      rescue Muack::Expected => e
-        e.expected.should.eq 'obj.say()'
-        e.expected_times.should.eq 2
-        e.actual_times  .should.eq 3
-        e.message       .should.eq "\nExpected: obj.say()\n  " \
-                                   "called 2 times\n but was 3 times."
-      end
+      e = should.raise(Muack::Expected){ 3.times{ Obj.say } }
+      e.expected.should.eq 'obj.say()'
+      e.expected_times.should.eq 2
+      e.actual_times  .should.eq 3
+      e.message       .should.eq "\nExpected: obj.say()\n  " \
+                                 "called 2 times\n but was 3 times."
     end
 
-    should 'have correct message for mocks with special satisfier' do
+    would 'have correct message for mocks with special satisfier' do
       mock(Obj).say(anything){}
-      begin
+      e = should.raise(Muack::Expected) do
         Obj.say(1)
         Obj.say(2)
-        'never'.should.eq 'reach'
-      rescue Muack::Expected => e
-        expected = 'obj.say(Muack::API.anything())'
-        e.expected.should.eq expected
-        e.expected_times.should.eq 1
-        e.actual_times  .should.eq 2
-        e.message       .should.eq "\nExpected: #{expected}\n  " \
-                                   "called 1 times\n but was 2 times."
       end
+      expected = 'obj.say(Muack::API.anything())'
+      e.expected.should.eq expected
+      e.expected_times.should.eq 1
+      e.actual_times  .should.eq 2
+      e.message       .should.eq "\nExpected: #{expected}\n  " \
+                                 "called 1 times\n but was 2 times."
     end
 
-    should 'raise if a mock with times(0) gets called' do
+    would 'raise if a mock with times(0) gets called' do
       mock(Obj).say.times(0)
-      begin
-        Obj.say
-        'never'.should.eq 'reach'
-      rescue Muack::Unexpected => e
-        e.expected.should.eq nil
-        e.was     .should.eq 'obj.say()'
-        e.message .should.eq "\nUnexpected call: #{e.was}"
-      end
+      e = should.raise(Muack::Unexpected){ Obj.say }
+      e.expected.should.eq nil
+      e.was     .should.eq 'obj.say()'
+      e.message .should.eq "\nUnexpected call: #{e.was}"
     end
 
-    should 'raise if a mock with times(0) gets called with diff sig' do
+    would 'raise if a mock with times(0) gets called with diff sig' do
       mock(Obj).say.times(0)
-      begin
-        Obj.say(true)
-        'never'.should.eq 'reach'
-      rescue Muack::Unexpected => e
-        e.expected.should.eq nil
-        e.was     .should.eq 'obj.say(true)'
-        e.message .should.eq "\nUnexpected call: #{e.was}"
-      end
+      e = should.raise(Muack::Unexpected){ Obj.say(true) }
+      e.expected.should.eq nil
+      e.was     .should.eq 'obj.say(true)'
+      e.message .should.eq "\nUnexpected call: #{e.was}"
     end
 
-    should 'raise Unexpected when calling with diff sig' do
+    would 'raise Unexpected when calling with diff sig' do
       mock(Obj).say(true){1}
       Obj.say(true).should.eq 1
-      begin
-        Obj.say
-        'never'.should.eq 'reach'
-      rescue Muack::Unexpected => e
-        e.expected.should.eq 'obj.say(true)'
-        e.was     .should.eq 'obj.say()'
-        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
-      end
+      e = should.raise(Muack::Unexpected){ Obj.say }
+      e.expected.should.eq 'obj.say(true)'
+      e.was     .should.eq 'obj.say()'
+      e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
-    should 'raise Expected error if mock methods not called' do
+    would 'raise Expected error if mock methods not called' do
       mock(Obj).say(true){ 'boo' }
-      begin
-        Muack.verify
-      rescue Muack::Expected => e
-        e.expected      .should.eq 'obj.say(true)'
-        e.expected_times.should.eq 1
-        e.actual_times  .should.eq 0
-        e.message       .should.eq "\nExpected: obj.say(true)\n  " \
-                                   "called 1 times\n but was 0 times."
-      end
+      e = should.raise(Muack::Expected){ Muack.verify }
+      e.expected      .should.eq 'obj.say(true)'
+      e.expected_times.should.eq 1
+      e.actual_times  .should.eq 0
+      e.message       .should.eq "\nExpected: obj.say(true)\n  " \
+                                 "called 1 times\n but was 0 times."
     end
 
-    should 'show first not enough calls' do
+    would 'show first not enough calls' do
       mock(Obj).say{ 'boo' }.times(2)
       mock(Obj).saya{}      .times(2)
-      begin
+      e = should.raise(Muack::Expected) do
         Obj.say
         Muack.verify
-      rescue Muack::Expected => e
-        e.expected      .should.eq 'obj.say()'
-        e.expected_times.should.eq 2
-        e.actual_times  .should.eq 1
-        e.message       .should.eq "\nExpected: obj.say()\n  " \
-                                   "called 2 times\n but was 1 times."
       end
+      e.expected      .should.eq 'obj.say()'
+      e.expected_times.should.eq 2
+      e.actual_times  .should.eq 1
+      e.message       .should.eq "\nExpected: obj.say()\n  " \
+                                 "called 2 times\n but was 1 times."
     end
   end
 end

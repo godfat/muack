@@ -33,27 +33,27 @@ Muack is much simpler and thus much faster and much more consistent.
 
 ## SYNOPSIS:
 
-Here's a quick example using [Bacon][].
+Here's a quick example using [Pork][].
 
 ``` ruby
-require 'bacon'
+require 'pork/auto'
 require 'muack'
 
-Bacon::Context.__send__(:include, Muack::API)
+include Muack::API
 
 describe 'Hello' do
   before{ Muack.reset  }
   after { Muack.verify }
 
-  should 'say world!' do
+  would 'say world!' do
     str = 'Hello'
     mock(str).say('!'){ |arg| "World#{arg}" }
-    str.say('!').should.equal 'World!'
+    str.say('!').should.eq 'World!'
   end
 end
 ```
 
-[Bacon]: https://github.com/chneukirchen/bacon
+[Pork]: https://github.com/godfat/pork
 
 ### Overview
 

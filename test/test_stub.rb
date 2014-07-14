@@ -2,7 +2,7 @@
 require 'muack/test'
 
 describe Muack::Stub do
-  should 'raise StubHasNoTimes with stub(obj).f.times(0)' do
+  would 'raise StubHasNoTimes with stub(obj).f.times(0)' do
     lambda{ stub(Obj).f.times(0) }.should.raise(Muack::StubHasNoTimes)
   end
 
@@ -12,20 +12,20 @@ describe Muack::Stub do
       Muack::EnsureReset.call
     end
 
-    should 'inspect' do
+    would 'inspect' do
       stub(Obj).inspect.should.eq "Muack::API.stub(obj)"
     end
 
-    should 'inspect' do
+    would 'inspect' do
       spy( Obj).inspect.should.eq "Muack::API.spy(obj)"
     end
 
-    should 'stub with regular method' do
+    would 'stub with regular method' do
       stub(Obj).say{ 'goo' }
       3.times{ Obj.say.should.eq 'goo' }
     end
 
-    should 'stub with any arguments' do
+    would 'stub with any arguments' do
       stub(Str).say{ Str.sub('M', 'H') }.with_any_args
       Str.say      .should.eq 'Hoo'
       Str.say(0)   .should.eq 'Hoo'
@@ -33,36 +33,36 @@ describe Muack::Stub do
       Str.say('  ').should.eq 'Hoo'
     end
 
-    should 'pass the actual block' do
+    would 'pass the actual block' do
       stub(Obj).say{ |&block| block.call('Hi') }
       Obj.say{ |msg| msg }.should.eq 'Hi'
     end
 
-    should 'accept block form' do
+    would 'accept block form' do
       stub(Obj){ |o| o.say{0}; o.saya{1} }
       Obj.saya.should.eq 1
       Obj.say .should.eq 0
     end
 
-    should 'work with spy' do
+    would 'work with spy' do
       stub(Obj).say{0}
       Obj.say.should.eq 0
        spy(Obj).say
     end
 
-    should 'work with spy twice' do
+    would 'work with spy twice' do
       stub(Obj).say{}
       2.times{ Obj.say.should.eq nil }
        spy(Obj).say.times(2)
     end
 
-    should 'work with spy spy' do
+    would 'work with spy spy' do
       stub(Obj).say{}
       2.times{ Obj.say.should.eq nil }
       2.times{ spy(Obj).say }
     end
 
-    should 'work with call spy and call spy' do
+    would 'work with call spy and call spy' do
       stub(Obj).say{}
       2.times do
         Obj.say.should.eq nil
@@ -70,19 +70,19 @@ describe Muack::Stub do
       end
     end
 
-    should 'verify spy arguments' do
+    would 'verify spy arguments' do
       stub(Obj).say(1){|a|a}
       Obj.say(1).should.eq 1
        spy(Obj).say(1)
     end
 
-    should 'properly verify spy arguments' do
+    would 'properly verify spy arguments' do
       stub(Obj).say(is_a(String)){|a|a}
       Obj.say('Hi!').should.eq 'Hi!'
        spy(Obj).say(is_a(String))
     end
 
-    should 'ignore messages spies not interested' do
+    would 'ignore messages spies not interested' do
       stub(Obj).saya{0}
       stub(Obj).sayb{1}
       Obj.saya.should.eq 0
@@ -97,90 +97,66 @@ describe Muack::Stub do
       Muack::EnsureReset.call
     end
 
-    should 'raise Unexpected error if passing unexpected argument' do
+    would 'raise Unexpected error if passing unexpected argument' do
       stub(Obj).say(true){ 'boo' }
-      begin
-        Obj.say(false)
-        'never'.should.eq 'reach'
-      rescue Muack::Unexpected => e
-        e.expected.should.eq 'obj.say(true)'
-        e.was     .should.eq 'obj.say(false)'
-        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
-      end
+      e = should.raise(Muack::Unexpected){ Obj.say(false) }
+      e.expected.should.eq 'obj.say(true)'
+      e.was     .should.eq 'obj.say(false)'
+      e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
-    should 'give all alternatives' do
+    would 'give all alternatives' do
       stub(Obj).say(0){ 'boo' }
       stub(Obj).say(1){ 'moo' }
-      begin
-        Obj.say(false)
-        'never'.should.eq 'reach'
-      rescue Muack::Unexpected => e
-        e.expected.should.eq "obj.say(0)\n      or: obj.say(1)"
-        e.was     .should.eq 'obj.say(false)'
-        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
-      end
+      e = should.raise(Muack::Unexpected){ Obj.say(false) }
+      e.expected.should.eq "obj.say(0)\n      or: obj.say(1)"
+      e.was     .should.eq 'obj.say(false)'
+      e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
-    should 'raise Expected if the spy is not satisfied' do
+    would 'raise Expected if the spy is not satisfied' do
       stub(Obj).say{}
        spy(Obj).say
-      begin
-        Muack.verify
-        'never'.should.eq 'reach'
-      rescue Muack::Expected => e
-        e.expected      .should.eq 'obj.say()'
-        e.expected_times.should.eq 1
-        e.actual_times  .should.eq 0
-        e.message       .should.eq "\nExpected: obj.say()\n  " \
-                                   "called 1 times\n but was 0 times."
-      end
+      e = should.raise(Muack::Expected){ Muack.verify }
+      e.expected      .should.eq 'obj.say()'
+      e.expected_times.should.eq 1
+      e.actual_times  .should.eq 0
+      e.message       .should.eq "\nExpected: obj.say()\n  " \
+                                 "called 1 times\n but was 0 times."
     end
 
-    should 'raise Expected if the spy is not satisfied enough' do
+    would 'raise Expected if the spy is not satisfied enough' do
       stub(Obj).say{}
       Obj.say
        spy(Obj).say(0)
-      begin
-        Muack.verify
-        'never'.should.eq 'reach'
-      rescue Muack::Unexpected => e
-        e.expected.should.eq "obj.say(0)"
-        e.was     .should.eq 'obj.say()'
-        e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
-      end
+      e = should.raise(Muack::Unexpected){ Muack.verify }
+      e.expected.should.eq "obj.say(0)"
+      e.was     .should.eq 'obj.say()'
+      e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
-    should 'show correct times for under satisfaction' do
+    would 'show correct times for under satisfaction' do
       stub(Obj).say{}
       2.times{ Obj.say }
        spy(Obj).say.times(3)
-      begin
-        Muack.verify
-        'never'.should.eq 'reach'
-      rescue Muack::Expected => e
-        e.expected      .should.eq 'obj.say()'
-        e.expected_times.should.eq 3
-        e.actual_times  .should.eq 2
-        e.message       .should.eq "\nExpected: obj.say()\n  " \
-                                   "called 3 times\n but was 2 times."
-      end
+      e = should.raise(Muack::Expected){ Muack.verify }
+      e.expected      .should.eq 'obj.say()'
+      e.expected_times.should.eq 3
+      e.actual_times  .should.eq 2
+      e.message       .should.eq "\nExpected: obj.say()\n  " \
+                                 "called 3 times\n but was 2 times."
     end
 
-    should 'show correct times for over satisfaction' do
+    would 'show correct times for over satisfaction' do
       stub(Obj).say{}
       2.times{ Obj.say }
        spy(Obj).say
-      begin
-        Muack.verify
-        'never'.should.eq 'reach'
-      rescue Muack::Expected => e
-        e.expected      .should.eq 'obj.say()'
-        e.expected_times.should.eq 1
-        e.actual_times  .should.eq 2
-        e.message       .should.eq "\nExpected: obj.say()\n  " \
-                                   "called 1 times\n but was 2 times."
-      end
+      e = should.raise(Muack::Expected){ Muack.verify }
+      e.expected      .should.eq 'obj.say()'
+      e.expected_times.should.eq 1
+      e.actual_times  .should.eq 2
+      e.message       .should.eq "\nExpected: obj.say()\n  " \
+                                 "called 1 times\n but was 2 times."
     end
   end
 end

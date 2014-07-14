@@ -9,7 +9,7 @@ describe 'from README.md' do
   after{ Muack.reset }
 
   Context = Module.new{
-    include Muack::API
+    include Pork::API, Muack::API
 
     def results; @results ||= []; end
     def p res  ; results << res ; end
@@ -19,7 +19,7 @@ describe 'from README.md' do
       results.zip(expects).each do |(res, exp)|
         next if exp == 'ok'
         if exp.start_with?('raise')
-          res.should.kind_of eval(exp.sub('raise', ''))
+          res.should.kind_of? eval(exp.sub('raise', ''))
         else
           res.should.eq eval(exp)
         end
@@ -28,7 +28,7 @@ describe 'from README.md' do
   }
 
   codes.each.with_index do |code, index|
-    should 'pass from README.md #%02d' % index do
+    would 'pass from README.md #%02d' % index do
       context = Module.new{extend Context}
       begin
         context.instance_eval(code, 'README.md', 0)
