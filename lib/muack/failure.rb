@@ -1,6 +1,6 @@
 
 module Muack
-  class Failure < Exception
+  class Failure < StandardError
     attr_reader :expected
     def build_expected obj, expected_defis
       @expected = expected_defis.uniq{ |d| [d.msg, d.args] }.map{ |defi|
