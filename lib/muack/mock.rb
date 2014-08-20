@@ -112,17 +112,7 @@ module Muack
 
     # used for Muack::Session#reset
     def __mock_reset
-      __mock_injected.each_value do |defi|
-        object.singleton_class.module_eval do
-          remove_method(defi.msg)
-          # restore original method
-          if instance_methods(false).include?(defi.original_method) ||
-             private_instance_methods(false).include?(defi.original_method)
-            alias_method(defi.msg, defi.original_method)
-            remove_method(defi.original_method)
-          end
-        end
-      end
+      __mock_injected.each_value{ |defi| __mock_reset_method(defi) }
     end
 
     protected # get warnings for private attributes
@@ -134,6 +124,18 @@ module Muack
       target = object.singleton_class # would be the class in AnyInstanceOf
       privilege = Mock.store_original_method(target, defi)
       __mock_inject_mock_method(target, defi, privilege)
+    end
+
+    def __mock_reset_method defi
+      object.singleton_class.module_eval do
+        remove_method(defi.msg)
+        # restore original method
+        if instance_methods(false).include?(defi.original_method) ||
+           private_instance_methods(false).include?(defi.original_method)
+          alias_method(defi.msg, defi.original_method)
+          remove_method(defi.original_method)
+        end
+      end
     end
 
     def self.store_original_method klass, defi
