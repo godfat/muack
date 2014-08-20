@@ -31,6 +31,11 @@ module Muack
       if block_given? then yield(ret) else ret end
     end
 
+    def coat obj=Object.new
+      ret = Muack.session.coat(obj)
+      if block_given? then yield(ret) else ret end
+    end
+
     def spy obj
       ret = Muack.session.spy(obj)
       if block_given? then yield(ret) else ret end
