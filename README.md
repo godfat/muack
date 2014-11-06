@@ -71,14 +71,15 @@ Let's explain them one by one.
 
 ### Mocks
 
-There are also 3 different kinds of mocks in Muack, which are:
+There are also 4 different kinds of mocks in Muack, which are:
 
 * Mocks
 * Stubs
 * Spies
+* Coats
 
-You could think of _mocks_ are sort of _stubs_ combined with _spies_. Here's
-the inequation:
+You could think of _mocks_ are sort of _stubs_ combined with _spies_.
+Here's the inequation: (we'll talk about _coats_ later)
 
     mock >= stub + spy
 
@@ -180,6 +181,39 @@ p Time.now.to_i > 0  # true
 p Time.new.to_i > 0  # true
 Muack.reset(name)
 p name.to_s          # 'str'
+p Muack.verify       # true
+```
+
+### Coats
+
+Now we could talk about coats. It's a kind of mocks but it would wear out
+instead of raising an exception when it's called more than expected times.
+This is useful when we want to restore the original behaviour of a
+particular method at some point. The problem is that we can't simply
+call the original method because it's already mocked! We could workaround
+this by using `Muack.verify` or `Muack.reset` at some point, or let _coats_
+handle that.
+
+Here's an example with _coats_:
+
+``` ruby
+coat(Time).now{ Time.at(0) }.times(2)
+
+p Time.now.to_i == 0 # true
+p Time.now.to_i == 0 # true
+p Time.now.to_i  > 0 # true
+p Muack.verify       # true
+```
+
+Without _coats_ we might end up with:
+
+``` ruby
+mock(Time).now{ Time.at(0) }
+mock(Time).now{ Muack.verify(Time); Time.at(0) }
+
+p Time.now.to_i == 0 # true
+p Time.now.to_i == 0 # true
+p Time.now.to_i  > 0 # true
 p Muack.verify       # true
 ```
 
