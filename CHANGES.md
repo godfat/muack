@@ -2,7 +2,7 @@
 
 ## Muack 1.1.2 -- 2014-11-07
 
-* Introduced `Muack::API.coat`. See <README.md> for explanation.
+* Introduced `Muack::API.coat`. See [README.md](README.md) for explanation.
 
 * `Muack::Session` is no longer a hash. Hope no one is trying to store
    anything into it so this change would break nothing.
