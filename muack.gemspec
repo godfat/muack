@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Lin Jen-Shin (godfat)"]
-  s.date = "2014-11-07"
+  s.date = "2014-11-08"
   s.description = "Muack -- A fast, small, yet powerful mocking library.\n\nInspired by [RR][], and it's 32x times faster (750s vs 23s) than RR\nfor running [Rib][] tests.\n\n[RR]: https://github.com/rr/rr\n[Rib]: https://github.com/godfat/rib"
   s.email = ["godfat (XD) godfat.org"]
   s.files = [

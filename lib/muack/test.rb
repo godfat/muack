@@ -1,13 +1,4 @@
 
-if ENV['COV'] || ENV['CI']
-  require 'simplecov'
-  if ENV['CI']
-    require 'coveralls'
-    SimpleCov.formatter = Coveralls::SimpleCov::Formatter
-  end
-  SimpleCov.start
-end
-
 require 'pork/auto'
 require 'muack'
 
