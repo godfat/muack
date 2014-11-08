@@ -1,4 +1,4 @@
-# Muack [![Build Status](https://secure.travis-ci.org/godfat/muack.png?branch=master)](http://travis-ci.org/godfat/muack)
+# Muack [![Build Status](https://secure.travis-ci.org/godfat/muack.png?branch=master)](http://travis-ci.org/godfat/muack) [![Coverage Status](https://img.shields.io/coveralls/godfat/muack.svg)](https://coveralls.io/r/godfat/muack)
 
 by Lin Jen-Shin ([godfat](http://godfat.org))
 
