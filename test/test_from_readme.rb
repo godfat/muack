@@ -9,7 +9,12 @@ describe 'from README.md' do
   after{ Muack.reset }
 
   Context = Module.new{
-    include Pork::API, Muack::API
+    include Muack::API
+
+    def describe desc, &block
+      @executor.describe(desc, &block)
+      @executor.send(:execute_with_parent, @io, @stat)
+    end
 
     def results; @results ||= []; end
     def p res  ; results << res ; end
@@ -29,7 +34,12 @@ describe 'from README.md' do
 
   codes.each.with_index do |code, index|
     would 'pass from README.md #%02d' % index do
-      context = Module.new{extend Context}
+      executor = Class.new(self.class){ init }
+      io, stat = self.class.io, self.class.stat
+      context = Module.new do
+        extend Context
+        @executor, @io, @stat = executor, io, stat
+      end
       begin
         context.instance_eval(code, 'README.md', 0)
       rescue Muack::Failure => e
