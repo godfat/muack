@@ -13,7 +13,7 @@ describe 'from README.md' do
 
     def describe desc, &block
       @executor.describe(desc, &block)
-      @executor.send(:execute_with_parent, @io, @stat)
+      @executor.send(:execute_with_parent, @stat)
     end
 
     def results; @results ||= []; end
@@ -34,11 +34,10 @@ describe 'from README.md' do
 
   codes.each.with_index do |code, index|
     would 'pass from README.md #%02d' % index do
-      executor = Class.new(self.class){ init }
-      io, stat = self.class.io, self.class.stat
+      executor, stat = Class.new(self.class){ init }, @__pork__stat__
       context = Module.new do
         extend Context
-        @executor, @io, @stat = executor, io, stat
+        @executor, @stat = executor, stat
       end
       begin
         context.instance_eval(code, 'README.md', 0)
