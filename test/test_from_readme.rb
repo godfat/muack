@@ -34,7 +34,7 @@ describe 'from README.md' do
 
   codes.each.with_index do |code, index|
     would 'pass from README.md #%02d' % index do
-      executor, stat = Class.new(self.class){ init }, @__pork__stat__
+      executor, stat = Class.new(self.class){ init }, pork_stat
       context = Module.new do
         extend Context
         @executor, @stat = executor, stat
