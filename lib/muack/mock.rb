@@ -181,7 +181,7 @@ module Muack
     # used for __mock_dispatch_call
     def __mock_block_call context, block, actual_args, actual_block, splat
       return unless block
-      # for AnyInstanceOf, we don't have actually context at the time
+      # for AnyInstanceOf, we don't have the actual context at the time
       # we're defining it, so we update it here
       block.context = context if block.kind_of?(Block)
       if splat
