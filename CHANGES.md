@@ -1,5 +1,9 @@
 # CHANGES
 
+## Muack 1.2.0 -- 2015-03-10
+
+* Now stubs could be overwritten. Input from @mz026
+
 ## Muack 1.1.2 -- 2014-11-07
 
 * Introduced `Muack::API.coat`.
