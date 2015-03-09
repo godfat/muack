@@ -1078,6 +1078,38 @@ verifiers details.
 [dm-core]: https://github.com/datamapper/dm-core
 [ruby-lint]: https://github.com/YorickPeterse/ruby-lint
 
+#### Why didn't mocks nor stubs check if the injected method exists before?
+
+Long story short. I can't find a set of good APIs along with good
+implementation. My ideal APIs would be that for mocks and stubs, they
+do check if the injected methods exist before, and if we don't want
+that check, we use `fake` instead of `mock` or `stub`.
+
+However, how do we specify if `fake` should act like `mock` or `stub`?
+Introducing yet another name would make the terms even more confusing
+(which are already fairly confusing!), and I don't want something like:
+`fake.mock` or `mock.fake` or `fake_mock` or `mock_fake`. Using an option
+would also raise the other questions.
+
+What if we make `mock.with_any_times` work exactly like `stub` then?
+Then we could have `fake.with_any_times` and that would be the stub
+version of fake. This should greatly reduce the complexity and confusion.
+However this won't work well because stub is not just mock without times.
+They are different in:
+
+* Mocked methods are called in FIFO (queue) order
+* Stubbed methods are called in FILO (stack) order
+* Stubbed methods could do some pattern matching
+
+Of course we could break them though, but do we really have to, just for
+this simple feature? Also, it could be pretty challenging to implement
+existing method checking for `any_instance_of`.
+
+If you could find a good set of APIs while implementing it nicely, please
+do let me know. Compatibility is not an issue. We could always bump the
+major number to inform this incompatibility. I am open to breaking legacy.
+Or, I am happy to break legacy.
+
 ## USERS:
 
 * [Rib][]
