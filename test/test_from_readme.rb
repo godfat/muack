@@ -13,7 +13,7 @@ describe 'from README.md' do
 
     def describe desc, &block
       @executor.describe(desc, &block)
-      @executor.send(:execute_with_parent, @stat)
+      @executor.execute(@stat)
     end
 
     def results; @results ||= []; end
