@@ -6,6 +6,13 @@ module Muack
     # used for Muack::Session#verify
     def __mock_verify; true; end
 
+    # used for Muack::Modifier#times
+    def __mock_defis_push defi
+      # since stubs never wear out, the reverse ordering would make more sense
+      # so that the latter wins over the previous one (overwrite)
+      __mock_defis[defi.msg].unshift(defi)
+    end
+
     # used for mocked object to dispatch mocked method
     def __mock_dispatch msg, actual_args
       if defi = __mock_defis[msg].find{ |d|

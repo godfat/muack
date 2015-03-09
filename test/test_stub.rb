@@ -109,7 +109,7 @@ describe Muack::Stub do
       stub(Obj).say(0){ 'boo' }
       stub(Obj).say(1){ 'moo' }
       e = should.raise(Muack::Unexpected){ Obj.say(false) }
-      e.expected.should.eq "obj.say(0)\n      or: obj.say(1)"
+      e.expected.should.eq "obj.say(1)\n      or: obj.say(0)"
       e.was     .should.eq 'obj.say(false)'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end

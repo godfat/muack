@@ -461,8 +461,8 @@ p obj.name     # 2
 p Muack.verify # true
 ```
 
-Note that this does not apply to stubs because stubs never run out, thus
-making stubs defined later have no effects at all.
+Note that this does not apply to stubs because stubs never run out. Instead,
+the latter stub would overwrite the previous one.
 
 ``` ruby
 obj = Object.new
@@ -471,9 +471,9 @@ stub(obj) do |m|
   m.name{ 1 }
   m.name{ 2 }
 end
-p obj.name     # 0
-p obj.name     # 0
-p obj.name     # 0
+p obj.name     # 2
+p obj.name     # 2
+p obj.name     # 2
 p Muack.verify # true
 ```
 
