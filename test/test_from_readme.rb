@@ -13,7 +13,7 @@ describe 'from README.md' do
 
     def describe desc, &block
       @executor.describe(desc, &block)
-      @executor.execute(@stat)
+      @executor.execute(Pork.execute_mode, @stat)
     end
 
     def results; @results ||= []; end
