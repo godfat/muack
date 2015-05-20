@@ -290,6 +290,44 @@ You might also want to use `peek_args` and `peek_return` modifier along with
 proxies in order to slightly tweak the original implementation. Jump to
 _Muack as a mocky patching library_ section for more detail.
 
+#### Partial mode
+
+Occasionally we would want to fake some of the values inside a hash, but
+we don't want to interfere with the other values in that hash, and we also
+don't want to modify it directly, or we'll need to make sure to restore it
+after the tests.
+
+Partial mode is not really a mode, but a combination of using proxy mode and
+the [pattern matching mechanism specialized in stubs][pattern-matching].
+Suppose we want to stub `ENV` (which is not a hash but you get the idea),
+enabling some of the flags inside tests without really setting it, we'll do:
+
+``` ruby
+@user = ENV['USER']
+p ENV['NDEBUG'] # nil
+
+stub(ENV)[is_a(String)] #- NOTE: NEED TO DEFINE THIS PROXY FIRST
+stub(ENV)['NDEBUG'].returns{ '1' } #- Workaround syntax: [`returns`](#returns)
+
+p ENV['NDEBUG'] # '1'
+p ENV['USER']   # @user
+p Muack.verify  # true
+p ENV['NDEBUG'] # nil
+```
+
+Note that in order to make this work, proxy should be defined first. Because
+stubs are searched in Last In First Out (LIFO) order, it would first check
+if the key is matching `'NDEBUG'` in this case. If it's not matched, then
+search the next one. Eventually it would reach to the first stub, which
+we put `is_a(String)` there so it much match, and return the original value
+inside `ENV`.
+
+If the order is reversed, then it would always return the original value,
+because the proxy would always match, and Muack would stop searching the
+next stub.
+
+[pattern-matching]: #arguments-verifiers-satisfy
+
 #### any_instance_of mode
 
 We only talked about mocking a specific object, but never mentioned what if
