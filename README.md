@@ -307,7 +307,7 @@ enabling some of the flags inside tests without really setting it, we'll do:
 p ENV['NDEBUG'] # nil
 
 stub(ENV)[is_a(String)] #- NOTE: NEED TO DEFINE THIS PROXY FIRST
-stub(ENV)['NDEBUG'].returns{ '1' } #- Workaround syntax: [returns](#returns)
+stub(ENV)['NDEBUG'].returns{ '1' } #- `returns` workaround Ruby syntax
 
 p ENV['NDEBUG'] # '1'
 p ENV['USER']   # @user
