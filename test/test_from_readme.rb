@@ -26,7 +26,7 @@ describe 'from README.md' do
         if exp.start_with?('raise')
           res.should.kind_of? eval(exp.sub('raise', ''))
         else
-          res.should.eq eval(exp)
+          res.should.eq instance_eval(exp)
         end
       end
     end
