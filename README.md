@@ -319,7 +319,7 @@ Note that in order to make this work, proxy should be defined first. Because
 stubs are searched in Last In First Out (LIFO) order, it would first check
 if the key is matching `'NDEBUG'` in this case. If it's not matched, then
 search the next one. Eventually it would reach to the first stub, which
-we put `is_a(String)` there so it much match, and return the original value
+we put `is_a(String)` there so it must match, and return the original value
 inside `ENV`.
 
 If the order is reversed, then it would always return the original value,
