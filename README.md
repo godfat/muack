@@ -59,9 +59,9 @@ end
 
 There are 3 parts in Muack, which are:
 
-* Mocks
-* Mocks Modifiers
-* Arguments Verifiers (Satisfy)
+* [Mocks](#mocks)
+* [Mocks Modifiers](#mocks-modifiers)
+* [Arguments Verifiers (Satisfy)](#arguments-verifiers-satisfy)
 
 Mocks are objects with injected methods which we could observe, and mocks
 modifiers are telling how we want to observe the mocks, and finally argument
@@ -688,7 +688,7 @@ raise a `Muack::Unexpected` and list the candidates for us.
 
 However, What if we don't want to be so exact? Then we should use verifiers.
 We'll introduce each of them in next section. Note that verifiers
-are not recursive though. If you need complex argument verification,
+are not recursive though. If you need complex arguments verification,
 you'll need to use `satisfy` verifier which you could give an arbitrary
 block to verify anything.
 
@@ -706,7 +706,7 @@ p Muack.verify         # true
 
 #### anything
 
-`anything` is a wildcard argument verifier. It matches anything.
+`anything` is a wildcard arguments verifier. It matches anything.
 Although this actually verifies nothing, we could still think of
 this as an arity verifier. Since one anything is not two anythings.
 
