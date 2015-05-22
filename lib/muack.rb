@@ -75,7 +75,7 @@ module Muack
     end
 
     def satisfy &block
-      Muack::Satisfy.new(block)
+      Muack::Satisfy.new(&block)
     end
   end
 end

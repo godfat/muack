@@ -1,6 +1,10 @@
 
 module Muack
-  class Satisfy < Struct.new(:block, :api_args)
+  class Satisfy < Struct.new(:api_args, :block)
+    def initialize args=nil, &block
+      super(args, block)
+    end
+
     def match actual_arg
       !!block.call(actual_arg)
     end
@@ -11,8 +15,10 @@ module Muack
     class Disj < Satisfy
       def initialize lhs, rhs
         @lhs, @rhs = lhs, rhs
-        super(lambda{ |actual_arg| lhs.match(actual_arg) ||
-                                   rhs.match(actual_arg) })
+      end
+
+      def match actual_arg
+        @lhs.match(actual_arg) || @rhs.match(actual_arg)
       end
 
       def to_s; "#{@lhs} | #{@rhs}"; end
@@ -22,8 +28,10 @@ module Muack
     class Conj < Satisfy
       def initialize lhs, rhs
         @lhs, @rhs = lhs, rhs
-        super(lambda{ |actual_arg| lhs.match(actual_arg) &&
-                                   rhs.match(actual_arg) })
+      end
+
+      def match actual_arg
+        @lhs.match(actual_arg) && @rhs.match(actual_arg)
       end
 
       def to_s; "#{@lhs} & #{@rhs}"; end
@@ -41,60 +49,84 @@ module Muack
     end
 
     def api_args
-      super || [block]
+      super || [block || method(:match)]
     end
   end
 
   class IsA < Satisfy
     def initialize klass
-      super lambda{ |actual_arg| actual_arg.kind_of?(klass) }, [klass]
+      super([klass])
+    end
+
+    def match actual_arg
+      actual_arg.kind_of?(api_args.first)
     end
   end
 
   class Anything < Satisfy
     def initialize
-      super lambda{ |_| true }, []
+      super([])
+    end
+
+    def match _
+      true
     end
   end
 
   class Match < Satisfy
     def initialize regexp
-      super lambda{ |actual_arg| regexp.match(actual_arg) }, [regexp]
+      super([regexp])
+    end
+
+    def match actual_arg
+      api_args.first.match(actual_arg)
     end
   end
 
   class HashIncluding < Satisfy
-    def initialize hash
-      super lambda{ |actual_arg|
-        actual_arg.values_at(*hash.keys).zip(hash.values).all? do |(av, ev)|
-          if ev.kind_of?(Satisfy)
-            ev.match(av)
-          else
-            ev == av
-          end
+    def initialize subset
+      super([subset])
+    end
+
+    def match actual_arg
+      subset = api_args.first
+      actual_arg.values_at(*subset.keys).zip(subset.values).all? do |(av, ev)|
+        if ev.kind_of?(Satisfy)
+          ev.match(av)
+        else
+          ev == av
         end
-      }, [hash]
+      end
     end
   end
 
   class Including < Satisfy
     def initialize element
-      super lambda{ |actual_arg|
-        actual_arg.include?(element) }, [element]
+      super([element])
+    end
+
+    def match actual_arg
+      actual_arg.include?(api_args.first)
     end
   end
 
   class Within < Satisfy
     def initialize range_or_array
-      super lambda{ |actual_arg| range_or_array.include?(actual_arg) },
-            [range_or_array]
+      super([range_or_array])
+    end
+
+    def match actual_arg
+      api_args.first.include?(actual_arg)
     end
   end
 
   class RespondTo < Satisfy
     def initialize *messages
-      super lambda{ |actual_arg|
-        messages.all?{ |msg| actual_arg.respond_to?(msg) } }, messages
+      super(messages)
+    end
+
+    def match actual_arg
+      api_args.all?{ |msg| actual_arg.respond_to?(msg) }
     end
   end
 end

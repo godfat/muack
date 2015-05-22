@@ -1094,8 +1094,8 @@ Food = Class.new
 User = Class.new{ attr_accessor :food }
 
 FoodFrozen = Class.new(Muack::Satisfy) do
-  def initialize
-    super lambda{ |actual_arg| actual_arg.frozen? }
+  def match actual_arg
+    actual_arg.frozen?
   end
 end
 
