@@ -101,6 +101,13 @@ describe Muack::Satisfy do
       Muack.verify.should.eq true
     end
 
+    would 'satisfy with satisfy recursive' do
+      spec = hash_including(:a => {:b => is_a(Fixnum)})
+      mock(Str).say(spec){ |arg| arg[:a][:c] }
+      Str.say(:a => {:b => 1, :c => 2}, :d => 3).should.eq 2
+      Muack.verify.should.eq true
+    end
+
     would 'raise Unexpected error if passing unexpected argument' do
       mock(Obj).say(hash_including(:b => 2)){ 'boo' }
       e = should.raise(Muack::Unexpected){ Obj.say(:a => 1) }

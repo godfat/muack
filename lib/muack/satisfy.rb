@@ -88,11 +88,12 @@ module Muack
       super([subset])
     end
 
-    def match actual_arg
-      subset = api_args.first
+    def match actual_arg, subset=api_args.first
       actual_arg.values_at(*subset.keys).zip(subset.values).all? do |(av, ev)|
         if ev.kind_of?(Satisfy)
           ev.match(av)
+        elsif ev.kind_of?(Hash)
+          match(av, ev)
         else
           ev == av
         end
