@@ -1,4 +1,6 @@
 
+require 'muack/error'
+
 module Muack
   class Satisfy < Struct.new(:api_args, :block)
     def initialize args=nil, &block
@@ -83,20 +85,71 @@ module Muack
     end
   end
 
-  class HashIncluding < Satisfy
-    def initialize subset
-      super([subset])
+  class MatchSpec < Satisfy
+    def initialize spec
+      super([spec])
     end
 
-    def match actual_arg, subset=api_args.first
-      actual_arg.values_at(*subset.keys).zip(subset.values).all? do |(av, ev)|
-        if ev.kind_of?(Satisfy)
-          ev.match(av)
-        elsif ev.kind_of?(Hash)
-          match(av, ev)
-        else
-          ev == av
-        end
+    def match actual_arg, spec=api_args.first
+      case spec
+      when Hash
+        match_hash(actual_arg, spec)
+      when Array
+        match_array(actual_arg, spec)
+      else
+        raise UnknownSpec.new(spec)
+      end
+    end
+
+    private
+    def match_hash actual_arg, spec
+      (spec.keys | actual_arg.keys).all? do |key|
+        match_value(actual_arg[key], spec[key])
+      end
+    end
+
+    def match_array actual_arg, spec
+      spec.zip(actual_arg).all? do |(ev, av)|
+        match_value(av, ev)
+      end
+    end
+
+    def match_value av, ev
+      case ev
+      when Satisfy
+        ev.match(av)
+      when Hash
+        match_hash(av, ev)
+      when Array
+        match_array(av, ev)
+      else
+        ev == av
+      end
+    end
+  end
+
+  class SupersetOf < MatchSpec
+    def initialize subset
+      super(subset)
+    end
+
+    private
+    def match_hash actual_arg, subset
+      subset.each_key.all? do |key|
+        match_value(actual_arg[key], subset[key])
+      end
+    end
+  end
+
+  class SubsetOf < MatchSpec
+    def initialize superset
+      super(superset)
+    end
+
+    private
+    def match_hash actual_arg, superset
+      actual_arg.each_key.all? do |key|
+        match_value(actual_arg[key], superset[key])
       end
     end
   end

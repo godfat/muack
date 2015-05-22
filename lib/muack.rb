@@ -58,8 +58,16 @@ module Muack
       Muack::Match.new(regexp)
     end
 
-    def hash_including hash
-      Muack::HashIncluding.new(hash)
+    def match_spec spec
+      Muack::MatchSpec.new(spec)
+    end
+
+    def superset_of spec
+      Muack::SupersetOf.new(spec)
+    end
+
+    def subset_of spec
+      Muack::SubsetOf.new(spec)
     end
 
     def including element
@@ -76,6 +84,12 @@ module Muack
 
     def satisfy &block
       Muack::Satisfy.new(&block)
+    end
+
+    def hash_including spec
+      $stderr.puts("Muack::API.hash_including is deprecated." \
+                   " Use Muack::API.superset_of instead.")
+      superset_of(spec)
     end
   end
 end

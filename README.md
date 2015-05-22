@@ -773,14 +773,34 @@ Note that please don't pass the regular expression directly without
 wrapping it with a match verifier, or how do we distinguish if we
 really want to make sure the argument is exactly the regular expression?
 
-#### hash_including
+#### match_spec
 
-`hash_including` would check if the given hash is the actual
-argument's subset.
+`match_spec` would check if the actual argument matches given specification.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(hash_including(:a => 0)){ |arg| arg }
+mock(obj).say(match_spec(:a => is_a(Fixnum))){ |arg| arg }
+p obj.say(:a => 0) # {:a => 0}
+p Muack.verify # true
+```
+
+Note that this could be recursive.
+
+``` ruby
+obj = Object.new
+mock(obj).say(match_spec(:a => {:b => [is_a(Fixnum)]})){ |arg| arg[:a] }
+p obj.say(:a => {:b => [0]}) # {:b => [0]}
+p Muack.verify # true
+```
+
+#### superset_of
+
+`superset_of` would check if the actual argument is a superset of given
+specification.
+
+``` ruby
+obj = Object.new
+mock(obj).say(superset_of(:a => 0)){ |arg| arg }
 p obj.say(:a => 0, :b => 1) # {:a => 0, :b => 1}
 p Muack.verify # true
 ```
@@ -789,8 +809,29 @@ Note that this could be recursive.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(hash_including(:a => {:b => is_a(Fixnum)})){ |arg| arg[:c] }
-p obj.say(:a => {:b => 1}, :c => 2) # 2
+mock(obj).say(superset_of(:a => {:b => [is_a(Fixnum)]})){ |arg| arg[:c] }
+p obj.say(:a => {:b => [1]}, :c => 2) # 2
+p Muack.verify # true
+```
+
+#### subset_of
+
+`subset_of` would check if the actual argument is a subset of given
+specification.
+
+``` ruby
+obj = Object.new
+mock(obj).say(subset_of(:a => 0, :b => [1])){ |arg| arg }
+p obj.say(:a => 0) # {:a => 0}
+p Muack.verify # true
+```
+
+Note that this could be recursive.
+
+``` ruby
+obj = Object.new
+mock(obj).say(subset_of(:a => {:b => is_a(Fixnum), :c => 1})){ |arg| arg[:a] }
+p obj.say(:a => {:b => 2}) # {:b => 2}
 p Muack.verify # true
 ```
 

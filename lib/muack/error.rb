@@ -15,4 +15,10 @@ module Muack
             ".times(#{times})"
     end
   end
+
+  class UnknownSpec < Error
+    def initialize spec
+      super "\nUnknown spec: #{spec.inspect}"
+    end
+  end
 end
