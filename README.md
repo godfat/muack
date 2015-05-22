@@ -785,6 +785,15 @@ p obj.say(:a => 0, :b => 1) # {:a => 0, :b => 1}
 p Muack.verify # true
 ```
 
+Note that this could be recursive.
+
+``` ruby
+obj = Object.new
+mock(obj).say(hash_including(:a => {:b => is_a(Fixnum)})){ |arg| arg[:c] }
+p obj.say(:a => {:b => 1}, :c => 2) # 2
+p Muack.verify # true
+```
+
 #### including
 
 `including` would check if the actual argument includes the given value
