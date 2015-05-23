@@ -55,16 +55,6 @@ module Muack
     end
   end
 
-  class IsA < Satisfy
-    def initialize klass
-      super([klass])
-    end
-
-    def match actual_arg
-      actual_arg.kind_of?(api_args.first)
-    end
-  end
-
   class Anything < Satisfy
     def initialize
       super([])
@@ -75,13 +65,53 @@ module Muack
     end
   end
 
-  class Match < Satisfy
+  class IsA < Satisfy
+    def initialize klass
+      super([klass])
+    end
+
+    def match actual_arg
+      actual_arg.kind_of?(api_args.first)
+    end
+  end
+
+  class Matching < Satisfy
     def initialize regexp
       super([regexp])
     end
 
     def match actual_arg
       api_args.first.match(actual_arg)
+    end
+  end
+
+  class Including < Satisfy
+    def initialize element
+      super([element])
+    end
+
+    def match actual_arg
+      actual_arg.include?(api_args.first)
+    end
+  end
+
+  class Within < Satisfy
+    def initialize range_or_array
+      super([range_or_array])
+    end
+
+    def match actual_arg
+      api_args.first.include?(actual_arg)
+    end
+  end
+
+  class RespondingTo < Satisfy
+    def initialize *messages
+      super(messages)
+    end
+
+    def match actual_arg
+      api_args.all?{ |msg| actual_arg.respond_to?(msg) }
     end
   end
 
@@ -128,7 +158,7 @@ module Muack
     end
   end
 
-  class SupersetOf < MatchSpec
+  class Having < MatchSpec
     def initialize subset
       super(subset)
     end
@@ -141,7 +171,7 @@ module Muack
     end
   end
 
-  class SubsetOf < MatchSpec
+  class Allowing < MatchSpec
     def initialize superset
       super(superset)
     end
@@ -151,36 +181,6 @@ module Muack
       actual_arg.each_key.all? do |key|
         match_value(actual_arg[key], superset[key])
       end
-    end
-  end
-
-  class Including < Satisfy
-    def initialize element
-      super([element])
-    end
-
-    def match actual_arg
-      actual_arg.include?(api_args.first)
-    end
-  end
-
-  class Within < Satisfy
-    def initialize range_or_array
-      super([range_or_array])
-    end
-
-    def match actual_arg
-      api_args.first.include?(actual_arg)
-    end
-  end
-
-  class RespondTo < Satisfy
-    def initialize *messages
-      super(messages)
-    end
-
-    def match actual_arg
-      api_args.all?{ |msg| actual_arg.respond_to?(msg) }
     end
   end
 end

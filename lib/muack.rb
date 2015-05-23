@@ -46,28 +46,16 @@ module Muack
       if block_given? then yield(ret) else ret end
     end
 
-    def is_a klass
-      Muack::IsA.new(klass)
-    end
-
     def anything
       Muack::Anything.new
     end
 
-    def match regexp
-      Muack::Match.new(regexp)
+    def is_a klass
+      Muack::IsA.new(klass)
     end
 
-    def match_spec spec
-      Muack::MatchSpec.new(spec)
-    end
-
-    def superset_of spec
-      Muack::SupersetOf.new(spec)
-    end
-
-    def subset_of spec
-      Muack::SubsetOf.new(spec)
+    def matching regexp
+      Muack::Matching.new(regexp)
     end
 
     def including element
@@ -78,18 +66,42 @@ module Muack
       Muack::Within.new(range_or_array)
     end
 
-    def respond_to *msg
-      Muack::RespondTo.new(*msg)
+    def responding_to *msg
+      Muack::RespondingTo.new(*msg)
+    end
+
+    def match_spec spec
+      Muack::MatchSpec.new(spec)
+    end
+
+    def having spec
+      Muack::Having.new(spec)
+    end
+
+    def allowing spec
+      Muack::Allowing.new(spec)
     end
 
     def satisfy &block
       Muack::Satisfy.new(&block)
     end
 
+    def match regexp
+      $stderr.puts("Muack::API.match is deprecated." \
+                   " Use Muack::API.matching instead.")
+      matching(regexp)
+    end
+
+    def respond_to *msg
+      $stderr.puts("Muack::API.respond_to is deprecated." \
+                   " Use Muack::API.responding_to instead.")
+      responding_to(*msg)
+    end
+
     def hash_including spec
       $stderr.puts("Muack::API.hash_including is deprecated." \
-                   " Use Muack::API.superset_of instead.")
-      superset_of(spec)
+                   " Use Muack::API.having instead.")
+      having(spec)
     end
   end
 end

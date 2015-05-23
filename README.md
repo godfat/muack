@@ -756,15 +756,15 @@ p obj.say(true) # true
 p Muack.verify  # true
 ```
 
-#### match
+#### matching
 
-`match` would check the argument with `match` method. Usually this is
+`matching` would check the argument with `match` method. Usually this is
 used with regular expression, but anything which responds to `match`
 should work.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(match(/\w+/)){ |arg| arg }
+mock(obj).say(matching(/\w+/)){ |arg| arg }
 p obj.say('Hi') # 'Hi'
 p Muack.verify  # true
 ```
@@ -793,14 +793,14 @@ p obj.say(:a => {:b => [0]}) # {:b => [0]}
 p Muack.verify # true
 ```
 
-#### superset_of
+#### having
 
-`superset_of` would check if the actual argument is a superset of given
+`having` would check if the actual argument is a superset of given
 specification.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(superset_of(:a => 0)){ |arg| arg }
+mock(obj).say(having(:a => 0)){ |arg| arg }
 p obj.say(:a => 0, :b => 1) # {:a => 0, :b => 1}
 p Muack.verify # true
 ```
@@ -809,19 +809,19 @@ Note that this could be recursive.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(superset_of(:a => {:b => [is_a(Fixnum)]})){ |arg| arg[:c] }
+mock(obj).say(having(:a => {:b => [is_a(Fixnum)]})){ |arg| arg[:c] }
 p obj.say(:a => {:b => [1]}, :c => 2) # 2
 p Muack.verify # true
 ```
 
-#### subset_of
+#### allowing
 
-`subset_of` would check if the actual argument is a subset of given
+`allowing` would check if the actual argument is a subset of given
 specification.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(subset_of(:a => 0, :b => [1])){ |arg| arg }
+mock(obj).say(allowing(:a => 0, :b => [1])){ |arg| arg }
 p obj.say(:a => 0) # {:a => 0}
 p Muack.verify # true
 ```
@@ -830,7 +830,7 @@ Note that this could be recursive.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(subset_of(:a => {:b => is_a(Fixnum), :c => 1})){ |arg| arg[:a] }
+mock(obj).say(allowing(:a => {:b => is_a(Fixnum), :c => 1})){ |arg| arg[:a] }
 p obj.say(:a => {:b => 2}) # {:b => 2}
 p Muack.verify # true
 ```
@@ -859,23 +859,23 @@ p obj.say(0)   # 0
 p Muack.verify # true
 ```
 
-#### respond_to
+#### responding_to
 
-`respond_to` would check if the actual argument would be responding to
+`responding_to` would check if the actual argument would be responding to
 the given message, checked via `respond_to?`, also known as duck typing.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(respond_to(:size)){ |arg| arg }
+mock(obj).say(responding_to(:size)){ |arg| arg }
 p obj.say([])  # []
 p Muack.verify # true
 ```
 
-Note that you could give multiple messages to `respond_to`.
+Note that you could give multiple messages to `responding_to`.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(respond_to(:size, :reverse)){ |arg| arg }
+mock(obj).say(responding_to(:size, :reverse)){ |arg| arg }
 p obj.say([])  # []
 p Muack.verify # true
 ```
@@ -925,7 +925,7 @@ class implements each method. We could use conjunction for this.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(is_a(Enumerable) & respond_to(:each)){}.times(3)
+mock(obj).say(is_a(Enumerable) & responding_to(:each)){}.times(3)
 p obj.say( [] ) # nil
 p obj.say( {} ) # nil
 p obj.say(0..1) # nil
