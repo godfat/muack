@@ -1,7 +1,7 @@
 
 require 'muack/test'
 
-describe Muack::Satisfy do
+describe Muack::Satisfying do
   after do
     Muack.reset
     Muack::EnsureReset.call
@@ -307,36 +307,36 @@ describe Muack::Satisfy do
     end
   end
 
-  describe Muack::Satisfy do
+  describe Muack::Satisfying do
     would 'have human readable to_s and inspect' do
-      matcher = satisfy{ |arg| arg % 2 == 0 }
-      expected = 'Muack::API.satisfy(#<Proc:'
+      matcher = satisfying{ |arg| arg % 2 == 0 }
+      expected = 'Muack::API.satisfying(#<Proc:'
       matcher.to_s   .should.start_with? expected
       matcher.inspect.should.start_with? expected
     end
 
     would 'not crash for top-level subclass' do
-      Class.new(Muack::Satisfy){ def self.name; 'TopLevel'; end }.new.
+      Class.new(Muack::Satisfying){ def self.name; 'TopLevel'; end }.new.
         api_name.should.eq 'top_level'
     end
 
     would 'satisfy' do
-      mock(Str).say(satisfy{ |arg| arg % 2 == 0 }){ |arg| arg + 1 }
+      mock(Str).say(satisfying{ |arg| arg % 2 == 0 }){ |arg| arg + 1 }
       Str.say(14).should.eq 15
       Muack.verify.should.eq true
       Muack::EnsureReset.call
     end
 
     would 'raise Unexpected error if passing unexpected argument' do
-      mock(Obj).say(satisfy{ |arg| arg % 2 == 0 }){ 'boo' }
+      mock(Obj).say(satisfying{ |arg| arg % 2 == 0 }){ 'boo' }
       e = should.raise(Muack::Unexpected){ Obj.say(1) }
-      e.expected.should.start_with? 'obj.say(Muack::API.satisfy(#<Proc:'
+      e.expected.should.start_with? 'obj.say(Muack::API.satisfying(#<Proc:'
       e.was     .should.eq          'obj.say(1)'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
   end
 
-  describe Muack::Satisfy::Disj do
+  describe Muack::Satisfying::Disj do
     would 'have human readable to_s and inspect' do
       matcher = is_a(TrueClass) | is_a(FalseClass)
       expected = 'Muack::API.is_a(TrueClass) | Muack::API.is_a(FalseClass)'
@@ -362,7 +362,7 @@ describe Muack::Satisfy do
     end
   end
 
-  describe Muack::Satisfy::Conj do
+  describe Muack::Satisfying::Conj do
     would 'have human readable to_s and inspect' do
       matcher = responding_to(:ancestors) & is_a(Class)
       expected =

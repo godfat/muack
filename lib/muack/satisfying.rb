@@ -2,7 +2,7 @@
 require 'muack/error'
 
 module Muack
-  class Satisfy < Struct.new(:api_args, :block)
+  class Satisfying < Struct.new(:api_args, :block)
     def initialize args=nil, &block
       super(args, block)
     end
@@ -11,10 +11,10 @@ module Muack
       !!block.call(actual_arg)
     end
 
-    def | rhs; Satisfy::Disj.new(self, rhs); end
-    def & rhs; Satisfy::Conj.new(self, rhs); end
+    def | rhs; Satisfying::Disj.new(self, rhs); end
+    def & rhs; Satisfying::Conj.new(self, rhs); end
 
-    class Disj < Satisfy
+    class Disj < Satisfying
       def initialize lhs, rhs
         @lhs, @rhs = lhs, rhs
       end
@@ -27,7 +27,7 @@ module Muack
       alias_method :inspect, :to_s
     end
 
-    class Conj < Satisfy
+    class Conj < Satisfying
       def initialize lhs, rhs
         @lhs, @rhs = lhs, rhs
       end
@@ -55,7 +55,7 @@ module Muack
     end
   end
 
-  class Anything < Satisfy
+  class Anything < Satisfying
     def initialize
       super([])
     end
@@ -65,7 +65,7 @@ module Muack
     end
   end
 
-  class IsA < Satisfy
+  class IsA < Satisfying
     def initialize klass
       super([klass])
     end
@@ -75,7 +75,7 @@ module Muack
     end
   end
 
-  class Matching < Satisfy
+  class Matching < Satisfying
     def initialize regexp
       super([regexp])
     end
@@ -85,7 +85,7 @@ module Muack
     end
   end
 
-  class Including < Satisfy
+  class Including < Satisfying
     def initialize element
       super([element])
     end
@@ -95,7 +95,7 @@ module Muack
     end
   end
 
-  class Within < Satisfy
+  class Within < Satisfying
     def initialize range_or_array
       super([range_or_array])
     end
@@ -105,7 +105,7 @@ module Muack
     end
   end
 
-  class RespondingTo < Satisfy
+  class RespondingTo < Satisfying
     def initialize *messages
       super(messages)
     end
@@ -115,7 +115,7 @@ module Muack
     end
   end
 
-  class MatchSpec < Satisfy
+  class MatchSpec < Satisfying
     def initialize spec
       super([spec])
     end
@@ -146,7 +146,7 @@ module Muack
 
     def match_value av, ev
       case ev
-      when Satisfy
+      when Satisfying
         ev.match(av)
       when Hash
         match_hash(av, ev)

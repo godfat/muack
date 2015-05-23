@@ -194,12 +194,12 @@ module Muack
     def __mock_check_args expected_args, actual_args
       if expected_args == [WithAnyArgs]
         true
-      elsif expected_args.none?{ |arg| arg.kind_of?(Satisfy) }
+      elsif expected_args.none?{ |arg| arg.kind_of?(Satisfying) }
         expected_args == actual_args
 
       elsif expected_args.size == actual_args.size
         expected_args.zip(actual_args).all?{ |(e, a)|
-          if e.kind_of?(Satisfy) then e.match(a) else e == a end
+          if e.kind_of?(Satisfying) then e.match(a) else e == a end
         }
       else
         false

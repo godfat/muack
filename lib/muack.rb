@@ -1,6 +1,6 @@
 
 require 'muack/session'
-require 'muack/satisfy'
+require 'muack/satisfying'
 
 module Muack
   def self.verify obj=nil
@@ -82,8 +82,8 @@ module Muack
       Muack::Allowing.new(spec)
     end
 
-    def satisfy &block
-      Muack::Satisfy.new(&block)
+    def satisfying &block
+      Muack::Satisfying.new(&block)
     end
 
     def match regexp
@@ -102,6 +102,12 @@ module Muack
       $stderr.puts("Muack::API.hash_including is deprecated." \
                    " Use Muack::API.having instead.")
       having(spec)
+    end
+
+    def satisfy &block
+      $stderr.puts("Muack::API.satisfy is deprecated." \
+                   " Use Muack::API.satisfying instead.")
+      satisfying(&block)
     end
   end
 end

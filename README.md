@@ -61,7 +61,7 @@ There are 3 parts in Muack, which are:
 
 * [Mocks](#mocks)
 * [Mocks Modifiers](#mocks-modifiers)
-* [Arguments Verifiers (Satisfy)](#arguments-verifiers-satisfy)
+* [Arguments Verifiers (Satisfying)](#arguments-verifiers-satisfying)
 
 Mocks are objects with injected methods which we could observe, and mocks
 modifiers are telling how we want to observe the mocks, and finally argument
@@ -673,7 +673,7 @@ p Muack.verify # true
 We could also omit `|_|` if we don't care about the original return value
 in the above example.
 
-### Arguments Verifiers (Satisfy)
+### Arguments Verifiers (Satisfying)
 
 If we're not passing any arguments to the injected method we define, then
 basically we're saying that there's no arguments should be passed to the
@@ -880,15 +880,15 @@ p obj.say(:a => {:b => 2}) # {:b => 2}
 p Muack.verify # true
 ```
 
-#### satisfy
+#### satisfying
 
-`satisfy` accepts a block to let you do arbitrary verification.
+`satisfying` accepts a block to let you do arbitrary verification.
 nil and false are considered false, otherwise true, just like in
 regular if expression.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(satisfy{ |arg| arg % 2 == 0 }){ |arg| arg }
+mock(obj).say(satisfying{ |arg| arg % 2 == 0 }){ |arg| arg }
 p obj.say(0)   # 0
 p Muack.verify # true
 ```
@@ -1143,7 +1143,7 @@ verifiers. For example, we could do this to check if the food is frozen:
 Food = Class.new
 User = Class.new{ attr_accessor :food }
 
-FoodFrozen = Class.new(Muack::Satisfy) do
+FoodFrozen = Class.new(Muack::Satisfying) do
   def match actual_arg
     actual_arg.frozen?
   end
@@ -1160,7 +1160,7 @@ p u.food = Food.new.freeze # ok
 p u.food = Food.new        # raise Muack::Unexpected
 ```
 
-Please check _Arguments Verifiers (Satisfy)_ section for more argument
+Please check _Arguments Verifiers (Satisfying)_ section for more argument
 verifiers details.
 
 [dm-core]: https://github.com/datamapper/dm-core
