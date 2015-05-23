@@ -730,18 +730,6 @@ are not recursive though. If you need complex arguments verification,
 you'll need to use `satisfy` verifier which you could give an arbitrary
 block to verify anything.
 
-#### is_a
-
-`is_a` would check if the argument is a kind of the given class.
-Actually, it's calling `kind_of?` underneath.
-
-``` ruby
-obj = Object.new
-mock(obj).say(is_a(String)){ |arg| arg }
-p obj.say('something') # 'something'
-p Muack.verify         # true
-```
-
 #### anything
 
 `anything` is a wildcard arguments verifier. It matches anything.
@@ -754,6 +742,18 @@ mock(obj).say(anything){ |arg| arg }.times(2)
 p obj.say(0)    # 0
 p obj.say(true) # true
 p Muack.verify  # true
+```
+
+#### is_a
+
+`is_a` would check if the argument is a kind of the given class.
+Actually, it's calling `kind_of?` underneath.
+
+``` ruby
+obj = Object.new
+mock(obj).say(is_a(String)){ |arg| arg }
+p obj.say('something') # 'something'
+p Muack.verify         # true
 ```
 
 #### matching
@@ -772,6 +772,51 @@ p Muack.verify  # true
 Note that please don't pass the regular expression directly without
 wrapping it with a match verifier, or how do we distinguish if we
 really want to make sure the argument is exactly the regular expression?
+
+#### including
+
+`including` would check if the actual argument includes the given value
+via `include?` method.
+
+``` ruby
+obj = Object.new
+mock(obj).say(including(0)){ |arg| arg }
+p obj.say([0,1]) # [0,1]
+p Muack.verify   # true
+```
+
+#### within
+
+`within` is the reverse version of `including`, verifying if the actual
+argument is included in the given value.
+
+``` ruby
+obj = Object.new
+mock(obj).say(within([0, 1])){ |arg| arg }
+p obj.say(0)   # 0
+p Muack.verify # true
+```
+
+#### responding_to
+
+`responding_to` would check if the actual argument would be responding to
+the given message, checked via `respond_to?`, also known as duck typing.
+
+``` ruby
+obj = Object.new
+mock(obj).say(responding_to(:size)){ |arg| arg }
+p obj.say([])  # []
+p Muack.verify # true
+```
+
+Note that you could give multiple messages to `responding_to`.
+
+``` ruby
+obj = Object.new
+mock(obj).say(responding_to(:size, :reverse)){ |arg| arg }
+p obj.say([])  # []
+p Muack.verify # true
+```
 
 #### match_spec
 
@@ -832,51 +877,6 @@ Note that this could be recursive.
 obj = Object.new
 mock(obj).say(allowing(:a => {:b => is_a(Fixnum), :c => 1})){ |arg| arg[:a] }
 p obj.say(:a => {:b => 2}) # {:b => 2}
-p Muack.verify # true
-```
-
-#### including
-
-`including` would check if the actual argument includes the given value
-via `include?` method.
-
-``` ruby
-obj = Object.new
-mock(obj).say(including(0)){ |arg| arg }
-p obj.say([0,1]) # [0,1]
-p Muack.verify   # true
-```
-
-#### within
-
-`within` is the reverse version of `including`, verifying if the actual
-argument is included in the given value.
-
-``` ruby
-obj = Object.new
-mock(obj).say(within([0, 1])){ |arg| arg }
-p obj.say(0)   # 0
-p Muack.verify # true
-```
-
-#### responding_to
-
-`responding_to` would check if the actual argument would be responding to
-the given message, checked via `respond_to?`, also known as duck typing.
-
-``` ruby
-obj = Object.new
-mock(obj).say(responding_to(:size)){ |arg| arg }
-p obj.say([])  # []
-p Muack.verify # true
-```
-
-Note that you could give multiple messages to `responding_to`.
-
-``` ruby
-obj = Object.new
-mock(obj).say(responding_to(:size, :reverse)){ |arg| arg }
-p obj.say([])  # []
 p Muack.verify # true
 ```
 
