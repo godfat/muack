@@ -1,6 +1,6 @@
 # CHANGES
 
-## Muack 1.3.0 -- ?
+## Muack 1.3.0 -- 2015-05-24
 
 ### Incompatible changes
 
