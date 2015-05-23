@@ -1,5 +1,20 @@
 # CHANGES
 
+## Muack 1.3.0 -- ?
+
+### Incompatible changes
+
+* `Muack::API.match` is renamed to `Muack::API.matching`
+* `Muack::API.respond_to` is renamed to `Muack::API.responding_to`
+* `Muack::API.hash_including` is renamed to `Muack::API.having`
+* `Muack::API.satisfy` is renamed to `Muack::API.satisfying`
+* `Muack::Satisy` is renamed to `Muack::Satisying`
+
+### Enhancement
+
+* `Muack::API.where` is added
+* `Muack::API.allowing` is added
+
 ## Muack 1.2.0 -- 2015-03-10
 
 * Now stubs could be overwritten. Input from @mz026
