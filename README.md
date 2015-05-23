@@ -818,13 +818,13 @@ p obj.say([])  # []
 p Muack.verify # true
 ```
 
-#### match_spec
+#### where
 
-`match_spec` would check if the actual argument matches given specification.
+`where` would check if the actual argument matches given specification.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(match_spec(:a => is_a(Fixnum))){ |arg| arg }
+mock(obj).say(where(:a => is_a(Fixnum))){ |arg| arg }
 p obj.say(:a => 0) # {:a => 0}
 p Muack.verify # true
 ```
@@ -833,7 +833,7 @@ Note that this could be recursive.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(match_spec(:a => {:b => [is_a(Fixnum)]})){ |arg| arg[:a] }
+mock(obj).say(where(:a => {:b => [is_a(Fixnum)]})){ |arg| arg[:a] }
 p obj.say(:a => {:b => [0]}) # {:b => [0]}
 p Muack.verify # true
 ```

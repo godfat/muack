@@ -70,8 +70,8 @@ module Muack
       Muack::RespondingTo.new(*msg)
     end
 
-    def match_spec spec
-      Muack::MatchSpec.new(spec)
+    def where spec
+      Muack::Where.new(spec)
     end
 
     def having spec

@@ -115,7 +115,7 @@ module Muack
     end
   end
 
-  class MatchSpec < Satisfying
+  class Where < Satisfying
     def initialize spec
       super([spec])
     end
@@ -158,7 +158,7 @@ module Muack
     end
   end
 
-  class Having < MatchSpec
+  class Having < Where
     def initialize subset
       super(subset)
     end
@@ -171,7 +171,7 @@ module Muack
     end
   end
 
-  class Allowing < MatchSpec
+  class Allowing < Where
     def initialize superset
       super(superset)
     end
