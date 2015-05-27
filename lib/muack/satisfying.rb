@@ -123,9 +123,9 @@ module Muack
     def match actual_arg, spec=api_args.first
       case spec
       when Hash
-        match_hash(actual_arg, spec)
+        actual_arg.kind_of?(Hash) && match_hash(actual_arg, spec)
       when Array
-        match_array(actual_arg, spec)
+        actual_arg.kind_of?(Array) && match_array(actual_arg, spec)
       else
         raise UnknownSpec.new(spec)
       end
@@ -149,9 +149,9 @@ module Muack
       when Satisfying
         ev.match(av)
       when Hash
-        match_hash(av, ev)
+        av.kind_of?(Hash) && match_hash(av, ev)
       when Array
-        match_array(av, ev)
+        av.kind_of?(Array) && match_array(av, ev)
       else
         ev == av
       end

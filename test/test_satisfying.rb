@@ -215,6 +215,20 @@ describe Muack::Satisfying do
       e.was     .should.eq 'obj.say({:a=>0, :b=>1, :c=>2})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
+
+    would 'recurse' do
+      mock(Obj).say(where(:a =>
+                      having(:b =>
+                        allowing(:c => [is_a(Fixnum)])))){ 'boo' }
+      e = should.raise(Muack::Unexpected){Obj.say(:a => 0)}
+      e.expected.should.eq               \
+        'obj.say(Muack::API.where({:a=>' \
+          'Muack::API.having({:b=>'      \
+            'Muack::API.allowing({:c=>'  \
+              '[Muack::API.is_a(Fixnum)]})})}))'
+      e.was     .should.eq 'obj.say({:a=>0})'
+      e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+    end
   end
 
   describe Muack::Having do
