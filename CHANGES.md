@@ -1,5 +1,10 @@
 # CHANGES
 
+## Muack 1.3.1 -- 2015-05-27
+
+* Fixed a bug for `where`, `having`, and `allowing` which would raise an
+  exception whenever the actual value is not a hash or array.
+
 ## Muack 1.3.0 -- 2015-05-24
 
 ### Incompatible changes
