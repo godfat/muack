@@ -1,5 +1,10 @@
 # CHANGES
 
+## Muack 1.3.2 -- 2015-06-11
+
+* Fixed a bug for `where`, `having`, and `allowing` which should distinguish
+  between `nil` and `undefined` (which does not have a key in a hash)
+
 ## Muack 1.3.1 -- 2015-05-27
 
 * Fixed a bug for `where`, `having`, and `allowing` which would raise an
