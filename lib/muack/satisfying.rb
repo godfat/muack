@@ -116,6 +116,7 @@ module Muack
   end
 
   class Where < Satisfying
+    None = Object.new
     def initialize spec
       super([spec])
     end
@@ -134,7 +135,7 @@ module Muack
     private
     def match_hash actual_arg, spec
       (spec.keys | actual_arg.keys).all? do |key|
-        match_value(actual_arg[key], spec[key])
+        match_value(actual_arg, spec, key)
       end
     end
 
@@ -144,16 +145,24 @@ module Muack
       end
     end
 
-    def match_value av, ev
-      case ev
-      when Satisfying
-        ev.match(av)
-      when Hash
-        av.kind_of?(Hash) && match_hash(av, ev)
-      when Array
-        av.kind_of?(Array) && match_array(av, ev)
+    def match_value av, ev, key=None
+      if key == None
+        a, e = av, ev
+      elsif av.key?(key) && ev.key?(key)
+        a, e = av[key], ev[key]
       else
-        ev == av
+        return false
+      end
+
+      case e
+      when Satisfying
+        e.match(a)
+      when Hash
+        a.kind_of?(Hash) && match_hash(a, e)
+      when Array
+        a.kind_of?(Array) && match_array(a, e)
+      else
+        e == a
       end
     end
   end
@@ -166,7 +175,7 @@ module Muack
     private
     def match_hash actual_arg, subset
       subset.each_key.all? do |key|
-        match_value(actual_arg[key], subset[key])
+        match_value(actual_arg, subset, key)
       end
     end
   end
@@ -179,7 +188,7 @@ module Muack
     private
     def match_hash actual_arg, superset
       actual_arg.each_key.all? do |key|
-        match_value(actual_arg[key], superset[key])
+        match_value(actual_arg, superset, key)
       end
     end
   end

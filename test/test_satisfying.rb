@@ -229,6 +229,11 @@ describe Muack::Satisfying do
       e.was     .should.eq 'obj.say({:a=>0})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
+
+    would 'respect all keys', :groups => [:only] do
+      mock(Obj).say(where(:a => 0)){ 'nnf' }
+      should.raise(Muack::Unexpected){Obj.say(:a => 0, :b => nil)}
+    end
   end
 
   describe Muack::Having do
@@ -274,6 +279,11 @@ describe Muack::Satisfying do
       e.was     .should.eq 'obj.say({:b=>1})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
+
+    would 'respect all keys' do
+      mock(Obj).say(having(:a => 0, :b => nil)){ 'nnf' }
+      should.raise(Muack::Unexpected){Obj.say(:a => 0)}
+    end
   end
 
   describe Muack::Allowing do
@@ -318,6 +328,11 @@ describe Muack::Satisfying do
         'obj.say(Muack::API.allowing({:b=>Muack::API.is_a(String)}))'
       e.was     .should.eq 'obj.say({:b=>"1", :c=>2})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+    end
+
+    would 'respect all keys' do
+      mock(Obj).say(allowing(:a => 0)){ 'nnf' }
+      should.raise(Muack::Unexpected){Obj.say(:a => 0, :b => nil)}
     end
   end
 
