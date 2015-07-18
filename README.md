@@ -1,4 +1,4 @@
-# Muack [![Build Status](https://secure.travis-ci.org/godfat/muack.png?branch=master)](http://travis-ci.org/godfat/muack) [![Coverage Status](https://coveralls.io/repos/godfat/muack/badge.png?branch=master)](https://coveralls.io/r/godfat/muack?branch=master)
+# Muack [![Build Status](https://secure.travis-ci.org/godfat/muack.png?branch=master)](http://travis-ci.org/godfat/muack) [![Coverage Status](https://coveralls.io/repos/godfat/muack/badge.png?branch=master)](https://coveralls.io/r/godfat/muack?branch=master) [![Join the chat at https://gitter.im/godfat/muack](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/godfat/muack)
 
 by Lin Jen-Shin ([godfat](http://godfat.org))
 
