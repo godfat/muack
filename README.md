@@ -39,9 +39,9 @@ Here's a quick example using [Pork][].
 require 'pork/auto'
 require 'muack'
 
-include Muack::API
-
 describe 'Hello' do
+  include Muack::API
+
   before{ Muack.reset  }
   after { Muack.verify }
 
