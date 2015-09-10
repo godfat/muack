@@ -1141,7 +1141,7 @@ verifiers. For example, we could do this to check if the food is frozen:
 
 ``` ruby
 Food = Class.new
-User = Class.new{ attr_accessor :food }
+User = Class.new(Struct.new(:food))
 
 FoodFrozen = Class.new(Muack::Satisfying) do
   def match actual_arg
