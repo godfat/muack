@@ -1114,7 +1114,7 @@ Consider we have two classes:
 
 ```  ruby
 Food = Class.new
-User = Class.new{ attr_accessor :food }
+User = Class.new(Struct.new(:food))
 ```
 
 And we could make sure User#food is always a kind of `Food` by putting this
