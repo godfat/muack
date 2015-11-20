@@ -61,7 +61,7 @@ describe 'Muack.verify==true' do
 
   describe Muack::See do
     would 'see: does not care about the order and times' do
-      stub(Obj).say(is_a(Fixnum), &:itself)
+      stub(Obj).say(is_a(Fixnum)){|i|i} # change to &:itself in the future
       0.upto(3){ |i| Obj.say(i).should.eq i }
        see(Obj).say(2)
        see(Obj).say(1)
