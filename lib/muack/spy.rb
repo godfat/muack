@@ -10,9 +10,7 @@ module Muack
 
     # used for Muack::Session#verify
     def __mock_verify
-      @stub.__mock_disps.values.flatten.each do |defi|
-        __mock_dispatch(defi.msg, defi.args) if __mock_defis.key?(defi.msg)
-      end
+      __mock_dispatch_spy
       super # simulate dispatching before passing to mock to verify
     end
 
@@ -21,5 +19,11 @@ module Muack
 
     private
     def __mock_inject_method defi; end # spies don't leave any track
+
+    def __mock_dispatch_spy
+      @stub.__mock_disps.values.flatten.each do |defi|
+        __mock_dispatch(defi.msg, defi.args) if __mock_defis.key?(defi.msg)
+      end
+    end
   end
 end
