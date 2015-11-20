@@ -62,7 +62,7 @@ module Muack
         end
       else
         defis = __mock_disps[msg]
-        if expected = defis.find{ |d| __mock_check_args(d.args, actual_args) }
+        if expected = __mock_find_checked_difi(defis, actual_args)
           Mock.__send__(:raise, # Too many times
             Expected.new(object, expected, defis.size, defis.size+1))
         else
@@ -189,6 +189,10 @@ module Muack
       else # peek_return doesn't need splat
         block.call(actual_args, &actual_block)
       end
+    end
+
+    def __mock_find_checked_difi defis, actual_args, meth=:find
+      defis.public_send(meth){ |d| __mock_check_args(d.args, actual_args) }
     end
 
     def __mock_check_args expected_args, actual_args
