@@ -59,12 +59,12 @@ describe 'Muack.verify==true' do
     end
   end
 
-  describe Muack::See do
+  describe Muack::Spot do
     would 'see: does not care about the order and times' do
       stub(Obj).say(is_a(Fixnum)){|i|i} # change to &:itself in the future
       0.upto(3){ |i| Obj.say(i).should.eq i }
-       see(Obj).say(2)
-       see(Obj).say(1)
+       spot(Obj).say(2)
+       spot(Obj).say(1)
     end
   end
 end
@@ -75,7 +75,7 @@ describe 'Muack.verify==false' do
     Muack::EnsureReset.call
   end
 
-  %w[spy see].each do |kind|
+  %w[spy spot].each do |kind|
     describe kind do
       would 'raise Expected if it is not satisfied' do
         stub(Obj).say{}
@@ -126,11 +126,11 @@ describe 'Muack.verify==false' do
     end
   end
 
-  describe Muack::See do
+  describe Muack::Spot do
     would 'raise Expected if it is not satisfied enough' do
       stub(Obj).say(is_a(Fixnum)){}
       Obj.say(1)
-      see(Obj).say(0)
+      spot(Obj).say(0)
       e = should.raise(Muack::Expected){ Muack.verify }
       e.expected      .should.eq 'obj.say(0)'
       e.expected_times.should.eq 1

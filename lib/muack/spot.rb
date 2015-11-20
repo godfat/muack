@@ -2,7 +2,7 @@
 require 'muack/spy'
 
 module Muack
-  class See < Spy
+  class Spot < Spy
     private
     def __mock_dispatch_spy
       @stub.__mock_disps.values.flatten.each do |defi|
