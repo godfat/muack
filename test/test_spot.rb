@@ -1,7 +1,7 @@
 
 require 'muack/test'
 
-describe Muack::Spot do
+describe Muack::Spy do
   describe 'Muack.verify==true' do
     after do
       Muack.verify.should.eq true
