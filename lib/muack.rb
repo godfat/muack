@@ -41,11 +41,6 @@ module Muack
       if block_given? then yield(ret) else ret end
     end
 
-    def spot obj
-      ret = Muack.session.spot(obj)
-      if block_given? then yield(ret) else ret end
-    end
-
     def any_instance_of klass
       ret = Muack.session.any_instance_of(klass)
       if block_given? then yield(ret) else ret end
