@@ -1,13 +1,13 @@
 
 require 'muack/test'
 
-describe Muack::Spy do
-  describe 'Muack.verify==true' do
-    after do
-      Muack.verify.should.eq true
-      Muack::EnsureReset.call
-    end
+describe 'Muack.verify==true' do
+  after do
+    Muack.verify.should.eq true
+    Muack::EnsureReset.call
+  end
 
+  describe Muack::Spy do
     would 'inspect' do
       spy( Obj).inspect.should.eq "Muack::API.spy(obj)"
     end
@@ -59,55 +59,84 @@ describe Muack::Spy do
     end
   end
 
-  describe 'Muack.verify==false' do
-    after do
-      Muack.reset
-      Muack::EnsureReset.call
+  describe Muack::See do
+    would 'see: does not care about the order and times' do
+      stub(Obj).say(is_a(Fixnum), &:itself)
+      0.upto(3){ |i| Obj.say(i).should.eq i }
+       see(Obj).say(2)
+       see(Obj).say(1)
     end
+  end
+end
 
-    would 'raise Expected if the spy is not satisfied' do
-      stub(Obj).say{}
-       spy(Obj).say
-      e = should.raise(Muack::Expected){ Muack.verify }
-      e.expected      .should.eq 'obj.say()'
-      e.expected_times.should.eq 1
-      e.actual_times  .should.eq 0
-      e.message       .should.eq "\nExpected: obj.say()\n  " \
-                                 "called 1 times\n but was 0 times."
+describe 'Muack.verify==false' do
+  after do
+    Muack.reset
+    Muack::EnsureReset.call
+  end
+
+  %w[spy see].each do |kind|
+    describe kind do
+      would 'raise Expected if it is not satisfied' do
+        stub(Obj).say{}
+        send(kind, Obj).say
+        e = should.raise(Muack::Expected){ Muack.verify }
+        e.expected      .should.eq 'obj.say()'
+        e.expected_times.should.eq 1
+        e.actual_times  .should.eq 0
+        e.message       .should.eq "\nExpected: obj.say()\n  " \
+                                   "called 1 times\n but was 0 times."
+      end
+
+      would 'show correct times for under satisfaction' do
+        stub(Obj).say{}
+        2.times{ Obj.say }
+        send(kind, Obj).say.times(3)
+        e = should.raise(Muack::Expected){ Muack.verify }
+        e.expected      .should.eq 'obj.say()'
+        e.expected_times.should.eq 3
+        e.actual_times  .should.eq 2
+        e.message       .should.eq "\nExpected: obj.say()\n  " \
+                                   "called 3 times\n but was 2 times."
+      end
     end
+  end
 
-    would 'raise Expected if the spy is not satisfied enough' do
-      stub(Obj).say{}
-      Obj.say
-       spy(Obj).say(0)
-      e = should.raise(Muack::Unexpected){ Muack.verify }
-      e.expected.should.eq "obj.say(0)"
-      e.was     .should.eq 'obj.say()'
-      e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
-    end
-
-    would 'show correct times for under satisfaction' do
-      stub(Obj).say{}
-      2.times{ Obj.say }
-       spy(Obj).say.times(3)
-      e = should.raise(Muack::Expected){ Muack.verify }
-      e.expected      .should.eq 'obj.say()'
-      e.expected_times.should.eq 3
-      e.actual_times  .should.eq 2
-      e.message       .should.eq "\nExpected: obj.say()\n  " \
-                                 "called 3 times\n but was 2 times."
-    end
-
+  describe Muack::Spy do
     would 'show correct times for over satisfaction' do
       stub(Obj).say{}
       2.times{ Obj.say }
-       spy(Obj).say
+      spy(Obj).say
       e = should.raise(Muack::Expected){ Muack.verify }
       e.expected      .should.eq 'obj.say()'
       e.expected_times.should.eq 1
       e.actual_times  .should.eq 2
       e.message       .should.eq "\nExpected: obj.say()\n  " \
                                  "called 1 times\n but was 2 times."
+    end
+
+    would 'raise Expected if it is not satisfied enough' do
+      stub(Obj).say(is_a(Fixnum)){}
+      Obj.say(1)
+      spy(Obj).say(0)
+      e = should.raise(Muack::Unexpected){ Muack.verify }
+      e.expected.should.eq "obj.say(0)"
+      e.was     .should.eq 'obj.say(1)'
+      e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+    end
+  end
+
+  describe Muack::See do
+    would 'raise Expected if it is not satisfied enough' do
+      stub(Obj).say(is_a(Fixnum)){}
+      Obj.say(1)
+      see(Obj).say(0)
+      e = should.raise(Muack::Expected){ Muack.verify }
+      e.expected      .should.eq 'obj.say(0)'
+      e.expected_times.should.eq 1
+      e.actual_times  .should.eq 0
+      e.message       .should.eq "\nExpected: obj.say(0)\n  " \
+                                 "called 1 times\n but was 0 times."
     end
   end
 end

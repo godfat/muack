@@ -3,6 +3,7 @@ require 'muack/mock'
 require 'muack/stub'
 require 'muack/coat'
 require 'muack/spy'
+require 'muack/see'
 require 'muack/any_instance_of'
 
 module Muack
@@ -14,6 +15,7 @@ module Muack
     def stub obj; data["sb #{obj.__id__}"] ||= Stub.new(obj)      ; end
     def coat obj; data["co #{obj.__id__}"] ||= Coat.new(obj)      ; end
     def spy  obj; data["sy #{obj.__id__}"] ||= Spy .new(stub(obj)); end
+    def see  obj; data["se #{obj.__id__}"] ||= See .new(stub(obj)); end
 
     def any_instance_of kls
       data["ai #{kls.__id__}"] ||= AnyInstanceOf.new(kls)
@@ -38,7 +40,7 @@ module Muack
 
     private
     def with obj, meth
-      %w[mk sb co sy ai].map{ |k|
+      %w[mk sb co sy se ai].map{ |k|
         data.__send__(meth, "#{k} #{obj.__id__}")
       }.compact
     end
