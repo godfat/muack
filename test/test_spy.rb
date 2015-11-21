@@ -117,5 +117,19 @@ describe Muack::Spy do
       e.was     .should.eq 'obj.say(1)'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
+
+    would 'raise Expected if arguments do not match, show original args' do
+      stub(Obj).say(is_a(Fixnum)){}
+           Obj .say(0)
+           Obj .say(1)
+           Obj .say(2)
+       spy(Obj).say(within(1..1))
+       spy(Obj).say(within(0..0))
+      e = should.raise(Muack::Unexpected){ Muack.verify }
+      e.expected.should.eq "obj.say(Muack::API.within(0..0))\n" \
+                 "      or: obj.say(Muack::API.within(1..1))"
+      e.was     .should.eq 'obj.say(2)'
+      e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
+    end
   end
 end

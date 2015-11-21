@@ -27,8 +27,7 @@ module Muack
 
         defis = __mock_defis[disp.msg]
         if idx = __mock_find_checked_difi(defis, disp.args, :index)
-          defis.delete_at(idx) # found, dispatch it
-          __mock_disps_push(disp)
+          __mock_disps_push(defis.delete_at(idx)) # found, dispatch it
         else # just dispatch it regularly so it would show nice error message
           __mock_dispatch(disp.msg, disp.args)
         end
