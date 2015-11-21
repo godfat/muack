@@ -144,9 +144,9 @@ However you should not mix mocks and stubs with the same method, or you
 might encounter some unexpected result. Jump to _Caveat_ for more detail.
 
 The other differences for stubs and spies, please check
-[Arguments Verifiers (Satisfying)][pattern-matching]. In short,
-stubs and spies would do some kind of pattern matching, making
-the order of the same method irrelevant.
+[Pattern Matching for stubs and spies][pattern-matching].
+In short, stubs and spies would do some kind of pattern matching,
+making the order of the same method irrelevant.
 
 On the other hand, stubs aren't limited to testing. If we want to monkey
 patching something, stubs could be useful as we don't care how many times
@@ -331,7 +331,7 @@ If the order is reversed, then it would always return the original value,
 because the proxy would always match, and Muack would stop searching the
 next stub.
 
-[pattern-matching]: #arguments-verifiers-satisfying
+[pattern-matching]: #pattern-matching-for-stubs-and-spies
 
 #### any_instance_of mode
 
@@ -712,6 +712,8 @@ mock(obj).say{ |&block| block.call('Hi') }
 obj.say{ |msg| p msg } # 'Hi'
 p Muack.verify  # true
 ```
+
+#### Pattern Matching for stubs and spies
 
 Moreover, we could also have stubs on the same method for different
 arguments. We could think of this as a sort of pattern matching, and Muack
