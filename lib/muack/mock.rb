@@ -61,14 +61,7 @@ module Muack
             Unexpected.new(object, [defi], msg, actual_args))
         end
       else
-        disps = __mock_disps[msg]
-        if expected = __mock_find_checked_difi(disps, actual_args)
-          Mock.__send__(:raise, # Too many times
-            Expected.new(object, expected, disps.size, disps.size+1))
-        else
-          Mock.__send__(:raise, # Wrong argument
-            Unexpected.new(object, disps, msg, actual_args))
-        end
+        __mock_failed(msg, actual_args)
       end
     end
 
@@ -176,6 +169,17 @@ module Muack
         end
       }
       target.__send__(privilege, defi.msg)
+    end
+
+    # used for __mock_dispatch
+    def __mock_failed msg, actual_args, disps=__mock_disps[msg]
+      if expected = __mock_find_checked_difi(disps, actual_args)
+        Mock.__send__(:raise, # Too many times
+          Expected.new(object, expected, disps.size, disps.size+1))
+      else
+        Mock.__send__(:raise, # Wrong argument
+          Unexpected.new(object, disps, msg, actual_args))
+      end
     end
 
     # used for __mock_dispatch_call
