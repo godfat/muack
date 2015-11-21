@@ -58,17 +58,12 @@ describe Muack::Spy do
        spy(Obj).saya
     end
 
-    would 'not care about the order and times' do
+    would 'not care about the order' do
       stub(Obj).say(is_a(Fixnum)){|i|i} # change to &:itself in the future
-      0.upto(3){ |i| Obj.say(i).should.eq i }
+           Obj .say(1).should.eq 1
+           Obj .say(2).should.eq 2
        spy(Obj).say(2)
        spy(Obj).say(1)
-    end
-
-    would 'accept over satisfaction' do
-      stub(Obj).say{}
-      2.times{ Obj.say.should.eq nil }
-       spy(Obj).say
     end
   end
 
@@ -101,9 +96,21 @@ describe Muack::Spy do
                                  "called 3 times\n but was 2 times."
     end
 
+    would 'show correct times for over satisfaction' do
+      stub(Obj).say{}
+      2.times{ Obj.say }
+      spy(Obj).say
+      e = should.raise(Muack::Expected){ Muack.verify }
+      e.expected      .should.eq 'obj.say()'
+      e.expected_times.should.eq 1
+      e.actual_times  .should.eq 2
+      e.message       .should.eq "\nExpected: obj.say()\n  " \
+                                 "called 1 times\n but was 2 times."
+    end
+
     would 'raise Expected if arguments do not match' do
       stub(Obj).say(is_a(Fixnum)){}
-      Obj.say(1)
+           Obj .say(1)
        spy(Obj).say(0)
       e = should.raise(Muack::Unexpected){ Muack.verify }
       e.expected.should.eq "obj.say(0)"

@@ -143,11 +143,9 @@ p Muack.verify # true
 However you should not mix mocks and stubs with the same method, or you
 might encounter some unexpected result. Jump to _Caveat_ for more detail.
 
-The other differences for stubs and spies, please check _Partial mode_ and
-_times_ modifiers. In short, stubs and spies would do some kind of pattern
-matching, making the order of the same method irrelevant, and they do
-not check for exact times for a given method, either. Mocks are the most
-strict verifiers. For lossy verification, use stubs and spies instead.
+The other differences for stubs and spies, please check _Partial mode_.
+In short, stubs and spies would do some kind of pattern matching, making
+the order of the same method irrelevant.
 
 On the other hand, stubs aren't limited to testing. If we want to monkey
 patching something, stubs could be useful as we don't care how many times
@@ -471,19 +469,6 @@ stub(obj).name{ 'obj' }
 p obj.name     # 'obj'
 p obj.name     # 'obj'
 spy(obj).name
-spy(obj).name
-p Muack.verify # true
-```
-
-A difference though, spies do not care if the method was called more
-times, effectively making it some kind of at least N times verifier. If
-you still want an exact match, use mocks instead:
-
-``` ruby
-obj = Object.new
-stub(obj).name{ 'obj' }
-p obj.name     # 'obj'
-p obj.name     # 'obj'
 spy(obj).name
 p Muack.verify # true
 ```

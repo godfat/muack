@@ -22,22 +22,16 @@ module Muack
 
     # simulate dispatching before passing to mock to verify
     def __mock_dispatch_spy
-      left = @stub.__mock_disps.values.flatten.map do |disp|
-        if (defis = __mock_defis[disp.msg]) && defis && defis.any?
-          if idx = __mock_find_checked_difi(defis, disp.args, :index)
-            defis.delete_at(idx) # found, dispatch it
-            __mock_disps_push(disp)
-            nil
-          else
-            disp # we might be interested if defis aren't drained in the end
-          end
-        end
-      end
+      @stub.__mock_disps.values.flatten.each do |disp|
+        next unless __mock_defis.key?(disp.msg) # ignore undefined spies
 
-      if __mock_defis.values.any?(&:any?) # now we're interested...
-        # we do a regular dispatch in this case to make better error messages
-        # because this way it could compare actual calls with expectation
-        left.each{ |disp| disp && __mock_dispatch(disp.msg, disp.args) }
+        defis = __mock_defis[disp.msg]
+        if idx = __mock_find_checked_difi(defis, disp.args, :index)
+          defis.delete_at(idx) # found, dispatch it
+          __mock_disps_push(disp)
+        else # just dispatch it regularly so it would show nice error message
+          __mock_dispatch(disp.msg, disp.args)
+        end
       end
     end
   end
