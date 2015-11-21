@@ -331,7 +331,7 @@ If the order is reversed, then it would always return the original value,
 because the proxy would always match, and Muack would stop searching the
 next stub.
 
-[pattern-matching]: #arguments-verifiers-satisfy
+[pattern-matching]: #arguments-verifiers-satisfying
 
 #### any_instance_of mode
 
