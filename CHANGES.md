@@ -1,5 +1,15 @@
 # CHANGES
 
+## Muack 1.4.0 -- 2015-11-21
+
+### Incompatible changes / Enhancement
+
+* Spies would now do pattern matching like stubs for matching
+  method arguments. This could be an incompatible change if you're
+  relying on spies checking the order for the same method calls.
+  This change would make spies and stubs more similar. If you are
+  really into a specific order, use mocks instead.
+
 ## Muack 1.3.2 -- 2015-06-11
 
 * Fixed a bug for `where`, `having`, and `allowing` which should distinguish
