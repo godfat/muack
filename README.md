@@ -143,8 +143,9 @@ p Muack.verify # true
 However you should not mix mocks and stubs with the same method, or you
 might encounter some unexpected result. Jump to _Caveat_ for more detail.
 
-The other differences for stubs and spies, please check _Partial mode_.
-In short, stubs and spies would do some kind of pattern matching, making
+The other differences for stubs and spies, please check
+[Arguments Verifiers (Satisfying)][pattern-matching]. In short,
+stubs and spies would do some kind of pattern matching, making
 the order of the same method irrelevant.
 
 On the other hand, stubs aren't limited to testing. If we want to monkey
@@ -726,7 +727,8 @@ p Muack.verify # true
 ```
 
 If `obj.find(2)` is called and Muack cannot find a matched stub, it would
-raise a `Muack::Unexpected` and list the candidates for us.
+raise a `Muack::Unexpected` and list the candidates for us. This also
+applies to spies.
 
 However, What if we don't want to be so exact? Then we should use verifiers.
 We'll introduce each of them in next section. Note that verifiers
