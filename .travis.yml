@@ -5,7 +5,8 @@ rvm:
   - 2.1
   - 2.2
   - rbx-2
-  - jruby-9.0.4.0
+  - jruby-9
 
+before_install: rvm get head
 install: 'bundle install --retry=3'
 script: 'ruby -r bundler/setup -S rake test'
