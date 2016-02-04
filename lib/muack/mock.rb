@@ -95,9 +95,9 @@ module Muack
     # used for Muack::Session#verify
     def __mock_verify
       __mock_defis.values.all?(&:empty?) || begin
-        msg, defis_with_same_msg = __mock_defis.find{ |_, v| v.size > 0 }
+        msg, defis_with_same_msg = __mock_defis.find{ |_, v| v.any? }
         args, defis = defis_with_same_msg.group_by(&:args).first
-        dsize = __mock_disps[msg].select{ |d| d.args == args }.size
+        dsize = __mock_disps[msg].count{ |d| d.args == args }
         Mock.__send__(:raise,   # Too little times
           Expected.new(object, defis.first, defis.size + dsize, dsize))
       end
