@@ -2,63 +2,63 @@
 # stub: muack 1.4.0 ruby lib
 
 Gem::Specification.new do |s|
-  s.name = "muack"
+  s.name = "muack".freeze
   s.version = "1.4.0"
 
-  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.require_paths = ["lib"]
-  s.authors = ["Lin Jen-Shin (godfat)"]
-  s.date = "2015-11-21"
-  s.description = "Muack -- A fast, small, yet powerful mocking library.\n\nInspired by [RR][], and it's 32x times faster (750s vs 23s) than RR\nfor running [Rib][] tests.\n\n[RR]: https://github.com/rr/rr\n[Rib]: https://github.com/godfat/rib"
-  s.email = ["godfat (XD) godfat.org"]
+  s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
+  s.require_paths = ["lib".freeze]
+  s.authors = ["Lin Jen-Shin (godfat)".freeze]
+  s.date = "2016-03-03"
+  s.description = "Muack -- A fast, small, yet powerful mocking library.\n\nInspired by [RR][], and it's 32x times faster (750s vs 23s) than RR\nfor running [Rib][] tests.\n\n[RR]: https://github.com/rr/rr\n[Rib]: https://github.com/godfat/rib".freeze
+  s.email = ["godfat (XD) godfat.org".freeze]
   s.files = [
-  ".gitignore",
-  ".gitmodules",
-  ".travis.yml",
-  "CHANGES.md",
-  "Gemfile",
-  "LICENSE",
-  "README.md",
-  "Rakefile",
-  "lib/muack.rb",
-  "lib/muack/any_instance_of.rb",
-  "lib/muack/block.rb",
-  "lib/muack/coat.rb",
-  "lib/muack/definition.rb",
-  "lib/muack/error.rb",
-  "lib/muack/failure.rb",
-  "lib/muack/mock.rb",
-  "lib/muack/modifier.rb",
-  "lib/muack/satisfying.rb",
-  "lib/muack/session.rb",
-  "lib/muack/spy.rb",
-  "lib/muack/stub.rb",
-  "lib/muack/test.rb",
-  "lib/muack/version.rb",
-  "muack.gemspec",
-  "task/README.md",
-  "task/gemgem.rb",
-  "test/test_any_instance_of.rb",
-  "test/test_coat.rb",
-  "test/test_from_readme.rb",
-  "test/test_mock.rb",
-  "test/test_modifier.rb",
-  "test/test_proxy.rb",
-  "test/test_satisfying.rb",
-  "test/test_spy.rb",
-  "test/test_stub.rb"]
-  s.homepage = "https://github.com/godfat/muack"
-  s.licenses = ["Apache License 2.0"]
-  s.rubygems_version = "2.5.0"
-  s.summary = "Muack -- A fast, small, yet powerful mocking library."
+  ".gitignore".freeze,
+  ".gitmodules".freeze,
+  ".travis.yml".freeze,
+  "CHANGES.md".freeze,
+  "Gemfile".freeze,
+  "LICENSE".freeze,
+  "README.md".freeze,
+  "Rakefile".freeze,
+  "lib/muack.rb".freeze,
+  "lib/muack/any_instance_of.rb".freeze,
+  "lib/muack/block.rb".freeze,
+  "lib/muack/coat.rb".freeze,
+  "lib/muack/definition.rb".freeze,
+  "lib/muack/error.rb".freeze,
+  "lib/muack/failure.rb".freeze,
+  "lib/muack/mock.rb".freeze,
+  "lib/muack/modifier.rb".freeze,
+  "lib/muack/satisfying.rb".freeze,
+  "lib/muack/session.rb".freeze,
+  "lib/muack/spy.rb".freeze,
+  "lib/muack/stub.rb".freeze,
+  "lib/muack/test.rb".freeze,
+  "lib/muack/version.rb".freeze,
+  "muack.gemspec".freeze,
+  "task/README.md".freeze,
+  "task/gemgem.rb".freeze,
+  "test/test_any_instance_of.rb".freeze,
+  "test/test_coat.rb".freeze,
+  "test/test_from_readme.rb".freeze,
+  "test/test_mock.rb".freeze,
+  "test/test_modifier.rb".freeze,
+  "test/test_proxy.rb".freeze,
+  "test/test_satisfying.rb".freeze,
+  "test/test_spy.rb".freeze,
+  "test/test_stub.rb".freeze]
+  s.homepage = "https://github.com/godfat/muack".freeze
+  s.licenses = ["Apache License 2.0".freeze]
+  s.rubygems_version = "2.6.1".freeze
+  s.summary = "Muack -- A fast, small, yet powerful mocking library.".freeze
   s.test_files = [
-  "test/test_any_instance_of.rb",
-  "test/test_coat.rb",
-  "test/test_from_readme.rb",
-  "test/test_mock.rb",
-  "test/test_modifier.rb",
-  "test/test_proxy.rb",
-  "test/test_satisfying.rb",
-  "test/test_spy.rb",
-  "test/test_stub.rb"]
+  "test/test_any_instance_of.rb".freeze,
+  "test/test_coat.rb".freeze,
+  "test/test_from_readme.rb".freeze,
+  "test/test_mock.rb".freeze,
+  "test/test_modifier.rb".freeze,
+  "test/test_proxy.rb".freeze,
+  "test/test_satisfying.rb".freeze,
+  "test/test_spy.rb".freeze,
+  "test/test_stub.rb".freeze]
 end
