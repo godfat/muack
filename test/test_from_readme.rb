@@ -12,8 +12,8 @@ describe 'from README.md' do
     include Muack::API
 
     def describe desc, &block
-      @executor.describe(desc, &block)
-      @executor.execute(Pork.execute_mode, @stat)
+      @suite.describe(desc, &block)
+      Pork::Executor.execute(:stat => @stat, :suite => @suite)
     end
 
     def results; @results ||= []; end
@@ -34,10 +34,10 @@ describe 'from README.md' do
 
   codes.each.with_index do |code, index|
     would 'pass from README.md #%02d' % index do
-      executor, stat = Class.new(self.class){ init }, pork_stat
+      suite, stat = Class.new(self.class){ init }, pork_stat
       context = Module.new do
         extend Context
-        @executor, @stat = executor, stat
+        @suite, @stat = suite, stat
       end
       begin
         context.instance_eval(code, 'README.md', 0)
