@@ -1,9 +1,8 @@
 
 module Muack
-  class Block
-    attr_accessor :block, :context
+  class Block < Struct.new(:block, :context)
     def initialize block, context=nil
-      self.block, self.context = block, context
+      super
     end
 
     def call *args, &actual_block
