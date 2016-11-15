@@ -2,8 +2,7 @@
 require 'muack/test'
 
 describe 'from README.md' do
-  readme = File.read(
-             "#{File.dirname(File.expand_path(__FILE__))}/../README.md")
+  readme = File.read("#{__dir__}/../README.md")
   codes  = readme.scan(/``` ruby(.+?)```/m).map(&:first)
 
   after{ Muack.reset }
@@ -20,7 +19,6 @@ describe 'from README.md' do
     def p res  ; results << res ; end
 
     def verify expects
-      return if results.empty?
       results.zip(expects).each do |(res, exp)|
         next if exp == 'ok'
         if exp.start_with?('raise')
