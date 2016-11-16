@@ -1,12 +1,12 @@
 
 begin
-  require "#{dir = File.dirname(__FILE__)}/task/gemgem"
+  require "#{__dir__}/task/gemgem"
 rescue LoadError
   sh 'git submodule update --init'
   exec Gem.ruby, '-S', $PROGRAM_NAME, *ARGV
 end
 
-Gemgem.init(dir) do |s|
+Gemgem.init(__dir__) do |s|
   require 'muack/version'
   s.name    = 'muack'
   s.version = Muack::VERSION
