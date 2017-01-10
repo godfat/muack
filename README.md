@@ -833,7 +833,7 @@ p Muack.verify # true
 
 ``` ruby
 obj = Object.new
-mock(obj).say(where(:a => is_a(Fixnum))){ |arg| arg }
+mock(obj).say(where(:a => is_a(Integer))){ |arg| arg }
 p obj.say(:a => 0) # {:a => 0}
 p Muack.verify # true
 ```
@@ -842,7 +842,7 @@ Note that this could be recursive.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(where(:a => {:b => [is_a(Fixnum)]})){ |arg| arg[:a] }
+mock(obj).say(where(:a => {:b => [is_a(Integer)]})){ |arg| arg[:a] }
 p obj.say(:a => {:b => [0]}) # {:b => [0]}
 p Muack.verify # true
 ```
@@ -863,7 +863,7 @@ Note that this could be recursive.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(having(:a => {:b => [is_a(Fixnum)]})){ |arg| arg[:c] }
+mock(obj).say(having(:a => {:b => [is_a(Integer)]})){ |arg| arg[:c] }
 p obj.say(:a => {:b => [1]}, :c => 2) # 2
 p Muack.verify # true
 ```
@@ -884,7 +884,7 @@ Note that this could be recursive.
 
 ``` ruby
 obj = Object.new
-mock(obj).say(allowing(:a => {:b => is_a(Fixnum), :c => 1})){ |arg| arg[:a] }
+mock(obj).say(allowing(:a => {:b => is_a(Integer), :c => 1})){ |arg| arg[:a] }
 p obj.say(:a => {:b => 2}) # {:b => 2}
 p Muack.verify # true
 ```

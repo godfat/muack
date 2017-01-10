@@ -59,7 +59,7 @@ describe Muack::Spy do
     end
 
     would 'not care about the order' do
-      stub(Obj).say(is_a(Fixnum)){|i|i} # change to &:itself in the future
+      stub(Obj).say(is_a(Integer)){|i|i} # change to &:itself in the future
            Obj .say(1).should.eq 1
            Obj .say(2).should.eq 2
        spy(Obj).say(2)
@@ -109,7 +109,7 @@ describe Muack::Spy do
     end
 
     would 'raise Expected if arguments do not match' do
-      stub(Obj).say(is_a(Fixnum)){}
+      stub(Obj).say(is_a(Integer)){}
            Obj .say(1)
        spy(Obj).say(0)
       e = should.raise(Muack::Unexpected){ Muack.verify }
@@ -119,7 +119,7 @@ describe Muack::Spy do
     end
 
     would 'raise Expected if arguments do not match, show original args' do
-      stub(Obj).say(is_a(Fixnum)){}
+      stub(Obj).say(is_a(Integer)){}
            Obj .say(0)
            Obj .say(1)
            Obj .say(2)
@@ -133,7 +133,7 @@ describe Muack::Spy do
     end
 
     would 'raise Expected if arguments do not match, show original args' do
-      stub(Obj).say(is_a(Fixnum)){}
+      stub(Obj).say(is_a(Integer)){}
            Obj .say(2)
            Obj .say(0)
            Obj .say(1)

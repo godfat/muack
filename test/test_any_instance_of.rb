@@ -57,8 +57,8 @@ describe Muack::AnyInstanceOf do
   end
 
   would 'mock with multiple any_instance_of call' do
-    any_instance_of(klass){ |inst| mock(inst).f(is_a(Fixnum)){ |i| i+1 } }
-    any_instance_of(klass){ |inst| mock(inst).f(is_a(Fixnum)){ |i| i+2 } }
+    any_instance_of(klass){ |inst| mock(inst).f(is_a(Integer)){ |i| i+1 } }
+    any_instance_of(klass){ |inst| mock(inst).f(is_a(Integer)){ |i| i+2 } }
     obj = klass.new
     obj.f(2).should.eq 3
     obj.f(2).should.eq 4
