@@ -5,7 +5,7 @@ require 'muack'
 Pork::Suite.include(Muack::API)
 
 Obj = Object.new
-Str = 'Moo'
+Str = String.new('Moo')
 def Obj.inspect
   'obj'
 end

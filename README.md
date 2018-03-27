@@ -47,7 +47,7 @@ describe 'Hello' do
   after { Muack.verify }
 
   would 'say world!' do
-    str = 'Hello'
+    str = 'Hello'.dup
     mock(str).say('!'){ |arg| "World#{arg}" }
     str.say('!').should.eq 'World!'
   end
@@ -173,7 +173,7 @@ affecting the others. This is helpful in the cases of mocking some very
 basic objects like Time, without causing too much side effect.
 
 ``` ruby
-name = 'str'
+name = 'str'.dup
 stub(name).to_s{ 'hi'       }
 stub(Time).new { Time.at(0) }
 mock(Time).now { Time.new   }
@@ -275,7 +275,7 @@ into proxy mode we simply do not provide any block to the injected method,
 but just name it. Here's an example:
 
 ``` ruby
-str = 'str'
+str = 'str'.dup
 mock(str).reverse
 p str.reverse  # 'rts'
 p Muack.verify # true
@@ -285,7 +285,7 @@ Note that if reverse was not called exactly once, the mock would complain.
 We could also use stub + spy to do the same thing as well:
 
 ``` ruby
-str = 'str'
+str = 'str'.dup
 stub(str).reverse
 p str.reverse  # 'rts'
 spy(str).reverse
@@ -624,7 +624,7 @@ our own behaviour, then we already have full control of the arguments.
 There's no points to use both. This also applies to `peek_return`.
 
 ``` ruby
-str = 'ff'
+str = 'ff'.dup
 mock(str).to_i.with_any_args.peek_args{ |radix| radix * 2 }
 p str.to_i(8)  # 255
 p Muack.verify # true
@@ -655,7 +655,7 @@ might just want to take a look at the return? Here's an example using
 `peek_return` to modify the original return value.
 
 ``` ruby
-str = 'ff'
+str = 'ff'.dup
 mock(str).to_i.with_any_args.peek_return{ |int| int * 2 }
 p str.to_i(16) # 510
 p Muack.verify # true
