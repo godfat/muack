@@ -114,13 +114,17 @@ module Muack
     private
     def __mock_inject_method defi
       __mock_injected[defi.msg] = defi
-      target = object.singleton_class # would be the class in AnyInstanceOf
+      # a) ancestors.first is the first module in the method chain.
+      #    it's just the singleton_class when nothing was prepended,
+      #    otherwise the last prepended module.
+      # b) would be the class in AnyInstanceOf.
+      target = object.singleton_class.ancestors.first
       privilege = Mock.store_original_method(target, defi)
       __mock_inject_mock_method(target, defi, privilege)
     end
 
     def __mock_reset_method defi
-      object.singleton_class.module_eval do
+      object.singleton_class.ancestors.first.module_eval do
         remove_method(defi.msg)
         # restore original method
         if instance_methods(false).include?(defi.original_method) ||
