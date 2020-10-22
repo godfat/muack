@@ -112,4 +112,17 @@ describe Muack::AnyInstanceOf do
 
     obj.f.should.eq 0
   end
+
+  would 'stub any_instance_of on module extending it self' do
+    mod = Module.new {
+      extend self
+      def hello; :hello; end
+    }
+
+    any_instance_of(mod){ |inst| stub(inst).hello{ :stub } }
+
+    expect(mod.hello).eq(:stub)
+    expect(Muack.verify)
+    expect(mod.hello).eq(:hello)
+  end
 end
