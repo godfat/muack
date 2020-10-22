@@ -93,4 +93,29 @@ describe 'mock with prepend' do
 
     paste :test
   end
+
+  # Brought from rspec-mocks and it's currently failing on rspec-mocks
+  # See https://github.com/rspec/rspec-mocks/pull/1218
+  would "handle stubbing prepending methods that were only defined on the prepended module" do
+    to_be_prepended = Module.new do
+      def value
+        "#{super}_prepended".to_sym
+      end
+
+      def value_without_super
+        :prepended
+      end
+    end
+
+    object = Object.new
+    object.singleton_class.send(:prepend, to_be_prepended)
+    expect(object.value_without_super).eq :prepended
+
+    stub(object).value_without_super{ :stubbed }
+
+    expect(object.value_without_super).eq :stubbed
+
+    expect(Muack.verify)
+    expect(object.value_without_super).eq :prepended
+  end
 end

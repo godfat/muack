@@ -113,6 +113,7 @@ describe Muack::AnyInstanceOf do
     obj.f.should.eq 0
   end
 
+  # Brought from rspec-mocks and it's currently failing on rspec-mocks
   would 'stub any_instance_of on module extending it self' do
     mod = Module.new {
       extend self
