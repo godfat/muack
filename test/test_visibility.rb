@@ -96,4 +96,25 @@ describe 'retain visibility' do
 
     paste :test
   end
+
+  # Brought from rspec-mocks
+  would "correctly restore the visibility of methods whose visibility has been tweaked on the singleton class" do
+    # hello is a private method when mixed in, but public on the module
+    # itself
+    mod = Module.new do
+      extend self
+      def hello; :hello; end
+
+      private :hello
+      class << self; public :hello; end
+    end
+
+    expect(mod.hello).eq :hello
+
+    stub(mod).hello{ :stub }
+
+    Muack.reset
+
+    expect(mod.hello).eq :hello
+  end
 end
