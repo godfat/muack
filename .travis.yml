@@ -1,7 +1,7 @@
 sudo: false
 language: ruby
 
-install: 'gem install bundler; bundle install --retry=3'
+install: 'gem update --system; gem install bundler; bundle install --retry=3'
 before_script: unset CI
 script: 'ruby -vr bundler/setup -S rake test'
 
