@@ -12,11 +12,12 @@ module Muack
 
   class Unexpected < Failure
     attr_reader :was
-    def initialize obj, expected_defis, msg, args
-      @was = "#{obj.inspect}.#{msg}(" \
-             "#{args.map(&:inspect).join(', ')})"
+    def initialize obj, expected_defis, actual_call
+      args = actual_call.args.map(&:inspect)
+      @was = "#{obj.inspect}.#{actual_call.msg}(#{args.join(', ')})"
+
       if expected_defis.empty?
-        super("\nUnexpected call: #{@was}")
+        super("\nUnexpected call: #{was}")
       else
         build_expected(obj, expected_defis)
         super("\nExpected: #{expected}\n but was: #{was}")

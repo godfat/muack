@@ -6,8 +6,6 @@ require 'muack/block'
 require 'muack/error'
 
 module Muack
-  EmptyBlock = proc{}
-
   class Mock < BasicObject
     attr_reader :object
     def initialize object
@@ -51,44 +49,52 @@ module Muack
     end
 
     # used for mocked object to dispatch mocked method
-    def __mock_dispatch msg, actual_args
-      if defi = __mock_defis[msg].shift
+    def __mock_dispatch actual_call
+      if defi = __mock_defis[actual_call.msg].shift
         __mock_disps_push(defi)
-        if __mock_check_args(defi.args, actual_args)
+        if __mock_check_args(defi, actual_call)
           defi
         else
           Mock.__send__(:raise, # Wrong argument
-            Unexpected.new(object, [defi], msg, actual_args))
+            Unexpected.new(object, [defi], actual_call))
         end
       else
-        __mock_failed(msg, actual_args)
+        __mock_failed(actual_call)
       end
     end
 
     # used for mocked object to dispatch mocked method
-    def __mock_dispatch_call context, disp, actual_args, actual_block, &_yield
-      args = if disp.peek_args
-               __mock_block_call(context, disp.peek_args,
-                                 actual_args, actual_block, true)
-             else
-               actual_args
-             end
+    def __mock_dispatch_call context, disp, actual_call, &proxy_super
+      # resolving arguments
+      call =
+        if disp.peek_args
+          args = __mock_block_call(context, disp.peek_args, actual_call)
+          ActualCall.new(actual_call.msg, args, actual_call.block)
+        else
+          actual_call
+        end
 
-      ret = if disp.returns
-              __mock_block_call(context, disp.returns,
-                                args, actual_block, true)
-            elsif disp.original_method # proxies for singleton methods
-              context.__send__(disp.original_method, *args, &actual_block)
-            else # proxies for instance methods
-              # need the original context for calling `super`
-              # ruby: can't pass a block to yield, so we name it _yield
-              _yield.call(args, &actual_block)
-            end
+      # retrieve actual return
+      ret =
+        if disp.returns
+          __mock_block_call(context, disp.returns, call)
+        else
+          __mock_proxy_call(context, disp, call, proxy_super)
+        end
 
+      # resolving return
       if disp.peek_return
-        __mock_block_call(context, disp.peek_return, ret, EmptyBlock, false)
+        __mock_block_call(context, disp.peek_return, ret, true)
       else
         ret
+      end
+    end
+
+    def __mock_proxy_call context, disp, call, proxy_super
+      if disp.original_method # proxies for singleton methods with __send__
+        context.__send__(disp.original_method, *call.args, &call.block)
+      else # proxies for instance methods with super
+        proxy_super.call(call)
       end
     end
 
@@ -172,47 +178,51 @@ module Muack
     def __mock_inject_mock_method target, defi
       mock = self # remember the context
       target.__send__(:define_method, defi.msg){ |*actual_args, &actual_block|
-        disp = mock.__mock_dispatch(defi.msg, actual_args)
-        mock.__mock_dispatch_call(self, disp, actual_args,
-                                              actual_block) do |args, &block|
-          super(*args, &block)
+        actual_call = ActualCall.new(defi.msg, actual_args, actual_block)
+        disp = mock.__mock_dispatch(actual_call)
+        mock.__mock_dispatch_call(self, disp, actual_call) do |call|
+          # need the original context for calling `super`
+          super(*call.args, &call.block)
         end
       }
       target.__send__(defi.visibility, defi.msg)
     end
 
     # used for __mock_dispatch
-    def __mock_failed msg, actual_args, disps=__mock_disps[msg]
-      if expected = __mock_find_checked_difi(disps, actual_args)
+    def __mock_failed actual_call, disps=__mock_disps[actual_call.msg]
+      if expected = __mock_find_checked_difi(disps, actual_call)
         Mock.__send__(:raise, # Too many times
           Expected.new(object, expected, disps.size, disps.size+1))
       else
         Mock.__send__(:raise, # Wrong argument
-          Unexpected.new(object, disps, msg, actual_args))
+          Unexpected.new(object, disps, actual_call))
       end
     end
 
     # used for __mock_dispatch_call
-    def __mock_block_call context, block, actual_args, actual_block, splat
-      return unless block
+    def __mock_block_call context, block, actual_call, peek_return=false
       # for AnyInstanceOf, we don't have the actual context at the time
       # we're defining it, so we update it here
       block.context = context if block.kind_of?(Block)
-      if splat
-        block.call(*actual_args, &actual_block)
-      else # peek_return doesn't need splat
-        block.call(actual_args, &actual_block)
+
+      if peek_return # actual_call is the actual return in this case
+        block.call(actual_call)
+      else
+        block.call(*actual_call.args, &actual_call.block)
       end
     end
 
-    def __mock_find_checked_difi defis, actual_args, meth=:find
-      defis.public_send(meth){ |d| __mock_check_args(d.args, actual_args) }
+    def __mock_find_checked_difi defis, actual_call, meth=:find
+      defis.public_send(meth){ |d| __mock_check_args(d, actual_call) }
     end
 
-    def __mock_check_args expected_args, actual_args
-      if expected_args == [WithAnyArgs]
-        true
-      elsif expected_args.none?{ |arg| arg.kind_of?(Satisfying) }
+    def __mock_check_args defi, actual_call
+      return true if defi.args.size == 1 && defi.args.first == WithAnyArgs
+
+      expected_args = defi.args
+      actual_args = actual_call.args
+
+      if expected_args.none?{ |arg| arg.kind_of?(Satisfying) }
         expected_args == actual_args
 
       elsif expected_args.size == actual_args.size

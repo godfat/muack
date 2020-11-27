@@ -14,14 +14,16 @@ module Muack
     end
 
     # used for mocked object to dispatch mocked method
-    def __mock_dispatch msg, actual_args
-      if defi = __mock_find_checked_difi(__mock_defis[msg], actual_args)
+    def __mock_dispatch actual_call
+      defis = __mock_defis[actual_call.msg]
+
+      if disp = __mock_find_checked_difi(defis, actual_call)
         # our spies are interested in this
-        __mock_disps_push(Definition.new(msg, actual_args))
-        defi
+        __mock_disps_push(actual_call)
+        disp
       else
         Mock.__send__(:raise, # Wrong argument
-          Unexpected.new(object, __mock_defis[msg], msg, actual_args))
+          Unexpected.new(object, defis, actual_call))
       end
     end
   end

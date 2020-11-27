@@ -26,12 +26,12 @@ module Muack
         next unless __mock_defis.key?(disp.msg) # ignore undefined spies
 
         defis = __mock_defis[disp.msg]
-        if idx = __mock_find_checked_difi(defis, disp.args, :index)
+        if idx = __mock_find_checked_difi(defis, disp, :index)
           __mock_disps_push(defis.delete_at(idx)) # found, dispatch it
         elsif defis.empty? # show called candidates
-          __mock_failed(disp.msg, disp.args)
+          __mock_failed(disp)
         else # show expected candidates
-          __mock_failed(disp.msg, disp.args, defis)
+          __mock_failed(disp, defis)
         end
       end
     end
