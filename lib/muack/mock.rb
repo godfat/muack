@@ -24,8 +24,8 @@ module Muack
     end
 
     # Public API: Define mocked method
-    def method_missing msg, *args, &block
-      defi = Definition.new(msg, args, block)
+    def method_missing msg, *args, &returns
+      defi = Definition.new(msg, args, returns)
       if injected = __mock_injected[defi.msg]
         defi.original_method = injected.original_method
       else
