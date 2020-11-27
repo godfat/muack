@@ -90,14 +90,6 @@ module Muack
       end
     end
 
-    def __mock_proxy_call context, disp, call, proxy_super
-      if disp.original_method # proxies for singleton methods with __send__
-        context.__send__(disp.original_method, *call.args, &call.block)
-      else # proxies for instance methods with super
-        proxy_super.call(call)
-      end
-    end
-
     # used for Muack::Session#verify
     def __mock_verify
       __mock_defis.values.all?(&:empty?) || begin
@@ -209,6 +201,15 @@ module Muack
         block.call(actual_call)
       else
         block.call(*actual_call.args, &actual_call.block)
+      end
+    end
+
+    # used for __mock_dispatch_call
+    def __mock_proxy_call context, disp, call, proxy_super
+      if disp.original_method # proxies for singleton methods with __send__
+        context.__send__(disp.original_method, *call.args, &call.block)
+      else # proxies for instance methods with super
+        proxy_super.call(call)
       end
     end
 
