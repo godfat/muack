@@ -42,28 +42,54 @@ describe Muack::Mock do
   end
 
   describe 'keyargs mock' do
-    would 'local block' do
-      mock(Obj).say.with_any_args.returns{ |a:| a }
+    copy :tests do
+      would 'local block' do
+        mock(obj).say.with_any_args.returns{ |a:| a }
 
-      expect(Obj.say(a: 0)).eq(0)
+        expect(instance.say(a: 0)).eq(0)
+      end
+
+      would 'instance method' do
+        mock(obj).bonjour(a: 0, b: 1)
+
+        expect(instance.bonjour(a: 0, b: 1)).eq([0, 1])
+      end
+
+      would 'prepended method' do
+        mock(obj).prepend_bonjour(a: 0, b: 1)
+
+        expect(instance.prepend_bonjour(a: 0, b: 1)).eq([0, 1])
+      end
     end
 
-    would 'instance method' do
-      mock(Obj).bonjour(a: 0, b: 1)
+    describe 'with direct mock' do
+      def obj
+        Obj
+      end
 
-      expect(Obj.bonjour(a: 0, b: 1)).eq([0, 1])
+      def instance
+        obj
+      end
+
+      paste :tests
+
+      would 'singleton method' do
+        mock(obj).single_bonjour(a: 0, b: 1)
+
+        expect(instance.single_bonjour(a: 0, b: 1)).eq([0, 1])
+      end
     end
 
-    would 'singleton method' do
-      mock(Obj).single_bonjour(a: 0, b: 1)
+    describe 'with any_instance_of' do
+      def obj
+        any_instance_of(Cls)
+      end
 
-      expect(Obj.single_bonjour(a: 0, b: 1)).eq([0, 1])
-    end
+      def instance
+        @instance ||= Cls.new
+      end
 
-    would 'prepended method' do
-      mock(Obj).prepend_bonjour(a: 0, b: 1)
-
-      expect(Obj.prepend_bonjour(a: 0, b: 1)).eq([0, 1])
+      paste :tests
     end
 
     would 'peek_args' do
