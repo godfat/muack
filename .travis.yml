@@ -18,4 +18,4 @@ matrix:
     - rvm: ruby-head
       env: RUBYOPT=--enable-frozen-string-literal
     - rvm: jruby
-      env: JRUBY_OPTS=--debug
+      env: RUBYOPT=--enable-frozen-string-literal
