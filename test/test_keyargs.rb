@@ -109,16 +109,52 @@ describe Muack::Mock do
     end
   end
 
-  would 'handle initialize via new' do
-    kargs_initialize = Class.new do
-      def initialize a:
-        @a = a
+  describe 'proxy new' do
+    would 'handle initialize via ordinal new' do
+      kargs_initialize = Class.new do
+        def initialize a:
+          @a = a
+        end
+        attr_reader :a
       end
-      attr_reader :a
+
+      mock(kargs_initialize).new(a: 0)
+
+      expect(kargs_initialize.new(a: 0).a).eq(0)
     end
 
-    mock(kargs_initialize).new(a: 0)
+    would 'handle overridden new without keyword arguments' do
+      kargs_initialize = Class.new do
+        def initialize a:
+          @a = a
+        end
+        attr_reader :a
 
-    expect(kargs_initialize.new(a: 0).a).eq(0)
+        def self.new a
+          super(a: a)
+        end
+      end
+
+      mock(kargs_initialize).new(0)
+
+      expect(kargs_initialize.new(0).a).eq(0)
+    end
+
+    would 'handle overridden new with keyword arguments' do
+      kargs_initialize = Class.new do
+        def initialize a
+          @a = a
+        end
+        attr_reader :a
+
+        def self.new a:
+          super(a)
+        end
+      end
+
+      mock(kargs_initialize).new(a: 0)
+
+      expect(kargs_initialize.new(a: 0).a).eq(0)
+    end
   end
 end
