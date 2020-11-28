@@ -250,7 +250,8 @@ module Muack
     end
 
     def __mock_block_with_kargs? block
-      block.parameters.dig(-1, 0)&.start_with?('key')
+      # there's no Symbol#start_with? in older Ruby
+      block.parameters.dig(-1, 0).to_s.start_with?('key')
     end
 
     def __mock_check_args defi, actual_call
