@@ -1,5 +1,17 @@
 # CHANGES
 
+## Muack 1.5.0 -- 2020-11-28
+
+### Bugs fixed
+
+* Properly handle prepended objects
+* Properly restore method visibilities for singleton methods
+
+### Enhancement
+
+* Eliminated any potential keyword arguments warnings to be future proof
+* Some major internal restructure
+
 ## Muack 1.4.0 -- 2015-11-21
 
 ### Incompatible changes / Enhancement
