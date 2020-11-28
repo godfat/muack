@@ -12,12 +12,41 @@ class Cls
   def aloha a=0, b=1
     [a, b]
   end
+  def bonjour a: 0, b: 1
+    [a, b]
+  end
+  def ciao h={a: 0, b: 1}
+    h.values_at(:a, :b)
+  end
+  module Prepend
+    def prepend_aloha a=0, b=1
+      [a, b]
+    end
+    def prepend_bonjour a: 0, b: 1
+      [a, b]
+    end
+    def prepend_ciao h={a: 0, b: 1}
+      h.values_at(:a, :b)
+    end
+  end
+  prepend Prepend
 end
 Obj = Cls.new
-def Obj.private
-  'pri'
+class << Obj
+  private def private
+    'pri'
+  end
+
+  def single_aloha a=0, b=1
+    [a, b]
+  end
+  def single_bonjour a: 0, b: 1
+    [a, b]
+  end
+  def single_ciao h={a: 0, b: 1}
+    h.values_at(:a, :b)
+  end
 end
-Obj.singleton_class.__send__(:private, :private)
 
 Muack::EnsureReset = lambda{
   [Obj, Str].each do |o|

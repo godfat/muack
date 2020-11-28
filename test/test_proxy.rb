@@ -53,6 +53,21 @@ describe Muack::Mock do
       Obj.aloha.should.eq [0, 1]
     end
 
+    would 'proxy and call the original method for keyargs' do
+      mock(Obj).bonjour(a: :b, b: :a)
+      mock(Obj).bonjour
+      Obj.bonjour(a: :b, b: :a).should.eq %i[b a]
+      Obj.bonjour.should.eq [0, 1]
+    end
+
+    would 'proxy and call the original method for fake keyargs' do
+      args = {a: :b, b: :a}
+      mock(Obj).ciao(args)
+      mock(Obj).ciao
+      Obj.ciao(args).should.eq %i[b a]
+      Obj.ciao.should.eq [0, 1]
+    end
+
     would 'proxy and call the block with super' do
       mock(Str).class.peek_return{ |k| k.name.reverse }
       Str.class.should.eq 'gnirtS'

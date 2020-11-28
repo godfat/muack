@@ -5,11 +5,11 @@ module Muack
       super
     end
 
-    def call *args, &actual_block
-      if context # ruby: no way to pass actual_block to instance_exec
-        context.instance_exec(*args, &block)
+    def call(...)
+      if context
+        context.instance_exec(...)
       else
-        block.call(*args, &actual_block)
+        block.call(...)
       end
     end
   end

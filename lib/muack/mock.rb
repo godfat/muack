@@ -172,9 +172,13 @@ module Muack
       target.__send__(:define_method, defi.msg){ |*actual_args, &actual_block|
         actual_call = ActualCall.new(defi.msg, actual_args, actual_block)
         disp = mock.__mock_dispatch(actual_call)
-        mock.__mock_dispatch_call(self, disp, actual_call) do |call|
+        mock.__mock_dispatch_call(self, disp, actual_call) do |call, has_kargs|
           # need the original context for calling `super`
-          super(*call.args, &call.block)
+          if has_kargs && kargs = call.args.last
+            super(*call.args[0...-1], **kargs, &call.block)
+          else
+            super(*call.args, &call.block)
+          end
         end
       }
       target.__send__(defi.visibility, defi.msg)
@@ -195,26 +199,58 @@ module Muack
     def __mock_block_call context, block, actual_call, peek_return=false
       # for AnyInstanceOf, we don't have the actual context at the time
       # we're defining it, so we update it here
-      block.context = context if block.kind_of?(Block)
+      if block.kind_of?(Block)
+        block.context = context
+        instance_exec_block = block.block
+      end
 
       if peek_return # actual_call is the actual return in this case
-        block.call(actual_call)
+        block.call(actual_call, &instance_exec_block)
       else
-        block.call(*actual_call.args, &actual_call.block)
+        actual_block = actual_call.block || instance_exec_block
+        if __mock_block_with_kargs?(instance_exec_block || block) &&
+           kargs = actual_call.args.last
+          block.call(*actual_call.args[0...-1], **kargs, &actual_block)
+        else
+          block.call(*actual_call.args, &actual_block)
+        end
       end
     end
 
     # used for __mock_dispatch_call
     def __mock_proxy_call context, disp, call, proxy_super
       if disp.original_method # proxies for singleton methods with __send__
-        context.__send__(disp.original_method, *call.args, &call.block)
+        if __mock_method_with_kargs?(context, disp.original_method) &&
+          kargs = call.args.last
+          context.__send__(
+            disp.original_method, *call.args[0...-1], **kargs, &call.block)
+        else
+          context.__send__(disp.original_method, *call.args, &call.block)
+        end
       else # proxies for instance methods with super
-        proxy_super.call(call)
+        proxy_super.call(call, __mock_super_with_kargs?(context, call.msg))
       end
     end
 
     def __mock_find_checked_difi defis, actual_call, meth=:find
       defis.public_send(meth){ |d| __mock_check_args(d, actual_call) }
+    end
+
+    def __mock_method_with_kargs? object, method_name
+      __mock_block_with_kargs?(
+        ::Kernel.instance_method(:method).bind(object).call(method_name))
+    end
+
+    def __mock_super_with_kargs? object, method_name
+      super_method =
+        ::Kernel.instance_method(:method).bind(object).call(method_name).
+        super_method
+
+      super_method && __mock_block_with_kargs?(super_method)
+    end
+
+    def __mock_block_with_kargs? block
+      block.parameters.dig(-1, 0)&.start_with?('key')
     end
 
     def __mock_check_args defi, actual_call
