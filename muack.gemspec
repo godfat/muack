@@ -23,6 +23,8 @@ Gem::Specification.new do |s|
   "lib/muack.rb".freeze,
   "lib/muack/any_instance_of.rb".freeze,
   "lib/muack/block.rb".freeze,
+  "lib/muack/block_26.rb".freeze,
+  "lib/muack/block_27.rb".freeze,
   "lib/muack/coat.rb".freeze,
   "lib/muack/definition.rb".freeze,
   "lib/muack/error.rb".freeze,
