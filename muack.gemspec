@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
-# stub: muack 1.4.0 ruby lib
+# stub: muack 1.5.0 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "muack".freeze
-  s.version = "1.4.0"
+  s.version = "1.5.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Lin Jen-Shin (godfat)".freeze]
-  s.date = "2018-12-26"
+  s.date = "2020-11-28"
   s.description = "Muack -- A fast, small, yet powerful mocking library.\n\nInspired by [RR][], and it's 32x times faster (750s vs 23s) than RR\nfor running [Rib][] tests.\n\n[RR]: https://github.com/rr/rr\n[Rib]: https://github.com/godfat/rib".freeze
   s.email = ["godfat (XD) godfat.org".freeze]
   s.files = [
@@ -41,6 +41,7 @@ Gem::Specification.new do |s|
   "test/test_any_instance_of.rb".freeze,
   "test/test_coat.rb".freeze,
   "test/test_from_readme.rb".freeze,
+  "test/test_keyargs.rb".freeze,
   "test/test_mock.rb".freeze,
   "test/test_modifier.rb".freeze,
   "test/test_prepend.rb".freeze,
@@ -51,12 +52,13 @@ Gem::Specification.new do |s|
   "test/test_visibility.rb".freeze]
   s.homepage = "https://github.com/godfat/muack".freeze
   s.licenses = ["Apache-2.0".freeze]
-  s.rubygems_version = "3.0.1".freeze
+  s.rubygems_version = "3.1.4".freeze
   s.summary = "Muack -- A fast, small, yet powerful mocking library.".freeze
   s.test_files = [
   "test/test_any_instance_of.rb".freeze,
   "test/test_coat.rb".freeze,
   "test/test_from_readme.rb".freeze,
+  "test/test_keyargs.rb".freeze,
   "test/test_mock.rb".freeze,
   "test/test_modifier.rb".freeze,
   "test/test_prepend.rb".freeze,
