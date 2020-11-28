@@ -1210,8 +1210,8 @@ Or, I am happy to break legacy.
 ## USERS:
 
 * [Rib][]
-* [rest-core](https://github.com/cardinalblue/rest-core)
-* [rest-more](https://github.com/cardinalblue/rest-more)
+* [rest-core](https://github.com/godfat/rest-core)
+* [rest-more](https://github.com/godfat/rest-more)
 
 ## CONTRIBUTORS:
 
