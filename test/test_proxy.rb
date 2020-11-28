@@ -60,9 +60,9 @@ describe Muack::Mock do
 
     would 'mock proxy and call, mock proxy and call' do
       mock(Obj).class.peek_return{ |k| k.name.reverse }
-      Obj.class.should.eq 'tcejbO'
+      Obj.class.should.eq 'slC'
       mock(Obj).class.peek_return{ |k| k.name.upcase }
-      Obj.class.should.eq 'OBJECT'
+      Obj.class.should.eq 'CLS'
     end
 
     would 'stub proxy and call, stub proxy and call' do
@@ -74,12 +74,12 @@ describe Muack::Mock do
 
     would 'stub proxy with any times' do
       stub(Obj).class.peek_return{ |k| k.name.downcase }
-      3.times{ Obj.class.should.eq 'object' }
+      3.times{ Obj.class.should.eq 'cls' }
     end
 
     would 'stub proxy and spy' do
       stub(Obj).class.peek_return{ |k| k.name.downcase }
-      Obj.class.should.eq 'object'
+      Obj.class.should.eq 'cls'
       spy(Obj).class
     end
   end

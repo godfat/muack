@@ -4,16 +4,18 @@ require 'muack'
 
 Pork::Suite.include(Muack::API)
 
-Obj = Object.new
 Str = String.new('Moo')
-def Obj.inspect
-  'obj'
+class Cls
+  def inspect
+    'obj'
+  end
+  def aloha a=0, b=1
+    [a, b]
+  end
 end
+Obj = Cls.new
 def Obj.private
   'pri'
-end
-def Obj.aloha a=0, b=1
-  [a, b]
 end
 Obj.singleton_class.__send__(:private, :private)
 
