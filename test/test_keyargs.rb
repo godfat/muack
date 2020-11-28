@@ -108,4 +108,17 @@ describe Muack::Mock do
       expect(Obj.say(a: 0)).eq(Obj.object_id)
     end
   end
+
+  would 'handle initialize via new' do
+    kargs_initialize = Class.new do
+      def initialize a:
+        @a = a
+      end
+      attr_reader :a
+    end
+
+    mock(kargs_initialize).new(a: 0)
+
+    expect(kargs_initialize.new(a: 0).a).eq(0)
+  end
 end
