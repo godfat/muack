@@ -102,6 +102,30 @@ describe Muack::Mock do
       Muack.verify.should.eq true
       obj.f       .should.eq 0
     end
+
+    describe 'not affect the original module' do
+      would 'with include' do
+        m = Module.new{ def f; :f; end }
+        c0 = Class.new{ include m }.new
+        c1 = Class.new{ include m }.new
+
+        mock(c0).f{:g}
+
+        expect(c0.f).eq :g
+        expect(c1.f).eq :f
+      end
+
+      would 'with prepend' do
+        m = Module.new{ def f; :f; end }
+        c0 = Class.new{ prepend m }.new
+        c1 = Class.new{ prepend m }.new
+
+        mock(c0).f{:g}
+
+        expect(c0.f).eq :g
+        expect(c1.f).eq :f
+      end
+    end
   end
 
   describe 'Muack.verify==false' do
