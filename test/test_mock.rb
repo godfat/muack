@@ -104,10 +104,17 @@ describe Muack::Mock do
     end
 
     describe 'not affect the original module' do
-      would 'with include' do
-        m = Module.new{ def f; :f; end }
-        c0 = Class.new{ include m }.new
-        c1 = Class.new{ include m }.new
+      def mod
+        @mod ||= Module.new{ def f; :f; end }
+      end
+
+      def setup type
+        m = mod
+        Array.new(2).map{ Class.new{ public_send(type, m) }.new }
+      end
+
+      would 'with include and mock' do
+        c0, c1 = setup(:include)
 
         mock(c0).f{:g}
 
@@ -115,15 +122,111 @@ describe Muack::Mock do
         expect(c1.f).eq :f
       end
 
-      would 'with prepend' do
-        m = Module.new{ def f; :f; end }
-        c0 = Class.new{ prepend m }.new
+      would 'with prepend and mock' do
+        c0, c1 = setup(:prepend)
+
+        mock(c0).f{:g}
+
+        expect(c0.f).eq :g
+        expect(c1.f).eq :f
+      end
+
+      would 'with include and mock any_instance_of C0' do
+        c0, c1 = setup(:include)
+
+        mock(any_instance_of(c0.class)).f{:g}
+
+        expect(c0.f).eq :g
+        expect(c1.f).eq :f
+      end
+
+      would 'with prepend and mock any_instance_of C0' do
+        c0, c1 = setup(:prepend)
+
+        mock(any_instance_of(c0.class)).f{:g}
+
+        expect(c0.f).eq :g
+        expect(c1.f).eq :f
+      end
+
+      would 'with include and mock any_instance_of M' do
+        c0, c1 = setup(:include)
+
+        mock(any_instance_of(mod)).f{:g}.times(2)
+
+        expect(c0.f).eq :g
+        expect(c1.f).eq :g
+      end
+
+      would 'with prepend and mock any_instance_of M' do
+        c0, c1 = setup(:prepend)
+
+        mock(any_instance_of(mod)).f{:g}.times(2)
+
+        expect(c0.f).eq :g
+        expect(c1.f).eq :g
+      end
+
+      would 'with extend on the instance' do
+        m = mod
+        c0 = Class.new.new.extend(m)
         c1 = Class.new{ prepend m }.new
 
         mock(c0).f{:g}
 
         expect(c0.f).eq :g
         expect(c1.f).eq :f
+      end
+
+      would 'with prepend on the singleton class of instance' do
+        m = mod
+        c0 = Class.new.new
+        c0.singleton_class.prepend m
+        c1 = Class.new{ prepend m }.new
+
+        mock(c0).f{:g}
+
+        expect(c0.f).eq :g
+        expect(c1.f).eq :f
+      end
+
+      describe 'any_instance_of on a module which has a prepended module' do
+        before do
+          @m0 = m0 = Module.new{ def f; :m0; end }
+          @m1 = m1 = Module.new{ def f; :m1; end; prepend m0 }
+          @c0 = c0 = Class.new{ prepend m0 }.new
+          @c1 = c1 = Class.new{ prepend m1 }.new
+        end
+
+        would 'any_instance_of m0' do
+          mock(any_instance_of(@m0)).f{:g}.times(2)
+
+          expect(@c0.f).eq :g
+          expect(@c1.f).eq :g
+        end
+
+        would 'any_instance_of m1' do
+          skip
+
+          mock(any_instance_of(@m1)).f{:g}
+
+          expect(@c0.f).eq :m0
+          expect(@c1.f).eq :g # m1 does not know c1 thus no way to pass this
+        end
+
+        would 'any_instance_of c0.class' do
+          mock(any_instance_of(@c0.class)).f{:g}
+
+          expect(@c0.f).eq :g
+          expect(@c1.f).eq :m0
+        end
+
+        would 'any_instance_of c1.class' do
+          mock(any_instance_of(@c1.class)).f{:g}
+
+          expect(@c0.f).eq :m0
+          expect(@c1.f).eq :g
+        end
       end
     end
   end

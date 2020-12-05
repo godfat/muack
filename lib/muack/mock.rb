@@ -112,11 +112,7 @@ module Muack
     private
     def __mock_inject_method defi
       __mock_injected[defi.msg] = defi
-      # a) ancestors.first is the first module in the method chain.
-      #    it's just the singleton_class when nothing was prepended,
-      #    otherwise the last prepended module.
-      # b) would be the class in AnyInstanceOf.
-      target = object.singleton_class.ancestors.first
+      target = Mock.prepare_target(object.singleton_class)
       Mock.store_original_method(target, defi)
       __mock_inject_mock_method(target, defi)
     end
@@ -131,6 +127,24 @@ module Muack
           alias_method(defi.msg, defi.original_method)
           __send__(defi.visibility, defi.msg)
           remove_method(defi.original_method)
+        end
+      end
+    end
+
+    def self.prepare_target singleton_class
+      target = singleton_class.ancestors.first
+      if target == singleton_class # no prepended module detected
+        target
+      else # prepend an internal module to override the prepended module(s)
+        name = :MuackPrepended
+        if singleton_class.const_defined?(name)
+          singleton_class.const_get(name)
+        else
+          prepended = ::Module.new
+          singleton_class.const_set(name, prepended)
+          singleton_class.private_constant(name)
+          singleton_class.prepend(prepended)
+          prepended
         end
       end
     end
