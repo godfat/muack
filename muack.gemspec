@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
-# stub: muack 1.5.0 ruby lib
+# stub: muack 1.5.1 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "muack".freeze
-  s.version = "1.5.0"
+  s.version = "1.5.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Lin Jen-Shin (godfat)".freeze]
-  s.date = "2020-11-28"
+  s.date = "2020-12-06"
   s.description = "Muack -- A fast, small, yet powerful mocking library.\n\nInspired by [RR][], and it's 32x times faster (750s vs 23s) than RR\nfor running [Rib][] tests.\n\n[RR]: https://github.com/rr/rr\n[Rib]: https://github.com/godfat/rib".freeze
   s.email = ["godfat (XD) godfat.org".freeze]
   s.files = [

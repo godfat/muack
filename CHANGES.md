@@ -1,5 +1,12 @@
 # CHANGES
 
+## Muack 1.5.1 -- 2020-12-06
+
+### Bugs fixed
+
+* Eliminated potential keyword arguments warnings for `initialize` when
+  mocking against `new`.
+
 ## Muack 1.5.0 -- 2020-11-28
 
 ### Bugs fixed
