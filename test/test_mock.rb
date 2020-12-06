@@ -194,8 +194,8 @@ describe Muack::Mock do
         before do
           @m0 = m0 = Module.new{ def f; :m0; end }
           @m1 = m1 = Module.new{ def f; :m1; end; prepend m0 }
-          @c0 = c0 = Class.new{ prepend m0 }.new
-          @c1 = c1 = Class.new{ prepend m1 }.new
+          @c0 = Class.new{ prepend m0 }.new
+          @c1 = Class.new{ prepend m1 }.new
         end
 
         would 'any_instance_of m0' do
