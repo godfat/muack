@@ -112,13 +112,14 @@ module Muack
     private
     def __mock_inject_method defi
       __mock_injected[defi.msg] = defi
-      target = Mock.prepare_target(object.singleton_class)
+      target = Mock.prepare_target(object.singleton_class, defi.msg)
+      defi.target = target
       Mock.store_original_method(target, defi)
       __mock_inject_mock_method(target, defi)
     end
 
     def __mock_reset_method defi
-      object.singleton_class.ancestors.first.module_eval do
+      defi.target.module_eval do
         remove_method(defi.msg)
         # restore original method
         if defi.original_method &&
@@ -163,20 +164,27 @@ module Muack
       end
     end
 
-    def self.prepare_target singleton_class
-      target = singleton_class.ancestors.first
-      if target == singleton_class # no prepended module detected
-        target
-      else # prepend an internal module to override the prepended module(s)
-        name = :MuackPrepended
-        if singleton_class.const_defined?(name)
-          singleton_class.const_get(name)
-        else
-          prepended = ::Module.new
-          singleton_class.const_set(name, prepended)
-          singleton_class.private_constant(name)
-          singleton_class.prepend(prepended)
-          prepended
+    def self.prepare_target singleton_class, msg
+      if singleton_class == singleton_class.ancestors.first # no prepended mod
+        singleton_class
+      else # check if we need to prepend an internal module to override
+        index = singleton_class.ancestors.index(singleton_class)
+        prepended_modules = singleton_class.ancestors[0...index]
+
+        if prepended_modules.find{ |m| direct_method_defined?(m, msg) }
+          # prepend an internal module to override the prepended module(s)
+          name = :MuackPrepended
+          if singleton_class.const_defined?(name)
+            singleton_class.const_get(name)
+          else
+            prepended = ::Module.new
+            singleton_class.const_set(name, prepended)
+            singleton_class.private_constant(name)
+            singleton_class.prepend(prepended)
+            prepended
+          end
+        else # we don't need to override so singleton class is enough
+          singleton_class
         end
       end
     end

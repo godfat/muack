@@ -190,6 +190,37 @@ describe Muack::Mock do
         expect(c1.f).eq :f
       end
 
+      describe 'with prepend on any_instance_of' do
+        describe 'on prepended method' do
+          would 'have a muack prepended module' do
+            m = mod
+            c = Class.new{ prepend m }
+            ancestors_size = c.ancestors.size
+
+            mock(any_instance_of(c)).f{:g}
+
+            expect(c.new.f).eq :g
+            expect(c).const_defined?(:MuackPrepended)
+            expect(c.ancestors.size).eq ancestors_size + 1
+          end
+        end
+
+        describe 'on non-prepended module' do
+          would 'not have a muack prepended module' do
+            m = mod
+            c = Class.new{ def g; :g; end; prepend m }
+            ancestors_size = c.ancestors.size
+
+            mock(any_instance_of(c)).g{:m}
+
+            expect(c.new.f).eq :f
+            expect(c.new.g).eq :m
+            expect(c).not.const_defined?(:MuackPrepended)
+            expect(c.ancestors.size).eq ancestors_size
+          end
+        end
+      end
+
       describe 'any_instance_of on a module which has a prepended module' do
         before do
           @m0 = m0 = Module.new{ def f; :m0; end }
