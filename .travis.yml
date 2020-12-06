@@ -7,6 +7,8 @@ script: 'ruby -vwr bundler/setup -S rake test'
 
 matrix:
   include:
+    - rvm: 2.3
+      env: RUBYOPT=--enable-frozen-string-literal
     - rvm: 2.4
       env: RUBYOPT=--enable-frozen-string-literal
     - rvm: 2.5
