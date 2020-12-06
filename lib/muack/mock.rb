@@ -132,7 +132,9 @@ module Muack
 
     def self.direct_method_defined? mod, msg
       mod.method_defined?(msg, false) || # this doesn't cover private method!
-        mod.private_method_defined?(msg, false)
+        (mod.respond_to?(:private_method_defined?) &&
+          mod.private_method_defined?(msg, false)) ||
+        mod.private_instance_methods(false).include?(msg) # older rubies
     end
 
     def self.prepare_target singleton_class
