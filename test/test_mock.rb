@@ -202,6 +202,13 @@ describe Muack::Mock do
             expect(c.new.f).eq :g
             expect(c).const_defined?(:MuackPrepended)
             expect(c.ancestors.size).eq ancestors_size + 1
+
+            expect(Muack.verify).eq true
+
+            # Make sure there's only one MuackPrepended
+            mock(any_instance_of(c)).f{:h}
+            expect(c.ancestors.size).eq ancestors_size + 1
+            expect(c.new.f).eq :h
           end
         end
 
