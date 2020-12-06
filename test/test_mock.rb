@@ -212,7 +212,7 @@ describe Muack::Mock do
           end
         end
 
-        describe 'on non-prepended module' do
+        describe 'on non-prepended method' do
           would 'not have a muack prepended module' do
             m = mod
             c = Class.new{ def g; :g; end; prepend m }
