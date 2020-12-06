@@ -121,14 +121,18 @@ module Muack
       object.singleton_class.ancestors.first.module_eval do
         remove_method(defi.msg)
         # restore original method
-        if public_instance_methods(false).include?(defi.original_method) ||
-           protected_instance_methods(false).include?(defi.original_method) ||
-           private_instance_methods(false).include?(defi.original_method)
+        if defi.original_method &&
+           Mock.direct_method_defined?(self, defi.original_method)
           alias_method(defi.msg, defi.original_method)
           __send__(defi.visibility, defi.msg)
           remove_method(defi.original_method)
         end
       end
+    end
+
+    def self.direct_method_defined? mod, msg
+      mod.method_defined?(msg, false) || # this doesn't cover private method!
+        mod.private_method_defined?(msg, false)
     end
 
     def self.prepare_target singleton_class
@@ -150,11 +154,11 @@ module Muack
     end
 
     def self.store_original_method klass, defi
-      visibility = if klass.public_instance_methods(false).include?(defi.msg)
+      visibility = if klass.public_method_defined?(defi.msg, false)
         :public
-      elsif klass.protected_instance_methods(false).include?(defi.msg)
+      elsif klass.protected_method_defined?(defi.msg, false)
         :protected
-      elsif klass.private_instance_methods(false).include?(defi.msg)
+      elsif klass.private_method_defined?(defi.msg, false)
         :private
       end
 
@@ -174,7 +178,7 @@ module Muack
       end
 
       new_name = "__muack_#{name}_#{level}_#{message}".to_sym
-      if klass.instance_methods(false).include?(new_name)
+      if direct_method_defined?(klass, new_name)
         find_new_name(klass, message, level+1)
       else
         new_name
