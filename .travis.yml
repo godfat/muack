@@ -18,5 +18,5 @@ matrix:
       env: RUBYOPT=--enable-frozen-string-literal
     - rvm: ruby-head
       env: RUBYOPT=--enable-frozen-string-literal
-    - rvm: jruby
+    - rvm: jruby-9.2
       env: RUBYOPT=--enable-frozen-string-literal

@@ -130,11 +130,37 @@ module Muack
       end
     end
 
-    def self.direct_method_defined? mod, msg
-      mod.method_defined?(msg, false) || # this doesn't cover private method!
-        (mod.respond_to?(:private_method_defined?) &&
-          mod.private_method_defined?(msg, false)) ||
-        mod.private_instance_methods(false).include?(msg) # older rubies
+    if ::Class.instance_method(:method_defined?).arity == 1 # Ruby 2.5-
+      def self.direct_method_defined? mod, msg
+        mod.public_instance_methods(false).include?(msg) ||
+          mod.protected_instance_methods(false).include?(msg) ||
+          mod.private_instance_methods(false).include?(msg)
+      end
+
+      def self.method_visibility mod, msg
+        if mod.public_instance_methods(false).include?(msg)
+          :public
+        elsif mod.protected_instance_methods(false).include?(msg)
+          :protected
+        elsif mod.private_instance_methods(false).include?(msg)
+          :private
+        end
+      end
+    else # Ruby 2.6+
+      def self.direct_method_defined? mod, msg
+        mod.method_defined?(msg, false) || # this doesn't cover private method
+          mod.private_method_defined?(msg, false)
+      end
+
+      def self.method_visibility mod, msg
+        if mod.public_method_defined?(msg, false)
+          :public
+        elsif mod.protected_method_defined?(msg, false)
+          :protected
+        elsif mod.private_method_defined?(msg, false)
+          :private
+        end
+      end
     end
 
     def self.prepare_target singleton_class
@@ -155,18 +181,10 @@ module Muack
       end
     end
 
-    def self.store_original_method klass, defi
-      visibility = if klass.public_method_defined?(defi.msg, false)
-        :public
-      elsif klass.protected_method_defined?(defi.msg, false)
-        :protected
-      elsif klass.private_method_defined?(defi.msg, false)
-        :private
-      end
-
-      if visibility # store original method
-        original_method = find_new_name(klass, defi.msg)
-        klass.__send__(:alias_method, original_method, defi.msg)
+    def self.store_original_method mod, defi
+      if visibility = method_visibility(mod, defi.msg)
+        original_method = find_new_name(mod, defi.msg)
+        mod.__send__(:alias_method, original_method, defi.msg)
         defi.original_method = original_method
         defi.visibility = visibility
       else
@@ -174,14 +192,14 @@ module Muack
       end
     end
 
-    def self.find_new_name klass, message, level=0
+    def self.find_new_name mod, message, level=0
       if level >= (::ENV['MUACK_RECURSION_LEVEL'] || 9).to_i
         raise CannotFindInjectionName.new(level+1, message)
       end
 
       new_name = "__muack_#{name}_#{level}_#{message}".to_sym
-      if direct_method_defined?(klass, new_name)
-        find_new_name(klass, message, level+1)
+      if direct_method_defined?(mod, new_name)
+        find_new_name(mod, message, level+1)
       else
         new_name
       end
