@@ -1,5 +1,18 @@
 # CHANGES
 
+## Muack 1.6.0 -- 2020-12-06
+
+### Enhancement
+
+* Fix a few cases for mocking against modules/classes with prepended modules,
+  especially when `any_instance_of` is also used in combination. Previously,
+  it's either not mocking correctly or it may affect modules/classes which
+  also use the same prepended modules. For mocking prepended methods, an
+  internal `MuackPrepended` module will be prepended into the modules/classes
+  to properly override the prepended methods. This module cannot be removed
+  between tests because there's no way to do that with current Rubies.
+* Performance could be potentially slightly improved with Ruby 2.6+
+
 ## Muack 1.5.1 -- 2020-12-06
 
 ### Bugs fixed
