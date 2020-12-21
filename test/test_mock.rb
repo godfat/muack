@@ -244,12 +244,12 @@ describe Muack::Mock do
         end
 
         would 'any_instance_of m1' do
-          skip
+          skip if RUBY_VERSION < '3.0.0'
 
           mock(any_instance_of(@m1)).f{:g}
 
           expect(@c0.f).eq :m0
-          expect(@c1.f).eq :g # m1 does not know c1 thus no way to pass this
+          expect(@c1.f).eq :g
         end
 
         would 'any_instance_of c0.class' do
