@@ -18,17 +18,9 @@ describe 'retain visibility' do
   end
 
   def generate visibility
-    klass = Class.new do
-      def greet
-        'hi'
-      end
-    end
+    klass = Class.new
 
     mod = Module.new do
-      def greet
-        hello
-      end
-
       def hello
         'hello'
       end
