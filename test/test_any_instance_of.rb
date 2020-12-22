@@ -113,6 +113,17 @@ describe Muack::AnyInstanceOf do
     obj.f.should.eq 0
   end
 
+  describe 'mock any_instance_of on a method defined higher up' do
+    methods_count = klass.instance_methods.size
+
+    would 'not store a backup method' do
+      any_instance_of(klass){ |inst| mock(inst).to_s{ 'to_s' } }
+
+      expect(klass.new.to_s).eq 'to_s'
+      expect(klass.instance_methods.size).eq methods_count
+    end
+  end
+
   # Brought from rspec-mocks and it's currently failing on rspec-mocks
   would 'stub any_instance_of on module extending it self' do
     mod = Module.new {
