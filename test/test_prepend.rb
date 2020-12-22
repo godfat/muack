@@ -110,6 +110,19 @@ describe 'mock with prepend' do
     end
   end
 
+  describe 'class and subclass' do
+    would 'work for prepended superclass' do
+      mod = Module.new{ def f; :f; end }
+      base = Class.new{ prepend mod }
+      sub = Class.new(base)
+
+      mock(any_instance_of(base)).f{:g}.times(2)
+
+      expect(base.new.f).eq :g
+      expect(sub.new.f).eq :g
+    end
+  end
+
   # Brought from rspec-mocks and it's currently failing on rspec-mocks
   # See https://github.com/rspec/rspec-mocks/pull/1218
   would "handle stubbing prepending methods that were only defined on the prepended module" do
