@@ -94,6 +94,22 @@ describe 'mock with prepend' do
     paste :test
   end
 
+  describe 'class with a chain of prepended modules' do
+    would 'not affect other modules' do
+      mod0 = Module.new{ def f; :m0; end }
+      mod1 = Module.new{ def f; :m1; end }
+      klass0 = Class.new{ prepend mod0 }
+      klass1 = Class.new{ prepend mod1 }
+      klass = Class.new{ prepend mod1; prepend mod0 }
+
+      mock(any_instance_of(klass)).f{:f}
+
+      expect(klass.new.f).eq :f
+      expect(klass0.new.f).eq :m0
+      expect(klass1.new.f).eq :m1
+    end
+  end
+
   # Brought from rspec-mocks and it's currently failing on rspec-mocks
   # See https://github.com/rspec/rspec-mocks/pull/1218
   would "handle stubbing prepending methods that were only defined on the prepended module" do
