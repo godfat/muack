@@ -22,6 +22,10 @@ module Muack
     def verify obj=nil
       if obj
         with(obj, :[]).all?(&:__mock_verify)
+      elsif RUBY_ENGINE == 'jruby'
+        # Workaround weird error:
+        # TypeError: Muack::Stub#to_ary should return Array
+        data.each_value.all?{ |v| v.__mock_verify }
       else
         data.each_value.all?(&:__mock_verify)
       end
