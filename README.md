@@ -1,4 +1,4 @@
-# Muack [![Build Status](https://secure.travis-ci.org/godfat/muack.png?branch=master)](http://travis-ci.org/godfat/muack) [![Coverage Status](https://coveralls.io/repos/github/godfat/muack/badge.png)](https://coveralls.io/github/godfat/muack) [![Join the chat at https://gitter.im/godfat/muack](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/godfat/muack)
+# Muack [![Pipeline status](https://gitlab.com/godfat/muack/badges/master/pipeline.svg)](https://gitlab.com/godfat/muack/-/pipelines)
 
 by Lin Jen-Shin ([godfat](http://godfat.org))
 
