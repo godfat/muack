@@ -292,7 +292,7 @@ module Muack
         ::Kernel.instance_method(:method).bind(object).call(method_name).
         super_method
 
-      if super_method.owner == ::Class && super_method.name == :new
+      if super_method.owner.kind_of?(::Class) && super_method.name == :new
         initialize_method = ::Class.instance_method(:instance_method).
           bind(object).call(:initialize)
         __mock_block_with_kargs?(initialize_method)
