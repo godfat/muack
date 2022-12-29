@@ -1,5 +1,11 @@
 # CHANGES
 
+## Muack 1.7.0 -- ?
+
+### Incompatible changes
+
+* Drop support for Ruby 2.5-
+
 ## Muack 1.6.0 -- 2020-12-06
 
 ### Enhancement

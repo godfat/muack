@@ -131,36 +131,18 @@ module Muack
       end
     end
 
-    if ::Class.instance_method(:method_defined?).arity == 1 # Ruby 2.5-
-      def self.direct_method_defined? mod, msg
-        mod.public_instance_methods(false).include?(msg) ||
-          mod.protected_instance_methods(false).include?(msg) ||
-          mod.private_instance_methods(false).include?(msg)
-      end
+    def self.direct_method_defined? mod, msg
+      mod.method_defined?(msg, false) || # this doesn't cover private method
+        mod.private_method_defined?(msg, false)
+    end
 
-      def self.method_visibility mod, msg
-        if mod.public_instance_methods(false).include?(msg)
-          :public
-        elsif mod.protected_instance_methods(false).include?(msg)
-          :protected
-        elsif mod.private_instance_methods(false).include?(msg)
-          :private
-        end
-      end
-    else # Ruby 2.6+
-      def self.direct_method_defined? mod, msg
-        mod.method_defined?(msg, false) || # this doesn't cover private method
-          mod.private_method_defined?(msg, false)
-      end
-
-      def self.method_visibility mod, msg
-        if mod.public_method_defined?(msg, false)
-          :public
-        elsif mod.protected_method_defined?(msg, false)
-          :protected
-        elsif mod.private_method_defined?(msg, false)
-          :private
-        end
+    def self.method_visibility mod, msg
+      if mod.public_method_defined?(msg, false)
+        :public
+      elsif mod.protected_method_defined?(msg, false)
+        :protected
+      elsif mod.private_method_defined?(msg, false)
+        :private
       end
     end
 
