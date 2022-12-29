@@ -283,7 +283,7 @@ module Muack
           bind(object).call(:initialize)
         __mock_block_with_kargs?(initialize_method)
       else
-        super_method && __mock_block_with_kargs?(super_method)
+        __mock_block_with_kargs?(super_method)
       end
     end
 
