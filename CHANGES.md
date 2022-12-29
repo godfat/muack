@@ -1,6 +1,6 @@
 # CHANGES
 
-## Muack 1.7.0 -- ?
+## Muack 1.7.0 -- 2022-12-29
 
 ### Incompatible changes
 
