@@ -89,6 +89,47 @@ describe 'retain visibility' do
     paste :test
   end
 
+  describe 'set the same visibility from the original method' do
+    copy :test do
+      def find_visibilities
+        %i[public protected private].map do |v|
+          object.send("#{v}_methods").include?(:hello)
+        end
+      end
+
+      would do
+        current_visibilities = find_visibilities
+
+        stub(object).hello{ :stub }
+
+        expect(find_visibilities).eq current_visibilities
+      end
+    end
+
+    describe 'for instance method' do
+      def object
+        @object ||= Class.new do
+          private
+          def hello; :hello; end
+        end.new
+      end
+
+      paste :test
+    end
+
+    describe 'for singleton method' do
+      def object
+        @object ||= begin
+          ret = Object.new
+          def ret.hello; :hello; end
+          ret
+        end
+      end
+
+      paste :test
+    end
+  end
+
   # Brought from rspec-mocks
   would "correctly restore the visibility of methods whose visibility has been tweaked on the singleton class" do
     # hello is a private method when mixed in, but public on the module

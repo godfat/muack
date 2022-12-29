@@ -136,12 +136,12 @@ module Muack
         mod.private_method_defined?(msg, false)
     end
 
-    def self.method_visibility mod, msg
-      if mod.public_method_defined?(msg, false)
+    def self.method_visibility mod, msg, inherit=false
+      if mod.public_method_defined?(msg, inherit)
         :public
-      elsif mod.protected_method_defined?(msg, false)
+      elsif mod.protected_method_defined?(msg, inherit)
         :protected
-      elsif mod.private_method_defined?(msg, false)
+      elsif mod.private_method_defined?(msg, inherit)
         :private
       end
     end
@@ -173,11 +173,15 @@ module Muack
 
     def self.store_original_method mod, defi
       if visibility = method_visibility(mod, defi.msg)
+        # Defined in itself, we need to make alias
         original_method = find_new_name(mod, defi.msg)
         mod.__send__(:alias_method, original_method, defi.msg)
         defi.original_method = original_method
         defi.visibility = visibility
-      else
+      elsif visibility = method_visibility(mod, defi.msg, true)
+        # Defined in parent, we can just override
+        defi.visibility = visibility
+      else # Not defined, pick a reasonable default
         defi.visibility = :public
       end
     end

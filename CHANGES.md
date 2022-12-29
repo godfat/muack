@@ -6,6 +6,11 @@
 
 * Drop support for Ruby 2.5-
 
+### Bugs fixed
+
+* Fixed stubbed instance method not following the original visibility.
+  It's always public before this fix.
+
 ## Muack 1.6.0 -- 2020-12-06
 
 ### Enhancement
