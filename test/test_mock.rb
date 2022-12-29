@@ -244,7 +244,7 @@ describe Muack::Mock do
         end
 
         would 'any_instance_of m1' do
-          skip if RUBY_VERSION < '3.0.0'
+          skip if RUBY_ENGINE == 'jruby'
 
           mock(any_instance_of(@m1)).f{:g}
 

@@ -132,6 +132,11 @@ describe 'retain visibility' do
 
   # Brought from rspec-mocks
   would "correctly restore the visibility of methods whose visibility has been tweaked on the singleton class" do
+    # JRuby didn't store the visibility change on the singleton class,
+    # therefore it cannot be properly detected and visibility change
+    # will be lost upon reset.
+    skip if RUBY_ENGINE == 'jruby'
+
     # hello is a private method when mixed in, but public on the module
     # itself
     mod = Module.new do
