@@ -50,6 +50,9 @@ describe Muack::Mock do
       end
 
       would 'instance method' do
+        # https://github.com/jruby/jruby/issues/7545
+        skip if RUBY_ENGINE == 'jruby' && obj.kind_of?(Muack::AnyInstanceOf)
+
         mock(obj).bonjour(a: 0, b: 1)
 
         expect(instance.bonjour(a: 0, b: 1)).eq([0, 1])
