@@ -10,6 +10,8 @@
 
 * Fixed stubbed instance method not following the original visibility.
   It's always public before this fix.
+* Worked around a few JRuby 9.4 compatibility issues. Note that there are
+  still some issues due to JRuby bugs. Those tests are currently skipped.
 
 ## Muack 1.6.0 -- 2020-12-06
 
