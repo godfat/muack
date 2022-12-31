@@ -1,12 +1,12 @@
 # Muack [![Pipeline status](https://gitlab.com/godfat/muack/badges/master/pipeline.svg)](https://gitlab.com/godfat/muack/-/pipelines)
 
-by Lin Jen-Shin ([godfat](http://godfat.org))
+by Lin Jen-Shin ([godfat](https://godfat.org))
 
 ## LINKS:
 
 * [github](https://github.com/godfat/muack)
 * [rubygems](https://rubygems.org/gems/muack)
-* [rdoc](http://rdoc.info/github/godfat/muack)
+* [rdoc](https://rubydoc.info/github/godfat/muack)
 * [issues](https://github.com/godfat/muack/issues) (feel free to ask for support)
 
 ## DESCRIPTION:
@@ -1221,13 +1221,13 @@ Or, I am happy to break legacy.
 
 Apache License 2.0 (Apache-2.0)
 
-Copyright (c) 2013-2022, Lin Jen-Shin (godfat)
+Copyright (c) 2013-2023, Lin Jen-Shin (godfat)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-<http://www.apache.org/licenses/LICENSE-2.0>
+<https://www.apache.org/licenses/LICENSE-2.0>
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
