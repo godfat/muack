@@ -25,6 +25,7 @@ module Muack
       elsif RUBY_ENGINE == 'jruby'
         # Workaround weird error:
         # TypeError: Muack::Stub#to_ary should return Array
+        # https://github.com/jruby/jruby/issues/7580
         data.each_value.all?{ |v| v.__mock_verify }
       else
         data.each_value.all?(&:__mock_verify)
