@@ -165,174 +165,174 @@ describe Muack::Satisfying do
 
   describe Muack::Where do
     would 'have human readable to_s and inspect' do
-      matcher = where('b' => 2)
-      expected = 'Muack::API.where({"b" => 2})'
+      matcher = where(b: 2)
+      expected = 'Muack::API.where({b: 2})'
       matcher.to_s   .should.eq expected
       matcher.inspect.should.eq expected
     end
 
     would 'satisfy' do
-      mock(Str).say(where(:b => 2)){ |arg| arg[:b] }
-      Str.say(:b => 2).should.eq 2
+      mock(Str).say(where(b: 2)){ |arg| arg[:b] }
+      Str.say(b: 2).should.eq 2
       Muack.verify.should.eq true
     end
 
     would 'satisfy with satisfy' do
-      mock(Str).say(where(:b => is_a(Integer))){ |arg| arg[:b] }
-      Str.say(:b => 3).should.eq 3
+      mock(Str).say(where(b: is_a(Integer))){ |arg| arg[:b] }
+      Str.say(b: 3).should.eq 3
       Muack.verify.should.eq true
     end
 
     would 'satisfy with satisfy recursive' do
-      spec = where(:a => {:b => is_a(Integer)})
+      spec = where(a: {b: is_a(Integer)})
       mock(Str).say(spec){ |arg| arg[:a][:b] }
-      Str.say(:a => {:b => 1}).should.eq 1
+      Str.say(a: {b: 1}).should.eq 1
       Muack.verify.should.eq true
     end
 
     would 'raise Unexpected error if passing unexpected argument' do
-      mock(Obj).say(where('b' => 2)){ 'boo' }
-      e = should.raise(Muack::Unexpected){ Obj.say('b' => 1) }
-      e.expected.should.eq 'obj.say(Muack::API.where({"b" => 2}))'
-      e.was     .should.eq 'obj.say({"b" => 1})'
+      mock(Obj).say(where(b: 2)){ 'boo' }
+      e = should.raise(Muack::Unexpected){ Obj.say(b: 1) }
+      e.expected.should.eq 'obj.say(Muack::API.where({b: 2}))'
+      e.was     .should.eq 'obj.say({b: 1})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'raise Unexpected error if passing unsatisfied argument' do
-      mock(Obj).say(where('a' => 0, 'b' => is_a(String))){ 'boo' }
-      e = should.raise(Muack::Unexpected){ Obj.say('a' => 0) }
+      mock(Obj).say(where(a: 0, b: is_a(String))){ 'boo' }
+      e = should.raise(Muack::Unexpected){ Obj.say(a: 0) }
       e.expected.should.eq \
-        'obj.say(Muack::API.where({"a" => 0, "b" => Muack::API.is_a(String)}))'
-      e.was     .should.eq 'obj.say({"a" => 0})'
+        'obj.say(Muack::API.where({a: 0, b: Muack::API.is_a(String)}))'
+      e.was     .should.eq 'obj.say({a: 0})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'raise Unexpected error if passing unsatisfied argument' do
-      mock(Obj).say(where('a' => 0, 'b' => is_a(Integer))){ 'boo' }
-      e = should.raise(Muack::Unexpected){Obj.say('a' => 0, 'b' => 1, 'c' => 2)}
+      mock(Obj).say(where(a: 0, b: is_a(Integer))){ 'boo' }
+      e = should.raise(Muack::Unexpected){Obj.say(a: 0, b: 1, c: 2)}
       e.expected.should.eq \
-        'obj.say(Muack::API.where({"a" => 0, "b" => Muack::API.is_a(Integer)}))'
-      e.was     .should.eq 'obj.say({"a" => 0, "b" => 1, "c" => 2})'
+        'obj.say(Muack::API.where({a: 0, b: Muack::API.is_a(Integer)}))'
+      e.was     .should.eq 'obj.say({a: 0, b: 1, c: 2})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'recurse' do
-      mock(Obj).say(where('a' =>
-                      having('b' =>
-                        allowing('c' => [is_a(Integer)])))){ 'boo' }
-      e = should.raise(Muack::Unexpected){Obj.say('a' => 0)}
-      e.expected.should.eq                  \
-        'obj.say(Muack::API.where({"a" => ' \
-          'Muack::API.having({"b" => '      \
-            'Muack::API.allowing({"c" => '  \
+      mock(Obj).say(where(a:
+                      having(b:
+                        allowing(c: [is_a(Integer)])))){ 'boo' }
+      e = should.raise(Muack::Unexpected){Obj.say(a: 0)}
+      e.expected.should.eq              \
+        'obj.say(Muack::API.where({a: ' \
+          'Muack::API.having({b: '      \
+            'Muack::API.allowing({c: '  \
               '[Muack::API.is_a(Integer)]})})}))'
-      e.was     .should.eq 'obj.say({"a" => 0})'
+      e.was     .should.eq 'obj.say({a: 0})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'respect all keys', :groups => [:only] do
-      mock(Obj).say(where(:a => 0)){ 'nnf' }
-      should.raise(Muack::Unexpected){Obj.say(:a => 0, :b => nil)}
+      mock(Obj).say(where(a: 0)){ 'nnf' }
+      should.raise(Muack::Unexpected){Obj.say(a: 0, b: nil)}
     end
   end
 
   describe Muack::Having do
     would 'have human readable to_s and inspect' do
-      matcher = having('b' => 2)
-      expected = 'Muack::API.having({"b" => 2})'
+      matcher = having(b: 2)
+      expected = 'Muack::API.having({b: 2})'
       matcher.to_s   .should.eq expected
       matcher.inspect.should.eq expected
     end
 
     would 'satisfy' do
-      mock(Str).say(having(:b => 2)){ |arg| arg[:a] }
-      Str.say(:a => 1, :b => 2).should.eq 1
+      mock(Str).say(having(b: 2)){ |arg| arg[:a] }
+      Str.say(a: 1, b: 2).should.eq 1
       Muack.verify.should.eq true
     end
 
     would 'satisfy with satisfy' do
-      mock(Str).say(having(:b => is_a(Integer))){ |arg| arg[:b] }
-      Str.say(:a => 1, :b => 2).should.eq 2
+      mock(Str).say(having(b: is_a(Integer))){ |arg| arg[:b] }
+      Str.say(a: 1, b: 2).should.eq 2
       Muack.verify.should.eq true
     end
 
     would 'satisfy with satisfy recursive' do
-      spec = having(:a => {:b => is_a(Integer)})
+      spec = having(a: {b: is_a(Integer)})
       mock(Str).say(spec){ |arg| arg[:a][:c] }
-      Str.say(:a => {:b => 1, :c => 2}, :d => 3).should.eq 2
+      Str.say(a: {b: 1, c: 2}, d: 3).should.eq 2
       Muack.verify.should.eq true
     end
 
     would 'raise Unexpected error if passing unexpected argument' do
-      mock(Obj).say(having('b' => 2)){ 'boo' }
-      e = should.raise(Muack::Unexpected){ Obj.say('a' => 1) }
-      e.expected.should.eq 'obj.say(Muack::API.having({"b" => 2}))'
-      e.was     .should.eq 'obj.say({"a" => 1})'
+      mock(Obj).say(having(b: 2)){ 'boo' }
+      e = should.raise(Muack::Unexpected){ Obj.say(a: 1) }
+      e.expected.should.eq 'obj.say(Muack::API.having({b: 2}))'
+      e.was     .should.eq 'obj.say({a: 1})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'raise Unexpected error if passing unsatisfied argument' do
-      mock(Obj).say(having('a' => 0, 'b' => is_a(Integer))){ 'boo' }
-      e = should.raise(Muack::Unexpected){ Obj.say('b' => 1) }
+      mock(Obj).say(having(a: 0, b: is_a(Integer))){ 'boo' }
+      e = should.raise(Muack::Unexpected){ Obj.say(b: 1) }
       e.expected.should.eq \
-        'obj.say(Muack::API.having({"a" => 0, "b" => Muack::API.is_a(Integer)}))'
-      e.was     .should.eq 'obj.say({"b" => 1})'
+        'obj.say(Muack::API.having({a: 0, b: Muack::API.is_a(Integer)}))'
+      e.was     .should.eq 'obj.say({b: 1})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'respect all keys' do
-      mock(Obj).say(having(:a => 0, :b => nil)){ 'nnf' }
-      should.raise(Muack::Unexpected){Obj.say(:a => 0)}
+      mock(Obj).say(having(a: 0, b: nil)){ 'nnf' }
+      should.raise(Muack::Unexpected){Obj.say(a: 0)}
     end
   end
 
   describe Muack::Allowing do
     would 'have human readable to_s and inspect' do
-      matcher = allowing('b' => 2)
-      expected = 'Muack::API.allowing({"b" => 2})'
+      matcher = allowing(b: 2)
+      expected = 'Muack::API.allowing({b: 2})'
       matcher.to_s   .should.eq expected
       matcher.inspect.should.eq expected
     end
 
     would 'satisfy' do
-      mock(Str).say(allowing(:a => 0, :b => 1)){ |arg| arg[:a] }
-      Str.say(:a => 0).should.eq 0
+      mock(Str).say(allowing(a: 0, b: 1)){ |arg| arg[:a] }
+      Str.say(a: 0).should.eq 0
       Muack.verify.should.eq true
     end
 
     would 'satisfy with satisfy' do
-      mock(Str).say(allowing(:a => is_a(Integer), :b => 1)){ |arg| arg[:a] }
-      Str.say(:a => 0).should.eq 0
+      mock(Str).say(allowing(a: is_a(Integer), b: 1)){ |arg| arg[:a] }
+      Str.say(a: 0).should.eq 0
       Muack.verify.should.eq true
     end
 
     would 'satisfy with satisfy recursive' do
-      spec = allowing(:a => {:b => is_a(Integer), :c => 1}, :d => 2)
+      spec = allowing(a: {b: is_a(Integer), c: 1}, d: 2)
       mock(Str).say(spec){ |arg| arg[:a][:b] }
-      Str.say(:a => {:b => 0}).should.eq 0
+      Str.say(a: {b: 0}).should.eq 0
       Muack.verify.should.eq true
     end
 
     would 'raise Unexpected error if passing unexpected argument' do
-      mock(Obj).say(allowing('b' => 2)){ 'boo' }
-      e = should.raise(Muack::Unexpected){ Obj.say('a' => 1) }
-      e.expected.should.eq 'obj.say(Muack::API.allowing({"b" => 2}))'
-      e.was     .should.eq 'obj.say({"a" => 1})'
+      mock(Obj).say(allowing(b: 2)){ 'boo' }
+      e = should.raise(Muack::Unexpected){ Obj.say(a: 1) }
+      e.expected.should.eq 'obj.say(Muack::API.allowing({b: 2}))'
+      e.was     .should.eq 'obj.say({a: 1})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'raise Unexpected error if passing unsatisfied argument' do
-      mock(Obj).say(allowing('b' => is_a(String))){ 'boo' }
-      e = should.raise(Muack::Unexpected){ Obj.say('b' => '1', 'c' => 2) }
+      mock(Obj).say(allowing(b: is_a(String))){ 'boo' }
+      e = should.raise(Muack::Unexpected){ Obj.say(b: '1', c: 2) }
       e.expected.should.eq \
-        'obj.say(Muack::API.allowing({"b" => Muack::API.is_a(String)}))'
-      e.was     .should.eq 'obj.say({"b" => "1", "c" => 2})'
+        'obj.say(Muack::API.allowing({b: Muack::API.is_a(String)}))'
+      e.was     .should.eq 'obj.say({b: "1", c: 2})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'respect all keys' do
-      mock(Obj).say(allowing(:a => 0)){ 'nnf' }
-      should.raise(Muack::Unexpected){Obj.say(:a => 0, :b => nil)}
+      mock(Obj).say(allowing(a: 0)){ 'nnf' }
+      should.raise(Muack::Unexpected){Obj.say(a: 0, b: nil)}
     end
   end
 
