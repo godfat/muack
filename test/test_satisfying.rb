@@ -165,8 +165,8 @@ describe Muack::Satisfying do
 
   describe Muack::Where do
     would 'have human readable to_s and inspect' do
-      matcher = where(:b => 2)
-      expected = 'Muack::API.where({:b=>2})'
+      matcher = where('b' => 2)
+      expected = 'Muack::API.where({"b" => 2})'
       matcher.to_s   .should.eq expected
       matcher.inspect.should.eq expected
     end
@@ -191,42 +191,42 @@ describe Muack::Satisfying do
     end
 
     would 'raise Unexpected error if passing unexpected argument' do
-      mock(Obj).say(where(:b => 2)){ 'boo' }
-      e = should.raise(Muack::Unexpected){ Obj.say(:b => 1) }
-      e.expected.should.eq 'obj.say(Muack::API.where({:b=>2}))'
-      e.was     .should.eq 'obj.say({:b=>1})'
+      mock(Obj).say(where('b' => 2)){ 'boo' }
+      e = should.raise(Muack::Unexpected){ Obj.say('b' => 1) }
+      e.expected.should.eq 'obj.say(Muack::API.where({"b" => 2}))'
+      e.was     .should.eq 'obj.say({"b" => 1})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'raise Unexpected error if passing unsatisfied argument' do
-      mock(Obj).say(where(:a => 0, :b => is_a(String))){ 'boo' }
-      e = should.raise(Muack::Unexpected){ Obj.say(:a => 0) }
+      mock(Obj).say(where('a' => 0, 'b' => is_a(String))){ 'boo' }
+      e = should.raise(Muack::Unexpected){ Obj.say('a' => 0) }
       e.expected.should.eq \
-        'obj.say(Muack::API.where({:a=>0, :b=>Muack::API.is_a(String)}))'
-      e.was     .should.eq 'obj.say({:a=>0})'
+        'obj.say(Muack::API.where({"a" => 0, "b" => Muack::API.is_a(String)}))'
+      e.was     .should.eq 'obj.say({"a" => 0})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'raise Unexpected error if passing unsatisfied argument' do
-      mock(Obj).say(where(:a => 0, :b => is_a(Integer))){ 'boo' }
-      e = should.raise(Muack::Unexpected){Obj.say(:a => 0, :b => 1, :c => 2)}
+      mock(Obj).say(where('a' => 0, 'b' => is_a(Integer))){ 'boo' }
+      e = should.raise(Muack::Unexpected){Obj.say('a' => 0, 'b' => 1, 'c' => 2)}
       e.expected.should.eq \
-        'obj.say(Muack::API.where({:a=>0, :b=>Muack::API.is_a(Integer)}))'
-      e.was     .should.eq 'obj.say({:a=>0, :b=>1, :c=>2})'
+        'obj.say(Muack::API.where({"a" => 0, "b" => Muack::API.is_a(Integer)}))'
+      e.was     .should.eq 'obj.say({"a" => 0, "b" => 1, "c" => 2})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'recurse' do
-      mock(Obj).say(where(:a =>
-                      having(:b =>
-                        allowing(:c => [is_a(Integer)])))){ 'boo' }
-      e = should.raise(Muack::Unexpected){Obj.say(:a => 0)}
-      e.expected.should.eq               \
-        'obj.say(Muack::API.where({:a=>' \
-          'Muack::API.having({:b=>'      \
-            'Muack::API.allowing({:c=>'  \
+      mock(Obj).say(where('a' =>
+                      having('b' =>
+                        allowing('c' => [is_a(Integer)])))){ 'boo' }
+      e = should.raise(Muack::Unexpected){Obj.say('a' => 0)}
+      e.expected.should.eq                  \
+        'obj.say(Muack::API.where({"a" => ' \
+          'Muack::API.having({"b" => '      \
+            'Muack::API.allowing({"c" => '  \
               '[Muack::API.is_a(Integer)]})})}))'
-      e.was     .should.eq 'obj.say({:a=>0})'
+      e.was     .should.eq 'obj.say({"a" => 0})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
@@ -238,8 +238,8 @@ describe Muack::Satisfying do
 
   describe Muack::Having do
     would 'have human readable to_s and inspect' do
-      matcher = having(:b => 2)
-      expected = 'Muack::API.having({:b=>2})'
+      matcher = having('b' => 2)
+      expected = 'Muack::API.having({"b" => 2})'
       matcher.to_s   .should.eq expected
       matcher.inspect.should.eq expected
     end
@@ -264,19 +264,19 @@ describe Muack::Satisfying do
     end
 
     would 'raise Unexpected error if passing unexpected argument' do
-      mock(Obj).say(having(:b => 2)){ 'boo' }
-      e = should.raise(Muack::Unexpected){ Obj.say(:a => 1) }
-      e.expected.should.eq 'obj.say(Muack::API.having({:b=>2}))'
-      e.was     .should.eq 'obj.say({:a=>1})'
+      mock(Obj).say(having('b' => 2)){ 'boo' }
+      e = should.raise(Muack::Unexpected){ Obj.say('a' => 1) }
+      e.expected.should.eq 'obj.say(Muack::API.having({"b" => 2}))'
+      e.was     .should.eq 'obj.say({"a" => 1})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'raise Unexpected error if passing unsatisfied argument' do
-      mock(Obj).say(having(:a => 0, :b => is_a(Integer))){ 'boo' }
-      e = should.raise(Muack::Unexpected){ Obj.say(:b => 1) }
+      mock(Obj).say(having('a' => 0, 'b' => is_a(Integer))){ 'boo' }
+      e = should.raise(Muack::Unexpected){ Obj.say('b' => 1) }
       e.expected.should.eq \
-        'obj.say(Muack::API.having({:a=>0, :b=>Muack::API.is_a(Integer)}))'
-      e.was     .should.eq 'obj.say({:b=>1})'
+        'obj.say(Muack::API.having({"a" => 0, "b" => Muack::API.is_a(Integer)}))'
+      e.was     .should.eq 'obj.say({"b" => 1})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
@@ -288,8 +288,8 @@ describe Muack::Satisfying do
 
   describe Muack::Allowing do
     would 'have human readable to_s and inspect' do
-      matcher = allowing(:b => 2)
-      expected = 'Muack::API.allowing({:b=>2})'
+      matcher = allowing('b' => 2)
+      expected = 'Muack::API.allowing({"b" => 2})'
       matcher.to_s   .should.eq expected
       matcher.inspect.should.eq expected
     end
@@ -314,19 +314,19 @@ describe Muack::Satisfying do
     end
 
     would 'raise Unexpected error if passing unexpected argument' do
-      mock(Obj).say(allowing(:b => 2)){ 'boo' }
-      e = should.raise(Muack::Unexpected){ Obj.say(:a => 1) }
-      e.expected.should.eq 'obj.say(Muack::API.allowing({:b=>2}))'
-      e.was     .should.eq 'obj.say({:a=>1})'
+      mock(Obj).say(allowing('b' => 2)){ 'boo' }
+      e = should.raise(Muack::Unexpected){ Obj.say('a' => 1) }
+      e.expected.should.eq 'obj.say(Muack::API.allowing({"b" => 2}))'
+      e.was     .should.eq 'obj.say({"a" => 1})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
     would 'raise Unexpected error if passing unsatisfied argument' do
-      mock(Obj).say(allowing(:b => is_a(String))){ 'boo' }
-      e = should.raise(Muack::Unexpected){ Obj.say(:b => '1', :c => 2) }
+      mock(Obj).say(allowing('b' => is_a(String))){ 'boo' }
+      e = should.raise(Muack::Unexpected){ Obj.say('b' => '1', 'c' => 2) }
       e.expected.should.eq \
-        'obj.say(Muack::API.allowing({:b=>Muack::API.is_a(String)}))'
-      e.was     .should.eq 'obj.say({:b=>"1", :c=>2})'
+        'obj.say(Muack::API.allowing({"b" => Muack::API.is_a(String)}))'
+      e.was     .should.eq 'obj.say({"b" => "1", "c" => 2})'
       e.message .should.eq "\nExpected: #{e.expected}\n but was: #{e.was}"
     end
 
