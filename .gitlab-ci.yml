@@ -1,10 +1,9 @@
-
 stages:
   - test
 
 .test:
   stage: test
-  image: ruby:${RUBY_VERSION}-trixie
+  image: ruby:${RUBY_VERSION}-alpine
   variables:
     GIT_DEPTH: "1"
     GIT_SUBMODULE_STRATEGY: recursive
@@ -12,7 +11,7 @@ stages:
     RUBYOPT: --enable-frozen-string-literal
   before_script:
     - bundle install --retry=3
-    - unset CI # Coverage doesn't work well with frozen literal
+    - unset CI # Don't run coverage
   script:
     - ruby -vr bundler/setup -S rake test
 
